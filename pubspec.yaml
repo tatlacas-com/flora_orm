@@ -1,0 +1,21 @@
+name: tatlacas_sqflite_storage
+description: sqflite storage
+version: 0.0.1
+publish_to: none
+environment:
+  sdk: ">=2.12.0 <3.0.0"
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  sqflite: ^2.0.0+2
+  uuid: ^3.0.1
+  path_provider: ^2.0.1
+
+  tatlacas_sql_storage:
+    path: ../tatlacas_sql_storage
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
