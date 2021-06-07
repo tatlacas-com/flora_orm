@@ -4,10 +4,9 @@ import 'package:tatlacas_sql_storage/tatlacas_sql_storage.dart';
 
 import 'sqflite_db_context.dart';
 
-class SqfliteStorage<TEntity extends Entity,
-        TDbContext extends SqfliteDbContext>
-    extends SqlStorage<TEntity, TDbContext> {
-  const SqfliteStorage({required TDbContext dbContext})
+class SqfliteStorage<TEntity extends Entity>
+    extends SqlStorage<TEntity, SqfliteDbContext> {
+  const SqfliteStorage({required SqfliteDbContext dbContext})
       : super(dbContext: dbContext);
 
   Future<TEntity> insert(TEntity item) async {

@@ -3,7 +3,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:tatlacas_sql_storage/tatlacas_sql_storage.dart';
 
-abstract class SqfliteDbContext extends DbContext<Entity> {
+class SqfliteDbContext extends DbContext<Entity> {
   Database? _database;
 
   SqfliteDbContext({
