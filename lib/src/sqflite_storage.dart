@@ -9,11 +9,10 @@ class SqfliteStorage<TEntity extends Entity>
   const SqfliteStorage({required SqfliteDbContext dbContext})
       : super(dbContext: dbContext);
 
-  Future<TEntity> insert(TEntity item) async {
+  Future<int> insert(TEntity item) async {
     final db = await dbContext.database;
-    await db.insert(item.tableName, item.toJson(),
+    return await db.insert(item.tableName, item.toJson(),
         conflictAlgorithm: ConflictAlgorithm.abort);
-    return item;
   }
 
   Future insertList(List<TEntity> items) async {
@@ -28,11 +27,10 @@ class SqfliteStorage<TEntity extends Entity>
     });
   }
 
-  Future<TEntity> insertOrUpdate(TEntity item) async {
+  Future<int> insertOrUpdate(TEntity item) async {
     final db = await dbContext.database;
-    await db.insert(item.tableName, item.toJson(),
+    return await db.insert(item.tableName, item.toJson(),
         conflictAlgorithm: ConflictAlgorithm.replace);
-    return item;
   }
 
   Future<Map<String, dynamic>?> getEntity(
