@@ -4,7 +4,7 @@ import 'package:tatlacas_sql_storage/tatlacas_sql_storage.dart';
 
 import 'sqflite_db_context.dart';
 
-class SqfliteStorage<TEntity extends Entity>
+class SqfliteStorage<TEntity extends IEntity>
     extends SqlStorage<TEntity, SqfliteDbContext> {
   const SqfliteStorage({required SqfliteDbContext dbContext})
       : super(dbContext: dbContext);
@@ -35,14 +35,14 @@ class SqfliteStorage<TEntity extends Entity>
 
   Future<Map<String, dynamic>?> getEntity(
     TEntity type, {
-    List<SqlColumn>? columns,
+    Iterable<SqlColumn>? columns,
     List<SqlColumn>? orderBy,
     required SqlWhere where,
   }) async {
     List<Map<String, dynamic>> maps = await query(
         where: where,
         type: type,
-        columns: columns ?? type.columns,
+        columns: columns ?? type.allColumns,
         orderBy: orderBy);
     if (maps.length > 0) {
       return maps.first;
@@ -68,7 +68,7 @@ class SqfliteStorage<TEntity extends Entity>
 
   Future<T> getSumProduct<T>(
     TEntity type, {
-    required List<SqlColumn> columns,
+    required Iterable<SqlColumn> columns,
     SqlWhere? where,
   }) async {
     final cols = columns.map((e) => e.name).join(' * ');
@@ -85,7 +85,7 @@ class SqfliteStorage<TEntity extends Entity>
 
   Future<List<Map<String, dynamic>>> getEntities(
     TEntity type, {
-    List<SqlColumn>? columns,
+        Iterable<SqlColumn>? columns,
     List<SqlColumn>? orderBy,
     SqlWhere? where,
   }) async {
@@ -159,7 +159,7 @@ class SqfliteStorage<TEntity extends Entity>
   Future<List<Map<String, dynamic>>> query({
     SqlWhere? where,
     required TEntity type,
-    List<SqlColumn>? columns,
+    Iterable<SqlColumn>? columns,
     List<SqlColumn>? orderBy,
   }) async {
     List<Map<String, dynamic>> maps;

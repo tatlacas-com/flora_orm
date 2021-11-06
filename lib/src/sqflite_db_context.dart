@@ -3,13 +3,13 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:tatlacas_sql_storage/tatlacas_sql_storage.dart';
 
-class SqfliteDbContext extends DbContext<Entity> {
+class SqfliteDbContext extends DbContext<IEntity> {
   Database? _database;
 
   SqfliteDbContext({
     required String dbName,
     required int dbVersion,
-    required List<Entity> tables,
+    required List<IEntity> tables,
   }) : super(
           dbName: dbName,
           dbVersion: dbVersion,
