@@ -1,0 +1,15 @@
+enum SqlCondition {
+  EqualTo,
+  NotEqualTo,
+  LessThan,
+  GreaterThan,
+  LessThanOrEqual,
+  GreaterThanOrEqual,
+  Between,
+  Null,
+  NotNull,
+  In,
+  Like,
+  NotIn,
+  NotBetween,
+}

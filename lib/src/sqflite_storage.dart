@@ -1,5 +1,5 @@
 import 'package:tatlacas_sqflite_storage/src/base_storage.dart';
-import 'package:tatlacas_sql_storage/tatlacas_sql_storage.dart';
+import '../sql.dart';
 
 import 'sqflite_db_context.dart';
 

@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:sqflite_common/sqlite_api.dart';
-import 'package:tatlacas_sql_storage/tatlacas_sql_storage.dart';
+
+import '../sql.dart';
 
 
 abstract class BaseContext extends DbContext<IEntity> {

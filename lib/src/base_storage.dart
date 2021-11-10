@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:sqflite_common/sqlite_api.dart';
 import 'package:tatlacas_sqflite_storage/src/base_context.dart';
-import 'package:tatlacas_sql_storage/tatlacas_sql_storage.dart';
+import '../sql.dart';
 import 'package:uuid/uuid.dart';
 
 class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>

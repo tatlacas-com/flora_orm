@@ -1,4 +1,4 @@
-import 'package:tatlacas_sql_storage/tatlacas_sql_storage.dart';
+import '../sql.dart';
 
 import 'base_storage.dart';
 import 'sqflite_common_db_context.dart';

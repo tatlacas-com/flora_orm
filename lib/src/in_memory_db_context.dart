@@ -1,6 +1,6 @@
 import 'package:sqflite_common/sqlite_api.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:tatlacas_sql_storage/tatlacas_sql_storage.dart';
+import '../sql.dart';
 
 import 'base_context.dart';
 import 'open_options.dart';
