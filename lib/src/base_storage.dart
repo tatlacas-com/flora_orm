@@ -1,8 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:sqflite_common/sqlite_api.dart';
 import 'package:tatlacas_sqflite_storage/src/base_context.dart';
-import '../sql.dart';
 import 'package:uuid/uuid.dart';
+
+import '../sql.dart';
 
 class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     extends SqlStorage<TEntity, TDbContext> {
@@ -23,6 +24,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
 
   Future<TEntity?> insert(TEntity item) async {
     if (item.id == null) item = item.setBaseParams(id: Uuid().v4()) as TEntity;
+    item = item.updateDates() as TEntity;
     final db = await dbContext.database;
     final updated = await db.insert(item.tableName, item.toJson(),
         conflictAlgorithm: ConflictAlgorithm.abort);
@@ -32,21 +34,26 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   Future<List<TEntity>?> insertList(Iterable<TEntity> items) async {
     final db = await dbContext.database;
     List<TEntity>? result;
+    List<TEntity> updatedItems = <TEntity>[];
     await db.transaction((txn) async {
       var batch = txn.batch();
       items.forEach((element) {
         if (element.id == null)
           element = element.setBaseParams(id: Uuid().v4()) as TEntity;
+        element = element.updateDates() as TEntity;
         batch.insert(element.tableName, element.toJson(),
             conflictAlgorithm: ConflictAlgorithm.abort);
+        updatedItems.add(element);
       });
-      result = await _finishBatch(batch, items);
+      result = await _finishBatch(batch, updatedItems);
     });
     return result;
   }
 
   Future<TEntity?> insertOrUpdate(TEntity item) async {
     final db = await dbContext.database;
+    if (item.id == null) item = item.setBaseParams(id: Uuid().v4()) as TEntity;
+    item = item.updateDates() as TEntity;
     final updated = await db.insert(item.tableName, item.toJson(),
         conflictAlgorithm: ConflictAlgorithm.replace);
     return updated > 0 ? item : null;
@@ -122,13 +129,18 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   Future<List<TEntity>?> insertOrUpdateList(Iterable<TEntity> items) async {
     final db = await dbContext.database;
     List<TEntity>? result;
+    List<TEntity> updatedItems = <TEntity>[];
     await db.transaction((txn) async {
       var batch = txn.batch();
       items.forEach((element) {
+        if (element.id == null)
+          element = element.setBaseParams(id: Uuid().v4()) as TEntity;
+        element = element.updateDates() as TEntity;
+        updatedItems.add(element);
         batch.insert(element.tableName, element.toJson(),
             conflictAlgorithm: ConflictAlgorithm.replace);
       });
-      result = await _finishBatch(batch, items);
+      result = await _finishBatch(batch, updatedItems);
     });
     return result;
   }
@@ -182,6 +194,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   }) async {
     final db = await dbContext.database;
     final formattedQuery = whereString(where);
+    item = item.updateDates() as TEntity;
     final update = columnValues != null
         ? item.toStorageJson(columnValues: columnValues)
         : item.toJson();

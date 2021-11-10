@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 
@@ -14,7 +16,7 @@ abstract class IEntity {
     this.createdAt,
     this.updatedAt,
   });
-
+  IEntity updateDates();
   IEntity setBaseParams({
     String? id,
     DateTime? createdAt,
@@ -43,7 +45,6 @@ abstract class IEntity {
 
   Map<String, dynamic> toStorageJson(
       {required Map<SqlColumn, dynamic> columnValues});
-
 }
 
 abstract class Entity<TEntity extends IEntity> extends Equatable
@@ -57,6 +58,18 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
     this.createdAt,
     this.updatedAt,
   });
+
+  @override
+  List<Object?> get props => [
+        id,
+        createdAt,
+        updatedAt,
+      ];
+
+  String indentedString(json) {
+    var encoder = new JsonEncoder.withIndent("     ");
+    return encoder.convert(json);
+  }
 
   Iterable<SqlColumn<TEntity, dynamic>> get columns;
 
@@ -81,27 +94,33 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
   get columnCreatedAt => SqlColumn<TEntity, DateTime>(
         'createdAt',
         read: (entity) => entity.createdAt,
-        write: (entity, value) => entity.setBaseParams(createdAt: value) as TEntity,
+        write: (entity, value) =>
+            entity.setBaseParams(createdAt: value) as TEntity,
       );
 
   get columnUpdatedAt => SqlColumn<TEntity, DateTime>(
         'updatedAt',
         read: (entity) => entity.updatedAt,
-        write: (entity, value) => entity.setBaseParams(updatedAt: value) as TEntity,
+        write: (entity, value) =>
+            entity.setBaseParams(updatedAt: value) as TEntity,
       );
 
   List<SqlColumn<TEntity, dynamic>> get compositePrimaryKey =>
       <SqlColumn<TEntity, dynamic>>[];
 
+  TEntity updateDates() {
+    var createdAt = this.createdAt ?? DateTime.now().toUtc();
+    var updatedAt = DateTime.now().toUtc();
+    return setBaseParams(
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     Map<String, dynamic> map = {};
     allColumns.forEach((column) {
-      if (column.name == 'updatedAt' ||
-          column.name == 'createdAt' && column.read(this as TEntity) == null) {
-        column.setValue(map, DateTime.now().toUtc());
-      } else {
-        column.commitValue(this as TEntity, map);
-      }
+      column.commitValue(this as TEntity, map);
     });
     return map;
   }
@@ -110,7 +129,8 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
   TEntity load(Map<String, dynamic> json) {
     TEntity entity = this as TEntity;
     allColumns.forEach((column) {
-      entity = column.write(entity, column.getValueFrom(json));
+      final value = column.getValueFrom(json);
+      entity = column.write(entity, value);
     });
     return entity;
   }
