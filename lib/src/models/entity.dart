@@ -62,8 +62,6 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
   @override
   List<Object?> get props => [
         id,
-        createdAt,
-        updatedAt,
       ];
 
   String indentedString(json) {
