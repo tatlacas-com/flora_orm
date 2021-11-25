@@ -18,6 +18,19 @@ class SqfliteInMemoryDbContext extends BaseContext {
         );
 
 
+  SqfliteInMemoryDbContext copyWith({
+     String? dbName,
+     int? dbVersion,
+     List<IEntity>? tables,
+  }) {
+    return SqfliteInMemoryDbContext(
+      dbName: dbName ?? this.dbName,
+      dbVersion: dbVersion ?? this.dbVersion,
+      tables: tables ?? this.tables,
+    );
+  }
+
+
 
   @override
   Future<Database> open() async {

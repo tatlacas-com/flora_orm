@@ -130,6 +130,7 @@ abstract class SqlStorage<TEntity extends IEntity, TDbContext extends DbContext<
       case SqlCondition.EqualTo:
         return ' = ? ';
       case SqlCondition.NotEqualTo:
+        return ' <> ? ';
       case SqlCondition.Null:
         return ' IS NULL ';
       case SqlCondition.NotNull:

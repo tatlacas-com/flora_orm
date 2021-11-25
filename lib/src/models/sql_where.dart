@@ -11,12 +11,14 @@ class SqlWhere {
   SqlWhere(SqlColumn column,
       {SqlCondition condition = SqlCondition.EqualTo,
         dynamic value,
+        dynamic value2,
         bool lb = false,
         bool rb = false}) {
     this._addFilter(
       column,
       condition: condition,
       value: value,
+      value2: value2,
       lb: lb,
       rb: rb,
     );
@@ -26,6 +28,7 @@ class SqlWhere {
       SqlColumn column, {
         SqlCondition condition = SqlCondition.EqualTo,
         dynamic value,
+        dynamic value2,
         bool lb = false,
         bool rb = false,
         bool isBracketOnly = false,
@@ -36,6 +39,7 @@ class SqlWhere {
       column: column,
       condition: condition,
       value: value,
+      value2: value2,
       leftBracket: lb,
       rightBracket: rb,
       isBracketOnly: isBracketOnly,

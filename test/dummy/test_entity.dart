@@ -107,7 +107,7 @@ class TestEntity extends Entity<TestEntity> {
     if (newVersion == 2) {
       return [createTable(newVersion)];
     }
-    if (newVersion == 3) {
+    if (newVersion == 4) {
       return [alterTableAddColumn(columnTestUpgrade)];
     }
     return [];
