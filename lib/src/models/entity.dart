@@ -64,6 +64,10 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
         id,
       ];
 
+  @override
+  String toString() => indentedString({runtimeType.toString(): toJson()});
+
+
   String indentedString(json) {
     var encoder = new JsonEncoder.withIndent("     ");
     return encoder.convert(json);

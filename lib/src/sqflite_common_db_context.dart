@@ -2,12 +2,12 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_common/sqlite_api.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
 import '../sql.dart';
 import 'base_context.dart';
 import 'open_options.dart';
 
 class SqfliteCommonDbContext extends BaseContext {
-
   SqfliteCommonDbContext({
     required String dbName,
     required int dbVersion,
@@ -18,6 +18,17 @@ class SqfliteCommonDbContext extends BaseContext {
           tables: tables,
         );
 
+  SqfliteCommonDbContext copyWith({
+    String? dbName,
+    int? dbVersion,
+    List<IEntity>? tables,
+  }) {
+    return SqfliteCommonDbContext(
+      dbName: dbName ?? this.dbName,
+      dbVersion: dbVersion ?? this.dbVersion,
+      tables: tables ?? this.tables,
+    );
+  }
 
   Future<String> getDbPath() async {
     return (await getApplicationDocumentsDirectory()).path;

@@ -5,9 +5,9 @@ import '../sql.dart';
 import 'base_context.dart';
 import 'open_options.dart';
 
-class InMemoryDbContext extends BaseContext {
+class SqfliteInMemoryDbContext extends BaseContext {
 
-  InMemoryDbContext({
+  SqfliteInMemoryDbContext({
     required String dbName,
     required int dbVersion,
     required List<IEntity> tables,

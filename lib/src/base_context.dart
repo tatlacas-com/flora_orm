@@ -28,7 +28,10 @@ abstract class BaseContext extends DbContext<IEntity> {
   Future<Database> open();
 
   @override
-  Future close() async => _database?.close();
+  Future close() async{
+  await _database?.close();
+  _database = null;
+}
 
 
   @override

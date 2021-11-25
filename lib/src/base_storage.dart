@@ -4,6 +4,7 @@ import 'package:tatlacas_sqflite_storage/src/base_context.dart';
 import 'package:uuid/uuid.dart';
 
 import '../sql.dart';
+import 'models/sql_order.dart';
 
 class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     extends SqlStorage<TEntity, TDbContext> {
@@ -62,7 +63,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   Future<Map<String, dynamic>?> getEntity(
     TEntity type, {
     Iterable<SqlColumn>? columns,
-    List<SqlColumn>? orderBy,
+    List<SqlOrder>? orderBy,
     required SqlWhere where,
   }) async {
     List<Map<String, dynamic>> maps = await query(
@@ -112,7 +113,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   Future<List<Map<String, dynamic>>> getEntities(
     TEntity type, {
     Iterable<SqlColumn>? columns,
-    List<SqlColumn>? orderBy,
+    List<SqlOrder>? orderBy,
     SqlWhere? where,
   }) async {
     List<Map<String, Object?>> maps = await query(
@@ -206,12 +207,13 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     );
   }
 
+
   @protected
   Future<List<Map<String, dynamic>>> query({
     SqlWhere? where,
     required TEntity type,
     Iterable<SqlColumn>? columns,
-    List<SqlColumn>? orderBy,
+    List<SqlOrder>? orderBy,
   }) async {
     List<Map<String, dynamic>> maps;
     final db = await dbContext.database;
@@ -223,7 +225,10 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     });
     String? orderByFilter;
     if (orderBy?.isNotEmpty == true) {
-      orderByFilter = columns.map((e) => e.name).join(',');
+      orderByFilter = orderBy!
+          .map((e) =>
+              '${e.column.name} ${e.direction == OrderDirection.Desc ? ' DESC' : ''}')
+          .join(',');
     }
     if (where == null)
       maps = await db.query(
@@ -261,4 +266,5 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
 
   @override
   List<Object?> get props => [dbContext];
+
 }

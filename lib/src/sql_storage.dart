@@ -4,6 +4,7 @@ import 'db_context.dart';
 import 'models/entity.dart';
 
 import 'models/sql.dart';
+import 'models/sql_order.dart';
 
 abstract class SqlStorage<TEntity extends IEntity, TDbContext extends DbContext<IEntity>>
     extends Equatable {
@@ -23,7 +24,7 @@ abstract class SqlStorage<TEntity extends IEntity, TDbContext extends DbContext<
   Future<Map<String,dynamic>?> getEntity(
     TEntity type, {
     List<SqlColumn>? columns,
-    List<SqlColumn>? orderBy,
+    List<SqlOrder>? orderBy,
     required SqlWhere where,
   });
 
@@ -60,13 +61,13 @@ abstract class SqlStorage<TEntity extends IEntity, TDbContext extends DbContext<
     SqlWhere? where,
     required TEntity type,
     List<SqlColumn>? columns,
-    List<SqlColumn>? orderBy,
+    List<SqlOrder>? orderBy,
   });
 
   Future<List<Map<String,dynamic>>> getEntities(
     TEntity type, {
     List<SqlColumn>? columns,
-    List<SqlColumn>? orderBy,
+    List<SqlOrder>? orderBy,
     SqlWhere? where,
   });
 
@@ -113,7 +114,7 @@ abstract class SqlStorage<TEntity extends IEntity, TDbContext extends DbContext<
         whereArgs.add(element.value2);
       if (element.rightBracket) query.write(')');
     });
-    return  FormattedQuery(where: query.toString(),whereArgs: whereArgs);;
+    return  FormattedQuery(where: query.toString(),whereArgs: whereArgs);
   }
 
   dynamic _dbValue(dynamic value) {

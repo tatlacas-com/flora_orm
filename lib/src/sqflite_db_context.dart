@@ -30,14 +30,10 @@ class SqfliteDbContext extends BaseContext {
   @protected
   Future<Database> open() async {
     return openDatabase(
-      // Set the path to the database.
       await getDbFullName(),
-      // When the database is first created, create a table to store dogs.
       onCreate: onDbCreate,
       onUpgrade: onDbUpgrade,
       onDowngrade: onDbDowngrade,
-      // Set the version. This executes the onCreate function and provides a
-      // path to perform database upgrades and downgrades.
       version: dbVersion,
     );
   }
