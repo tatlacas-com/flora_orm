@@ -1,8 +1,9 @@
+import 'package:equatable/equatable.dart';
 
 import 'sql_column.dart';
 import 'sql_condition.dart';
 
-class SqlWhereCondition {
+class SqlWhereCondition extends Equatable {
   final SqlColumn? column;
   final SqlCondition condition;
   final dynamic value;
@@ -24,4 +25,17 @@ class SqlWhereCondition {
     this.and = false,
     this.or = false,
   });
+
+  @override
+  List<Object?> get props => [
+        column,
+        condition,
+        value,
+        value2,
+        leftBracket,
+        rightBracket,
+        isBracketOnly,
+        and,
+        or,
+      ];
 }
