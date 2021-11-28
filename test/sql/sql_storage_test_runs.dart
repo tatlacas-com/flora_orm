@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:meta/meta.dart';
 import 'package:tatlacas_sqflite_storage/sql.dart';
@@ -48,6 +50,43 @@ void run(BaseStorage storage) {
     expect(updated, entity);
   });
 
+  test('getEntity() with empty columns should throw ArgumentError', () async {
+    var entity = TestEntity(
+        testBool: true,
+        testDateTime: DateTime.now(),
+        testDouble: 1.0,
+        testInt: 11,
+        testString: 'Testing 123456');
+    var insertedEntity = await storage.insert(entity) as TestEntity?;
+    expect(insertedEntity, isNotNull);
+    var fxn = () async =>await storage.getEntity(
+      entity,
+      columns: [],
+      where: SqlWhere(
+        entity.columnId,
+        value: insertedEntity!.id,
+      )
+          .and(
+            entity.columnTestInt,
+            value: entity.testInt,
+          )
+          .and(
+            entity.columnTestBool,
+            value: entity.testBool,
+          )
+          .and(
+            entity.columnTestDouble,
+            value: entity.testDouble,
+          )
+          .and(
+            entity.columTestDateTime,
+            value: entity.testDateTime,
+          ),
+    );
+    expect(() async => await fxn(),
+        throwsA(const TypeMatcher<ArgumentError>()));
+  });
+
   test('getEntity() should return expected entity', () async {
     var entity = TestEntity(
         testBool: true,
@@ -84,6 +123,44 @@ void run(BaseStorage storage) {
     entity = TestEntity().load(json!);
     expect(insertedEntity, entity);
   });
+  test('getEntity() with columns should return expected entity values', () async {
+    var entity = TestEntity(
+        testBool: true,
+        testDateTime: DateTime.now(),
+        testDouble: 1.0,
+        testInt: 11,
+        testString: 'Testing 123456');
+    var insertedEntity = await storage.insert(entity) as TestEntity?;
+    expect(insertedEntity, isNotNull);
+    var json = await storage.getEntity(
+      entity,
+      columns: [entity.columnTestInt],
+      where: SqlWhere(
+        entity.columnId,
+        value: insertedEntity!.id,
+      )
+          .and(
+            entity.columnTestInt,
+            value: entity.testInt,
+          )
+          .and(
+            entity.columnTestBool,
+            value: entity.testBool,
+          )
+          .and(
+            entity.columnTestDouble,
+            value: entity.testDouble,
+          )
+          .and(
+            entity.columTestDateTime,
+            value: entity.testDateTime,
+          ),
+    );
+    expect(json, isNotNull);
+    entity = TestEntity().load(json!);
+    expect(entity.toString(), TestEntity(testInt: 11).toString());
+  });
+
   test('getEntity(NotEqualTo) should return expected entity', () async {
     var entity = TestEntity(
         testBool: true,
@@ -111,6 +188,7 @@ void run(BaseStorage storage) {
     entity = TestEntity().load(json!);
     expect(insertedEntity, entity);
   });
+
   test('getEntity(Null) should return expected entity', () async {
     var entity = TestEntity(
         testBool: true,
@@ -164,11 +242,11 @@ void run(BaseStorage storage) {
     expect(insertedEntity, entity);
   });
 
-  test('getEntity(Between) should return expected entity', () async {
+  test('getEntity(LessThan) should return expected entity', () async {
     var entity = TestEntity(
         testBool: true,
         testDateTime: DateTime.now(),
-        testInt: 1001,
+        testInt: -15,
         testString: 'Testing 123456');
     var insertedEntity = await storage.insert(entity) as TestEntity?;
     expect(insertedEntity, isNotNull);
@@ -182,9 +260,8 @@ void run(BaseStorage storage) {
       ],
       where: SqlWhere(
         entity.columnTestInt,
-        condition: SqlCondition.Between,
-        value: 1000,
-        value2: 1002,
+        condition: SqlCondition.LessThan,
+        value: -14,
       ),
     );
     expect(json, isNotNull);
@@ -192,33 +269,6 @@ void run(BaseStorage storage) {
     expect(insertedEntity, entity);
   });
 
-  test('getEntity(NotBetween) should return expected entity', () async {
-    var entity = TestEntity(
-        testBool: true,
-        testDateTime: DateTime.now(),
-        testInt: 2020,
-        testString: 'Testing 123456');
-    var insertedEntity = await storage.insert(entity) as TestEntity?;
-    expect(insertedEntity, isNotNull);
-    var json = await storage.getEntity(
-      entity,
-      orderBy: [
-        SqlOrder(
-          column: entity.columnCreatedAt,
-          direction: OrderDirection.Desc,
-        )
-      ],
-      where: SqlWhere(
-        entity.columnTestInt,
-        condition: SqlCondition.NotBetween,
-        value: -500,
-        value2: 2019,
-      ),
-    );
-    expect(json, isNotNull);
-    entity = TestEntity().load(json!);
-    expect(insertedEntity, entity);
-  });
   test('getEntity(GreaterThan) should return expected entity', () async {
     var entity = TestEntity(
         testBool: true,
@@ -300,11 +350,11 @@ void run(BaseStorage storage) {
     expect(insertedEntity, entity);
   });
 
-  test('getEntity(LessThan) should return expected entity', () async {
+  test('getEntity(Between) should return expected entity', () async {
     var entity = TestEntity(
         testBool: true,
         testDateTime: DateTime.now(),
-        testInt: -15,
+        testInt: 1001,
         testString: 'Testing 123456');
     var insertedEntity = await storage.insert(entity) as TestEntity?;
     expect(insertedEntity, isNotNull);
@@ -318,9 +368,190 @@ void run(BaseStorage storage) {
       ],
       where: SqlWhere(
         entity.columnTestInt,
-        condition: SqlCondition.LessThan,
-        value: -14,
+        condition: SqlCondition.Between,
+        value: 1000,
+        value2: 1002,
       ),
+    );
+    expect(json, isNotNull);
+    entity = TestEntity().load(json!);
+    expect(insertedEntity, entity);
+  });
+
+  test('getEntity(NotBetween) should return expected entity', () async {
+    var entity = TestEntity(
+        testBool: true,
+        testDateTime: DateTime.now(),
+        testInt: 2020,
+        testString: 'Testing 123456');
+    var insertedEntity = await storage.insert(entity) as TestEntity?;
+    expect(insertedEntity, isNotNull);
+    var json = await storage.getEntity(
+      entity,
+      orderBy: [
+        SqlOrder(
+          column: entity.columnCreatedAt,
+          direction: OrderDirection.Desc,
+        )
+      ],
+      where: SqlWhere(
+        entity.columnTestInt,
+        condition: SqlCondition.NotBetween,
+        value: -500,
+        value2: 2019,
+      ),
+    );
+    expect(json, isNotNull);
+    entity = TestEntity().load(json!);
+    expect(insertedEntity, entity);
+  });
+
+  test('getEntity(In) should return expected entity', () async {
+    var entity = TestEntity(
+        testBool: true,
+        testDateTime: DateTime.now(),
+        testInt: 11001,
+        testString: 'Testing 123456');
+    var insertedEntity = await storage.insert(entity) as TestEntity?;
+    expect(insertedEntity, isNotNull);
+    var json = await storage.getEntity(
+      entity,
+      orderBy: [
+        SqlOrder(
+          column: entity.columnCreatedAt,
+          direction: OrderDirection.Desc,
+        )
+      ],
+      where: SqlWhere(
+        entity.columnTestInt,
+        condition: SqlCondition.In,
+        value: [11001],
+      ),
+    );
+    expect(json, isNotNull);
+    entity = TestEntity().load(json!);
+    expect(insertedEntity, entity);
+  });
+
+  test('getEntity(NotIn) should return expected entity', () async {
+    var entity = TestEntity(
+        testBool: true,
+        testDateTime: DateTime.now(),
+        testInt: 11002,
+        testString: 'Testing 123456');
+    var insertedEntity = await storage.insert(entity) as TestEntity?;
+    expect(insertedEntity, isNotNull);
+    var json = await storage.getEntity(
+      entity,
+      orderBy: [
+        SqlOrder(
+          column: entity.columnCreatedAt,
+          direction: OrderDirection.Desc,
+        )
+      ],
+      where: SqlWhere(
+        entity.columnTestInt,
+        condition: SqlCondition.NotIn,
+        value: [11001, 11005],
+      ),
+    );
+    expect(json, isNotNull);
+    entity = TestEntity().load(json!);
+    expect(insertedEntity, entity);
+  });
+
+  test('getEntity(Like) should return expected entity', () async {
+    var entity = TestEntity(
+        testBool: true,
+        testDateTime: DateTime.now(),
+        testInt: 11002,
+        testString: 'Likeable');
+    var insertedEntity = await storage.insert(entity) as TestEntity?;
+    expect(insertedEntity, isNotNull);
+    var json = await storage.getEntity(
+      entity,
+      orderBy: [
+        SqlOrder(
+          column: entity.columnCreatedAt,
+          direction: OrderDirection.Desc,
+        )
+      ],
+      where: SqlWhere(
+        entity.columnTestString,
+        condition: SqlCondition.Like,
+        value: '%Like%',
+      ),
+    );
+    expect(json, isNotNull);
+    entity = TestEntity().load(json!);
+    expect(insertedEntity, entity);
+  });
+
+  test('getEntity(NotLike) should return expected entity', () async {
+    var entity = TestEntity(
+        testBool: true,
+        testDateTime: DateTime.now(),
+        testInt: 11002,
+        testString: 'Loveable');
+    var insertedEntity = await storage.insert(entity) as TestEntity?;
+    expect(insertedEntity, isNotNull);
+    var json = await storage.getEntity(
+      entity,
+      orderBy: [
+        SqlOrder(
+          column: entity.columnCreatedAt,
+          direction: OrderDirection.Desc,
+        )
+      ],
+      where: SqlWhere(
+        entity.columnTestString,
+        condition: SqlCondition.NotLike,
+        value: '%Dummy%',
+      ),
+    );
+    expect(json, isNotNull);
+    entity = TestEntity().load(json!);
+    expect(insertedEntity, entity);
+  });
+
+  test('getEntity() with complex query should return expected entity',
+      () async {
+    var entity = TestEntity(
+        testBool: true,
+        testDateTime: DateTime.now(),
+        testInt: 11002,
+        testString: 'Loveable');
+    var insertedEntity = await storage.insert(entity) as TestEntity?;
+    expect(insertedEntity, isNotNull);
+    var json = await storage.getEntity(
+      entity,
+      orderBy: [
+        SqlOrder(
+          column: entity.columnCreatedAt,
+          direction: OrderDirection.Desc,
+        )
+      ],
+      where: SqlWhere.lb()
+          .query(
+            entity.columnTestString,
+            condition: SqlCondition.Like,
+            value: '%Dummy%',
+          )
+          .and(
+            entity.columnTestInt,
+            value: 10,
+          )
+          .rb()
+          .or(
+            entity.columnTestString,
+            value: 'Loveable',
+            lb: true,
+          )
+          .and(
+            entity.columnTestInt,
+            value: 11002,
+            rb: true,
+          ),
     );
     expect(json, isNotNull);
     entity = TestEntity().load(json!);
@@ -506,7 +737,31 @@ void run(BaseStorage storage) {
     expect(entity, insertedEntity);
   });
 
-  test('insertOrUpdateList() should insert or update entities', () async {
+  test('insertOrUpdateList() should insert entities', () async {
+    var entity = TestEntity(
+        testBool: true,
+        testDateTime: DateTime.now(),
+        testDouble: 1.0,
+        testInt: 11,
+        testString: 'Testing a');
+    var entity1 = TestEntity(
+        testBool: true,
+        testDateTime: DateTime.now(),
+        testDouble: 1.0,
+        testInt: 12,
+        testString: 'Testing b');
+    var insertedEntity = await storage.insertOrUpdateList([entity, entity1]);
+    expect(insertedEntity, isNotNull);
+    expect(insertedEntity!.length, 2);
+    var a = entity.copyWith(id: insertedEntity[0].id);
+    var b = entity1.copyWith(id: insertedEntity[1].id);
+    expect(insertedEntity, [
+      a,
+      b,
+    ]);
+  });
+
+  test('insertOrUpdateList() should update entities', () async {
     var entity = TestEntity(
         testBool: true,
         testDateTime: DateTime.now(),
@@ -612,7 +867,7 @@ void run(BaseStorage storage) {
         testString: 'Testing b');
     var insertedEntity1 = await storage.insert(entity1) as TestEntity?;
     expect(insertedEntity1, isNotNull);
-    var json = await storage.getSum<int>(
+    var sum = await storage.getSum<int>(
       entity,
       column: entity.columnTestInt,
       where: SqlWhere(
@@ -623,8 +878,14 @@ void run(BaseStorage storage) {
         value: insertedEntity1!.id,
       ),
     );
-    expect(json, 18);
+    expect(sum, 18);
+    sum = await storage.getSum<int>(
+      entity,
+      column: entity.columnTestInt,
+    );
+    expect(sum, greaterThan(0));
   });
+
   test('getSumProduct<double>() should return expected sumProduct', () async {
     var entity = TestEntity(
         testBool: true,
@@ -688,5 +949,9 @@ void run(BaseStorage storage) {
       ),
     );
     expect(json, 3.4);
+  });
+
+  test('parseInt should return expected int',(){
+    expect(storage.parseInt('1'), 1);
   });
 }

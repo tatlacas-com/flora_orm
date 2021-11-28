@@ -139,22 +139,22 @@ abstract class SqlStorage<TEntity extends IEntity, TDbContext extends DbContext<
         return ' < ? ';
       case SqlCondition.GreaterThan:
         return ' > ? ';
-      case SqlCondition.LessThanOrEqual:
-        return ' <= ? ';
       case SqlCondition.GreaterThanOrEqual:
         return ' >= ? ';
+      case SqlCondition.LessThanOrEqual:
+        return ' <= ? ';
       case SqlCondition.Between:
         return ' BETWEEN ? AND ? ';
-      case SqlCondition.In:
-        return ' IN ';
-      case SqlCondition.Like:
-        return ' LIKE ? ';
-      case SqlCondition.NotIn:
-        return ' NOT IN ';
       case SqlCondition.NotBetween:
         return ' NOT BETWEEN ? AND ? ';
-      default:
-        throw ArgumentError('unsupported condition');
+      case SqlCondition.In:
+        return ' IN ';
+      case SqlCondition.NotIn:
+        return ' NOT IN ';
+      case SqlCondition.Like:
+        return ' LIKE ? ';
+      case SqlCondition.NotLike:
+        return ' NOT LIKE ? ';
     }
   }
 }

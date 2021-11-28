@@ -5,6 +5,7 @@ class TestEntity extends Entity<TestEntity> {
   final String? testUpgrade;
   final DateTime? testDateTime;
   final int? testInt;
+  final int? testIntWithDefault;
   final bool? testBool;
   final double? testDouble;
 
@@ -32,6 +33,13 @@ class TestEntity extends Entity<TestEntity> {
         write: (entity, value) => entity.copyWith(testInt: value),
       );
 
+  get columnTestIntWithDefault => SqlColumn<TestEntity, int>(
+        'testIntWithDefault',
+        read: (entity) => entity.testIntWithDefault,
+        defaultValue: 100,
+        write: (entity, value) => entity.copyWith(testIntWithDefault: value),
+      );
+
   get columnTestBool => SqlColumn<TestEntity, bool>(
         'testBool',
         read: (entity) => entity.testBool,
@@ -52,6 +60,7 @@ class TestEntity extends Entity<TestEntity> {
     this.testUpgrade,
     this.testDateTime,
     this.testInt,
+    this.testIntWithDefault,
     this.testBool,
     this.testDouble,
   }) : super(id: id, createdAt: createdAt, updatedAt: updatedAt);
@@ -64,6 +73,7 @@ class TestEntity extends Entity<TestEntity> {
     String? testUpgrade,
     DateTime? testDateTime,
     int? testInt,
+    int? testIntWithDefault,
     bool? testBool,
     double? testDouble,
   }) {
@@ -75,6 +85,7 @@ class TestEntity extends Entity<TestEntity> {
       testUpgrade: testUpgrade ?? this.testUpgrade,
       testDateTime: testDateTime ?? this.testDateTime,
       testInt: testInt ?? this.testInt,
+      testIntWithDefault: testIntWithDefault ?? this.testIntWithDefault,
       testBool: testBool ?? this.testBool,
       testDouble: testDouble ?? this.testDouble,
     );
@@ -86,6 +97,7 @@ class TestEntity extends Entity<TestEntity> {
         columnTestDouble,
         columTestDateTime,
         columnTestBool,
+        columnTestIntWithDefault,
         columnTestInt,
       ];
 
@@ -105,10 +117,13 @@ class TestEntity extends Entity<TestEntity> {
   @override
   List<String> upgradeTable(int oldVersion, int newVersion) {
     if (newVersion == 2) {
-      return [createTable(newVersion)];
+      return [
+        dropTable(),
+        createTable(newVersion),
+      ];
     }
     if (newVersion == 4) {
-      return [alterTableAddColumn(columnTestUpgrade)];
+      return [addColumn(columnTestUpgrade)];
     }
     return [];
   }
@@ -119,6 +134,8 @@ class TestEntity extends Entity<TestEntity> {
         testDateTime,
         testInt,
         testBool,
+        testUpgrade,
+        testIntWithDefault,
         testDouble,
       ]).toList();
 }

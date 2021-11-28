@@ -10,6 +10,7 @@ enum SqlCondition {
   NotNull,
   In,
   Like,
+  NotLike,
   NotIn,
   NotBetween,
 }

@@ -24,6 +24,14 @@ class SqlWhere {
     );
   }
 
+  SqlWhere._();
+
+  factory SqlWhere.lb() {
+    final sqlWhere = SqlWhere._();
+    sqlWhere._filters.add(SqlWhereCondition(leftBracket: true, isBracketOnly: true));
+    return sqlWhere;
+  }
+
   void _addFilter(
       SqlColumn column, {
         SqlCondition condition = SqlCondition.EqualTo,
@@ -70,6 +78,21 @@ class SqlWhere {
       lb: lb,
       rb: rb,
       and: true,
+    );
+    return this;
+  }
+
+  SqlWhere query(SqlColumn column,
+      {SqlCondition condition = SqlCondition.EqualTo,
+        dynamic value,
+        bool lb = false,
+        bool rb = false}) {
+    this._addFilter(
+      column,
+      condition: condition,
+      value: value,
+      lb: lb,
+      rb: rb,
     );
     return this;
   }

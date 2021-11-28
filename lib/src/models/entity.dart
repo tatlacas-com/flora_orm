@@ -161,9 +161,13 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
       composite = ',\n PRIMARY KEY ($keys)';
     }
     return '''
-  CREATE TABLE $tableName (
+  CREATE TABLE IF NOT EXISTS $tableName (
   ${stringBuffer.toString()}$composite)
   ''';
+  }
+
+  String dropTable(){
+    return 'DROP TABLE IF EXISTS $tableName';
   }
 
   Map<String, dynamic> toStorageJson(
@@ -176,7 +180,7 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
   }
 
   @protected
-  String alterTableAddColumn(SqlColumn column) {
+  String addColumn(SqlColumn column) {
     var str = StringBuffer();
     columnDefinition(column, str);
     return 'ALTER TABLE $tableName ADD ${column.name} ${getColumnType(column.columnType)}${str.toString()}';
