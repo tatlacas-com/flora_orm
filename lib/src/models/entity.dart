@@ -86,21 +86,21 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
     DateTime? updatedAt,
   });
 
-  get columnId => SqlColumn<TEntity, String>(
+  SqlColumn<TEntity, String> get columnId => SqlColumn<TEntity, String>(
         'id',
         primaryKey: true,
         read: (entity) => entity.id,
         write: (entity, value) => entity.setBaseParams(id: value) as TEntity,
       );
 
-  get columnCreatedAt => SqlColumn<TEntity, DateTime>(
+  SqlColumn<TEntity, DateTime> get columnCreatedAt => SqlColumn<TEntity, DateTime>(
         'createdAt',
         read: (entity) => entity.createdAt,
         write: (entity, value) =>
             entity.setBaseParams(createdAt: value) as TEntity,
       );
 
-  get columnUpdatedAt => SqlColumn<TEntity, DateTime>(
+  SqlColumn<TEntity, DateTime> get columnUpdatedAt => SqlColumn<TEntity, DateTime>(
         'updatedAt',
         read: (entity) => entity.updatedAt,
         write: (entity, value) =>
@@ -166,7 +166,7 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
   ''';
   }
 
-  String dropTable(){
+  String dropTable(String tableName){
     return 'DROP TABLE IF EXISTS $tableName';
   }
 
@@ -184,6 +184,12 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
     var str = StringBuffer();
     columnDefinition(column, str);
     return 'ALTER TABLE $tableName ADD ${column.name} ${getColumnType(column.columnType)}${str.toString()}';
+  }
+
+
+  @protected
+  String dropColumn(String name) {
+    return 'ALTER TABLE $tableName DROP $name';
   }
 
   @protected

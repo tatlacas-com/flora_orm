@@ -118,7 +118,7 @@ class TestEntity extends Entity<TestEntity> {
   List<String> upgradeTable(int oldVersion, int newVersion) {
     if (newVersion == 2) {
       return [
-        dropTable(),
+        dropTable(tableName),
         createTable(newVersion),
       ];
     }
