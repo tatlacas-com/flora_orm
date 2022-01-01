@@ -25,6 +25,12 @@ abstract class IEntity {
 
   String get tableName;
 
+  SqlColumn<IEntity, String> get columnId;
+
+  SqlColumn<IEntity, DateTime> get columnCreatedAt;
+
+  SqlColumn<IEntity, DateTime> get columnUpdatedAt;
+
   Iterable<SqlColumn> get columns;
 
   Iterable<SqlColumn> get allColumns;
@@ -45,6 +51,8 @@ abstract class IEntity {
 
   Map<String, dynamic> toStorageJson(
       {required Map<SqlColumn, dynamic> columnValues});
+
+  IEntity load(Map<String, dynamic> json);
 }
 
 abstract class Entity<TEntity extends IEntity> extends Equatable

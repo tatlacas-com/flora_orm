@@ -65,11 +65,14 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     Iterable<SqlColumn>? columns,
     List<SqlOrder>? orderBy,
     required SqlWhere where,
+    int? offset,
   }) async {
     List<Map<String, dynamic>> maps = await query(
         where: where,
         type: type,
         columns: columns ?? type.allColumns,
+        limit: 1,
+        offset: offset,
         orderBy: orderBy);
     if (maps.length > 0) {
       return maps.first;
@@ -115,10 +118,14 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     Iterable<SqlColumn>? columns,
     List<SqlOrder>? orderBy,
     SqlWhere? where,
+    int? limit,
+    int? offset,
   }) async {
     List<Map<String, Object?>> maps = await query(
         where: where,
         type: type,
+        limit: limit,
+        offset: offset,
         columns: columns ?? type.allColumns,
         orderBy: orderBy);
     if (maps.isNotEmpty) {
@@ -160,7 +167,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     return inserted;
   }
 
-  Future<int?> getCount(
+  Future<int> getCount(
     TEntity type, {
     SqlWhere? where,
   }) async {
@@ -169,7 +176,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     if (result.isNotEmpty) {
       final firstRow = result.first;
       if (firstRow.isNotEmpty) {
-        return parseInt(firstRow.values.first);
+        return parseInt(firstRow.values.first) ?? 0;
       }
     }
     return 0;
@@ -207,13 +214,14 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     );
   }
 
-
   @protected
   Future<List<Map<String, dynamic>>> query({
     SqlWhere? where,
     required TEntity type,
     Iterable<SqlColumn>? columns,
     List<SqlOrder>? orderBy,
+    int? limit,
+    int? offset,
   }) async {
     List<Map<String, dynamic>> maps;
     final db = await dbContext.database;
@@ -235,6 +243,8 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
         type.tableName,
         columns: cols,
         orderBy: orderByFilter,
+        limit: limit,
+        offset: offset,
       );
     else {
       final formattedQuery = whereString(where);
@@ -243,7 +253,8 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
         columns: cols,
         where: formattedQuery.where,
         whereArgs: formattedQuery.whereArgs,
-        orderBy: orderByFilter,
+        orderBy: orderByFilter, limit: limit,
+        offset: offset,
       );
     }
     return maps;
@@ -266,5 +277,4 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
 
   @override
   List<Object?> get props => [dbContext];
-
 }

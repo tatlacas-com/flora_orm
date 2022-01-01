@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:sqflite_common/sqlite_api.dart';
 
 import '../sql.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 
 
 abstract class BaseContext extends DbContext<IEntity> {
@@ -28,10 +29,10 @@ abstract class BaseContext extends DbContext<IEntity> {
   Future<Database> open();
 
   @override
-  Future close() async{
-  await _database?.close();
-  _database = null;
-}
+  Future close() async {
+    await _database?.close();
+    _database = null;
+  }
 
 
   @override
@@ -44,7 +45,8 @@ abstract class BaseContext extends DbContext<IEntity> {
     throw UnimplementedError();
   }
 
-  FutureOr<void> onDbDowngrade(db, oldVersion, newVersion) async {
+  FutureOr<void> onDbDowngrade(Database db, int oldVersion,
+      int newVersion) async {
     // Run the CREATE TABLE statement on the database.
     await db.transaction((txn) async {
       var batch = txn.batch();
@@ -56,7 +58,10 @@ abstract class BaseContext extends DbContext<IEntity> {
           });
         }
       });
-      batch.commit(noResult: true);
+      var result = await batch.commit(noResult: true);
+      if (kDebugMode) print(
+          '***Database downgraded from $oldVersion to $newVersion');
+      _logBatchResult('onDbDowngrade', result);
     });
     await db.transaction((txn) async {
       var batch = txn.batch();
@@ -68,39 +73,70 @@ abstract class BaseContext extends DbContext<IEntity> {
           });
         }
       });
-      batch.commit(noResult: true);
+      var result = await batch.commit(noResult: true);
+      _logBatchResult('After onDbDowngrade', result);
     });
   }
 
-  FutureOr<void> onDbUpgrade(db, oldVersion, newVersion) async {
+  FutureOr<void> onDbUpgrade(Database db, int oldVersion,
+      int newVersion) async {
     // Run the CREATE TABLE statement on the database.
     await db.transaction((txn) async {
       var batch = txn.batch();
+      var upgradeQueriesFound = false;
       tables.forEach((element) {
         final queries = element.upgradeTable(oldVersion, newVersion);
         if (queries.isNotEmpty == true) {
+          upgradeQueriesFound = true;
           queries.forEach((query) {
             batch.execute(query);
           });
         }
       });
-      batch.commit(noResult: true);
+      if(!upgradeQueriesFound && kDebugMode){
+        throw ArgumentError('No Upgrade queries found. If you added new entities, make sure they are are added in EntitiesDbConfig.tables');
+      }
+        var result = await batch.commit();
+        if (kDebugMode) {
+          print('***Database upgraded from $oldVersion to $newVersion');
+          _logBatchResult('onDbUpgrade', result);
+        }
     });
     await db.transaction((txn) async {
       var batch = txn.batch();
+      var upgradeQueriesFound = false;
       tables.forEach((element) async {
         final queries = element.onUpgradeComplete(oldVersion, newVersion);
         if (queries.isNotEmpty == true) {
+          upgradeQueriesFound = true;
           queries.forEach((query) {
             batch.execute(query);
           });
+        }else{
+
         }
       });
-      batch.commit(noResult: true);
+
+      if(!upgradeQueriesFound && kDebugMode){
+        throw ArgumentError('No Upgrade queries found. If you added new entities, make sure they are are added in EntitiesDbConfig.tables');
+      }
+      var result = await batch.commit();
+      _logBatchResult('After onDbUpgrade', result);
     });
   }
 
-  FutureOr<void> onDbCreate(db, version) async {
+  void _logBatchResult(String what, List<Object?> res) {
+    if (!kDebugMode) return;
+    if (res.isNotEmpty) {
+      print('#################### $what ###############');
+      res.forEach((element) {
+        print(element);
+      });
+      print('#################### $what END ###############');
+    }
+  }
+
+  FutureOr<void> onDbCreate(Database db, int version) async {
     // Run the CREATE TABLE statement on the database.
     await db.transaction((txn) async {
       var batch = txn.batch();
@@ -108,7 +144,10 @@ abstract class BaseContext extends DbContext<IEntity> {
         final query = element.createTable(version);
         batch.execute(query);
       });
-      batch.commit(noResult: true);
+      var result = await batch.commit();
+      if (kDebugMode) print(
+          '***Database tables created with version from $version');
+      _logBatchResult('onDbCreate', result);
     });
     await db.transaction((txn) async {
       var batch = txn.batch();
@@ -120,7 +159,8 @@ abstract class BaseContext extends DbContext<IEntity> {
           });
         }
       });
-      batch.commit(noResult: true);
+      var result = await batch.commit();
+      _logBatchResult('After onDbCreate', result);
     });
   }
 }

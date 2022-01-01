@@ -1,17 +1,16 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
+
 import 'db_context.dart';
 import 'models/entity.dart';
-
 import 'models/sql.dart';
 import 'models/sql_order.dart';
 
-abstract class SqlStorage<TEntity extends IEntity, TDbContext extends DbContext<IEntity>>
-    extends Equatable {
+abstract class SqlStorage<TEntity extends IEntity,
+    TDbContext extends DbContext<IEntity>> extends Equatable {
   final TDbContext dbContext;
 
   const SqlStorage({required this.dbContext});
-
 
   Future<TEntity?> insert(TEntity item);
 
@@ -21,11 +20,12 @@ abstract class SqlStorage<TEntity extends IEntity, TDbContext extends DbContext<
 
   Future<List<TEntity>?> insertOrUpdateList(Iterable<TEntity> items);
 
-  Future<Map<String,dynamic>?> getEntity(
+  Future<Map<String, dynamic>?> getEntity(
     TEntity type, {
     List<SqlColumn>? columns,
     List<SqlOrder>? orderBy,
     required SqlWhere where,
+    int? offset,
   });
 
   Future<T> getSum<T>(
@@ -40,7 +40,7 @@ abstract class SqlStorage<TEntity extends IEntity, TDbContext extends DbContext<
     SqlWhere? where,
   });
 
-  Future<int?> getCount(
+  Future<int> getCount(
     TEntity type, {
     SqlWhere? where,
   });
@@ -62,16 +62,16 @@ abstract class SqlStorage<TEntity extends IEntity, TDbContext extends DbContext<
     required TEntity type,
     List<SqlColumn>? columns,
     List<SqlOrder>? orderBy,
+    int? limit,
+    int? offset,
   });
 
-  Future<List<Map<String,dynamic>>> getEntities(
+  Future<List<Map<String, dynamic>>> getEntities(
     TEntity type, {
     List<SqlColumn>? columns,
     List<SqlOrder>? orderBy,
     SqlWhere? where,
   });
-
-
 
   @protected
   Future<List<Map<String, Object?>>> rawQuery(
@@ -114,7 +114,7 @@ abstract class SqlStorage<TEntity extends IEntity, TDbContext extends DbContext<
         whereArgs.add(element.value2);
       if (element.rightBracket) query.write(')');
     });
-    return  FormattedQuery(where: query.toString(),whereArgs: whereArgs);
+    return FormattedQuery(where: query.toString(), whereArgs: whereArgs);
   }
 
   dynamic _dbValue(dynamic value) {
