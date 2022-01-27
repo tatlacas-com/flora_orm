@@ -89,7 +89,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
         where, 'SELECT SUM (${column.name}) FROM ${type.tableName}');
     if (result.isNotEmpty) {
       final firstRow = result.first;
-      if (firstRow.isNotEmpty) {
+      if (firstRow.isNotEmpty && firstRow.values.first != null) {
         return firstRow.values.first as T;
       }
     }
@@ -106,7 +106,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
         await rawQuery(where, 'SELECT SUM ($cols) FROM ${type.tableName}');
     if (result.isNotEmpty) {
       final firstRow = result.first;
-      if (firstRow.isNotEmpty) {
+      if (firstRow.isNotEmpty && firstRow.values.first != null) {
         return firstRow.values.first as T;
       }
     }
