@@ -90,10 +90,10 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     if (result.isNotEmpty) {
       final firstRow = result.first;
       if (firstRow.isNotEmpty && firstRow.values.first != null) {
-        return firstRow.values.first as T;
+        return  asCast<T>(firstRow.values.first);
       }
     }
-    return 0 as T;
+    return asCast<T>(0);
   }
 
   Future<T> getSumProduct<T>(
@@ -107,11 +107,22 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     if (result.isNotEmpty) {
       final firstRow = result.first;
       if (firstRow.isNotEmpty && firstRow.values.first != null) {
-        return firstRow.values.first as T;
+        return asCast<T>(firstRow.values.first);
       }
     }
-    return 0 as T;
+    return asCast<T>(0);
   }
+
+  T asCast<T>(dynamic value){
+    if(T == int && value is double){
+        return value.toInt() as T;
+    }else if(T == double && value is int){
+        return value.toDouble() as T;
+    }
+    return value as T;
+  }
+
+
 
   Future<List<Map<String, dynamic>>> getEntities(
     TEntity type, {
