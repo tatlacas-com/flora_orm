@@ -16,7 +16,9 @@ abstract class IEntity {
     this.createdAt,
     this.updatedAt,
   });
+
   IEntity updateDates();
+
   IEntity setBaseParams({
     String? id,
     DateTime? createdAt,
@@ -75,7 +77,6 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
   @override
   String toString() => indentedString({runtimeType.toString(): toJson()});
 
-
   String indentedString(json) {
     var encoder = new JsonEncoder.withIndent("     ");
     return encoder.convert(json);
@@ -101,14 +102,16 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
         write: (entity, value) => entity.setBaseParams(id: value) as TEntity,
       );
 
-  SqlColumn<TEntity, DateTime> get columnCreatedAt => SqlColumn<TEntity, DateTime>(
+  SqlColumn<TEntity, DateTime> get columnCreatedAt =>
+      SqlColumn<TEntity, DateTime>(
         'createdAt',
         read: (entity) => entity.createdAt,
         write: (entity, value) =>
             entity.setBaseParams(createdAt: value) as TEntity,
       );
 
-  SqlColumn<TEntity, DateTime> get columnUpdatedAt => SqlColumn<TEntity, DateTime>(
+  SqlColumn<TEntity, DateTime> get columnUpdatedAt =>
+      SqlColumn<TEntity, DateTime>(
         'updatedAt',
         read: (entity) => entity.updatedAt,
         write: (entity, value) =>
@@ -139,8 +142,12 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
   TEntity load(Map<String, dynamic> json) {
     TEntity entity = this as TEntity;
     allColumns.forEach((column) {
-      final value = column.getValueFrom(json);
-      entity = column.write(entity, value);
+      try {
+        final value = column.getValueFrom(json);
+        entity = column.write(entity, value);
+      } catch (e) {
+        throw ArgumentError('Error loading ${column.name}: $e');
+      }
     });
     return entity;
   }
@@ -174,7 +181,7 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
   ''';
   }
 
-  String dropTable(String tableName){
+  String dropTable(String tableName) {
     return 'DROP TABLE IF EXISTS $tableName';
   }
 
@@ -193,7 +200,6 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
     columnDefinition(column, str);
     return 'ALTER TABLE $tableName ADD ${column.name} ${getColumnType(column.columnType)}${str.toString()}';
   }
-
 
   @protected
   String dropColumn(String name) {

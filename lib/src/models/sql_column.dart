@@ -1,9 +1,14 @@
+import 'dart:convert';
+
 import 'package:equatable/equatable.dart';
+
 import 'entity.dart';
 import 'sql_column_extension.dart';
 
 class SqlColumn<TEntity extends IEntity, TType> extends Equatable {
   final String name;
+  final String? alias;
+  final bool jsonEncodeAlias;
   final bool primaryKey;
   final bool autoIncrementPrimary;
   final bool notNull;
@@ -18,6 +23,8 @@ class SqlColumn<TEntity extends IEntity, TType> extends Equatable {
   @override
   List<Object?> get props => [
         name,
+        alias,
+        jsonEncodeAlias,
         primaryKey,
         autoIncrementPrimary,
         notNull,
@@ -31,6 +38,8 @@ class SqlColumn<TEntity extends IEntity, TType> extends Equatable {
 
   SqlColumn(
     this.name, {
+    this.alias,
+    this.jsonEncodeAlias = false,
     this.primaryKey = false,
     this.unique = false,
     this.autoIncrementPrimary = false,
@@ -59,15 +68,18 @@ class SqlColumn<TEntity extends IEntity, TType> extends Equatable {
   }
 
   TType? getValueFrom(Map<String, dynamic> map) {
-    if (TType == bool) return (map[name] == true || map[name] == 1) as TType;
+    var value = map[name];
+    if (value == null && map[alias] != null) {
+      value = jsonEncodeAlias ? jsonEncode(map[alias]) : map[alias];
+    }
+    if (TType == bool) return (value == true || value == 1) as TType;
     if (TType == DateTime) {
-      var dt = map[name];
+      var dt = value;
       if (dt != null) return DateTime.tryParse(dt) as TType;
       return null;
     }
-    return map[name];
+    return value;
   }
-
 
   void commitValue(TEntity entity, Map<String, dynamic> map) {
     setValue(map, read(entity));
