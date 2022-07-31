@@ -9,12 +9,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  sqflite_common_ffi: ^2.1.0
-  sqflite: ^2.0.1
-  uuid: ^3.0.5
-  path_provider: ^2.0.8
+  sqflite_common_ffi: ^2.1.1+1
+  sqflite: ^2.0.3
+  uuid: ^3.0.6
+  path_provider: ^2.0.11
   equatable: ^2.0.3
   meta: ^1.7.0
+  shared_preferences: ^2.0.15
 
 dev_dependencies:
   flutter_test:

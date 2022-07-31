@@ -25,7 +25,9 @@ abstract class BaseContext extends DbContext<IEntity> {
   }
 
   @protected
-  Future<Database> open();
+  Future<Database> open(){
+    throw UnimplementedError('Not supported');
+  }
 
   @override
   Future close() async {
