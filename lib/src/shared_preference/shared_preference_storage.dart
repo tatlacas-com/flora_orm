@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tatlacas_sqflite_storage/sql.dart';
 import 'package:tatlacas_sqflite_storage/src/base_storage.dart';
@@ -8,27 +9,28 @@ import 'package:uuid/uuid.dart';
 
 class SharedPreferenceStorage<TEntity extends IEntity>
     extends BaseStorage<TEntity, SharedPreferenceContext> {
-  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  @protected
+  final Future<SharedPreferences> prefs = SharedPreferences.getInstance();
 
   SharedPreferenceStorage({required SharedPreferenceContext dbContext})
       : super(dbContext: dbContext);
 
-  Future<String?> _read({required String key}) async {
-    final SharedPreferences prefs = await _prefs;
-    return prefs.getString(key);
+  @protected
+  Future<String?> read({required String key}) async {
+    return (await prefs).getString(key);
   }
 
-  Future<void> _write(
+  @protected
+  Future<void> write(
       {required String key,
       required String? value,
       Map<String, dynamic>? additionalData}) async {
-    final SharedPreferences prefs = await _prefs;
-    await prefs.setString(key, value ?? '');
+    await (await prefs).setString(key, value ?? '');
   }
 
-  Future<String?> _delete({required String key}) async {
-    final SharedPreferences prefs = await _prefs;
-    await prefs.remove(key);
+  @protected
+  Future<void> deletePref({required String key}) async {
+    await (await prefs).remove(key);
   }
 
   @override
@@ -36,7 +38,7 @@ class SharedPreferenceStorage<TEntity extends IEntity>
     if (item.id == null) item = item.setBaseParams(id: Uuid().v4()) as TEntity;
     item = item.updateDates() as TEntity;
     final json = jsonEncode(item.toJson());
-    await _write(key: item.id!, value: json);
+    await write(key: item.id!, value: json);
     return item;
   }
 
@@ -60,7 +62,7 @@ class SharedPreferenceStorage<TEntity extends IEntity>
     if (item.id == null) item = item.setBaseParams(id: Uuid().v4()) as TEntity;
     item = item.updateDates() as TEntity;
     final json = jsonEncode(item.toJson());
-    await _write(key: item.id!, value: json);
+    await write(key: item.id!, value: json);
     return item;
   }
 
@@ -93,7 +95,7 @@ class SharedPreferenceStorage<TEntity extends IEntity>
         where.filters.where((element) => element.column?.name == 'id').toList();
     if (query.isNotEmpty == true) {
       final json = jsonEncode(item.toJson());
-      await _write(key: query[0].value, value: json);
+      await write(key: query[0].value, value: json);
       return 1;
     }
     return 0;
