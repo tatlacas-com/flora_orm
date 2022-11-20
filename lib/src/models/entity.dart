@@ -139,6 +139,13 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
     });
     return map;
   }
+  Map<String, dynamic> toDb() {
+    Map<String, dynamic> map = {};
+    allColumns.forEach((column) {
+      column.commitValue(this as TEntity, map);
+    });
+    return map;
+  }
 
   ///Reads the values from database and set the corresponding values
   TEntity load(Map<String, dynamic> json) {
