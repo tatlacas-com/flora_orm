@@ -27,7 +27,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     if (item.id == null) item = item.setBaseParams(id: Uuid().v4()) as TEntity;
     item = item.updateDates() as TEntity;
     final db = await dbContext.database;
-    final updated = await db.insert(item.tableName, item.toJson(),
+    final updated = await db.insert(item.tableName, item.toDb(),
         conflictAlgorithm: ConflictAlgorithm.abort);
     return updated > 0 ? item : null;
   }
@@ -55,7 +55,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     final db = await dbContext.database;
     if (item.id == null) item = item.setBaseParams(id: Uuid().v4()) as TEntity;
     item = item.updateDates() as TEntity;
-    final updated = await db.insert(item.tableName, item.toJson(),
+    final updated = await db.insert(item.tableName, item.toDb(),
         conflictAlgorithm: ConflictAlgorithm.replace);
     return updated > 0 ? item : null;
   }
@@ -216,7 +216,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     item = item.updateDates() as TEntity;
     final update = columnValues != null
         ? item.toStorageJson(columnValues: columnValues)
-        : item.toJson();
+        : item.toDb();
     return await db.update(
       item.tableName,
       update,

@@ -51,6 +51,8 @@ abstract class IEntity {
 
   Map<String, dynamic> toJson();
 
+  Map<String, dynamic> toDb();
+
   Map<String, dynamic> toStorageJson(
       {required Map<SqlColumn, dynamic> columnValues});
 
