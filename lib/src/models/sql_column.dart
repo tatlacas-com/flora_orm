@@ -67,9 +67,9 @@ class SqlColumn<TEntity extends IEntity, TType> extends Equatable {
     }
   }
 
-  TType? getValueFrom(Map<String, dynamic> map) {
+  dynamic getValueFrom(Map<String, dynamic> map) {
     var value = map[name];
-    if (value == null && alias !=null && map[alias] != null) {
+    if (value == null && alias != null && map[alias] != null) {
       value = jsonEncodeAlias ? jsonEncode(map[alias]) : map[alias];
     }
     if (TType == bool) return (value == true || value == 1) as TType;

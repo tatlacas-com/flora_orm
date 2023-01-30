@@ -154,11 +154,7 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
     allColumns.forEach((column) {
       try {
         final value = column.getValueFrom(json);
-        if (column is SqlColumn<TEntity, double> && value is int) {
-          entity = column.write(entity, value.toDouble());
-        } else {
-          entity = column.write(entity, value);
-        }
+        entity = column.write(entity, value);
       } catch (e) {
         throw ArgumentError('Error loading ${column.name}: $e');
       }
