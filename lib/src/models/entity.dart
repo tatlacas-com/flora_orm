@@ -160,7 +160,8 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
           entity = column.write(entity, value);
         }
       } catch (e) {
-        throw ArgumentError('Error loading ${column.name}: $e');
+        throw ArgumentError(
+            'Error on ${this.runtimeType} loading ${column.name}: $e');
       }
     });
     return entity;
