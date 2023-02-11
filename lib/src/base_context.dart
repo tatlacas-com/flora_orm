@@ -125,7 +125,9 @@ abstract class BaseContext extends DbContext<IEntity> {
   void _logBatchResult(String what, List<Object?> res, String? moreInfo) {
     if (res.isNotEmpty) {
       debugPrint('╔${'═' * 4} SQFLITE $what');
-      if (moreInfo != null) debugPrint('╟ $moreInfo');
+      if (moreInfo != null) {
+        _printMaxed(moreInfo, null);
+      }
       for (final element in res) {
         if (element != null) {
           _printMaxed(element.toString(), 'Query:');
