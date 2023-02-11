@@ -49,30 +49,34 @@ abstract class BaseContext extends DbContext<IEntity> {
     // Run the CREATE TABLE statement on the database.
     await db.transaction((txn) async {
       var batch = txn.batch();
+      List<String> allQueries = [];
       for (var element in tables) {
         final queries = element.downgradeTable(oldVersion, newVersion);
         if (queries.isNotEmpty == true) {
+          allQueries.addAll(queries);
           queries.forEach((query) {
             batch.execute(query);
           });
         }
       }
-      var result = await batch.commit(noResult: true);
-      _logBatchResult('onDbDowngrade', result,
+      await batch.commit(noResult: true);
+      _logBatchResult('onDbDowngrade', allQueries,
           'Database downgraded from $oldVersion to $newVersion');
     });
     await db.transaction((txn) async {
       var batch = txn.batch();
+      List<String> allQueries = [];
       for (var element in tables) {
         final queries = element.onDowngradeComplete(oldVersion, newVersion);
         if (queries.isNotEmpty == true) {
+          allQueries.addAll(queries);
           queries.forEach((query) {
             batch.execute(query);
           });
         }
       }
-      var result = await batch.commit(noResult: false);
-      _logBatchResult('After onDbDowngrade', result, null);
+      await batch.commit(noResult: true);
+      _logBatchResult('After onDbDowngrade', allQueries, null);
     });
   }
 
@@ -82,9 +86,11 @@ abstract class BaseContext extends DbContext<IEntity> {
     await db.transaction((txn) async {
       var batch = txn.batch();
       var upgradeQueriesFound = false;
+      List<String> allQueries = [];
       for (var element in tables) {
         final queries = element.upgradeTable(oldVersion, newVersion);
         if (queries.isNotEmpty == true) {
+          allQueries.addAll(queries);
           upgradeQueriesFound = true;
           queries.forEach((query) {
             batch.execute(query);
@@ -95,22 +101,24 @@ abstract class BaseContext extends DbContext<IEntity> {
         throw ArgumentError(
             'No Upgrade queries found. If you added new entities, make sure they are are added in EntitiesDbConfig.tables');
       }
-      var result = await batch.commit(noResult: false);
-      _logBatchResult('onDbUpgrade', result,
+      await batch.commit(noResult: true);
+      _logBatchResult('onDbUpgrade', allQueries,
           'Database upgraded from $oldVersion to $newVersion');
     });
     await db.transaction((txn) async {
       var batch = txn.batch();
+      List<String> allQueries = [];
       for (var element in tables) {
         final queries = element.onUpgradeComplete(oldVersion, newVersion);
         if (queries.isNotEmpty == true) {
+          allQueries.addAll(queries);
           queries.forEach((query) {
             batch.execute(query);
           });
         } else {}
       }
-      var result = await batch.commit(noResult: false);
-      _logBatchResult('After onDbUpgrade', result, null);
+      await batch.commit(noResult: true);
+      _logBatchResult('After onDbUpgrade', allQueries, null);
     });
   }
 
@@ -129,27 +137,31 @@ abstract class BaseContext extends DbContext<IEntity> {
     // Run the CREATE TABLE statement on the database.
     await db.transaction((txn) async {
       var batch = txn.batch();
+      List<String> allQueries = [];
       for (var element in tables) {
         final query = element.createTable(version);
+        allQueries.add(query);
         batch.execute(query);
       }
-      var result = await batch.commit(noResult: false);
+      await batch.commit(noResult: true);
 
-      _logBatchResult('onDbCreate', result,
+      _logBatchResult('onDbCreate', allQueries,
           'Database tables created with version from $version');
     });
     await db.transaction((txn) async {
       var batch = txn.batch();
+      List<String> allQueries = [];
       for (var element in tables) {
         final queries = element.onCreateComplete(version);
         if (queries.isNotEmpty == true) {
+          allQueries.addAll(queries);
           queries.forEach((query) {
             batch.execute(query);
           });
         }
       }
-      var result = await batch.commit(noResult: false);
-      _logBatchResult('After onDbCreate', result, null);
+      await batch.commit(noResult: true);
+      _logBatchResult('After onDbCreate', allQueries, null);
     });
   }
 }
