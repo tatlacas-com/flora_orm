@@ -124,7 +124,10 @@ abstract class BaseContext extends DbContext<IEntity> {
 
   void _logBatchResult(String what, List<Object?> res, String? moreInfo) {
     if (res.isNotEmpty) {
-      debugPrint('╔${'═' * 4} SQFLITE $what ${'═' * 4}╗');
+      final title = 'SQFLITE $what';
+      final titleSize = title.length + 5;
+      debugPrint(
+          '╔${'═' * 4} SQFLITE $what ${'═' * (titleSize < 78 ? (78 - titleSize) : 0)}╗');
       if (moreInfo != null) {
         _printMaxed(moreInfo);
       }
