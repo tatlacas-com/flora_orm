@@ -124,25 +124,33 @@ abstract class BaseContext extends DbContext<IEntity> {
 
   void _logBatchResult(String what, List<Object?> res, String? moreInfo) {
     if (res.isNotEmpty) {
-      debugPrint('╔${'═' * 4} SQFLITE $what');
+      debugPrint('╔${'═' * 4} SQFLITE $what╗');
       if (moreInfo != null) {
-        _printMaxed(moreInfo, null);
+        _printMaxed(moreInfo);
       }
       for (final element in res) {
         if (element != null) {
-          _printMaxed(element.toString(), 'Query:');
+          _printMaxed(element.toString(), prefix: 'Query:');
         }
       }
       debugPrint('╚${'═' * 60}╝');
     }
   }
 
-  void _printMaxed(String str, String? prefix) {
+  void _printMaxed(String str, {String? prefix}) {
     if (str.length < 50) {
-      debugPrint('╟ ${prefix != null ? prefix : ''} $str');
+      if (str.contains('\n')) {
+        final ls = str.split('\n');
+        for (final s in ls) {
+          _printMaxed(s, prefix: prefix);
+          prefix = null;
+        }
+      } else {
+        debugPrint('╟ ${prefix ?? ''} $str');
+      }
     } else {
-      debugPrint('╟ ${prefix != null ? prefix : ''} ${str.substring(0, 50)}');
-      _printMaxed(str.substring(50), null);
+      _printMaxed(str.substring(0, 50), prefix: prefix);
+      _printMaxed(str.substring(50));
     }
   }
 
