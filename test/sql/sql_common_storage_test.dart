@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sqlite_api.dart';
@@ -23,7 +24,7 @@ void main() {
         await database
             .rawDelete('drop table if exists ${TestEntity().tableName}');
       } catch (e) {
-        print(e);
+        debugPrint(e.toString());
       }
       await dbContext.close();
       dbContext = dbContext.copyWith(
@@ -35,16 +36,15 @@ void main() {
       expect(dbVersion, 2);
     });
 
-    test('SqfliteOpenDatabaseOptions', () async{
+    test('SqfliteOpenDatabaseOptions', () async {
       var options = SqfliteOpenDatabaseOptions(version: 1);
-      expect(options.toString(), '{version: 1, readOnly: false, singleInstance: true}');
+      expect(options.toString(),
+          '{version: 1, readOnly: false, singleInstance: true}');
     });
 
     run(storage);
 
     group('Test Db upgrade', () {
-
-
       test('should upgrade database', () async {
         await dbContext.close();
         dbContext = dbContext.copyWith(
@@ -59,8 +59,6 @@ void main() {
     });
 
     group('Test Db downgrade', () {
-
-
       test('should upgrade database', () async {
         await dbContext.close();
         dbContext = dbContext.copyWith(

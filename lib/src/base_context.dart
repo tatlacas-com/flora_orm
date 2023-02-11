@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:sqflite_common/sqlite_api.dart';
 
 import '../sql.dart';
@@ -25,7 +24,7 @@ abstract class BaseContext extends DbContext<IEntity> {
   }
 
   @protected
-  Future<Database> open(){
+  Future<Database> open() {
     throw UnimplementedError('Not supported');
   }
 
@@ -59,9 +58,8 @@ abstract class BaseContext extends DbContext<IEntity> {
         }
       }
       var result = await batch.commit(noResult: true);
-      if (kDebugMode)
-        print('***Database downgraded from $oldVersion to $newVersion');
-      _logBatchResult('onDbDowngrade', result);
+      _logBatchResult('onDbDowngrade', result,
+          'Database downgraded from $oldVersion to $newVersion');
     });
     await db.transaction((txn) async {
       var batch = txn.batch();
@@ -73,8 +71,8 @@ abstract class BaseContext extends DbContext<IEntity> {
           });
         }
       }
-      var result = await batch.commit(noResult: true);
-      _logBatchResult('After onDbDowngrade', result);
+      var result = await batch.commit(noResult: false);
+      _logBatchResult('After onDbDowngrade', result, null);
     });
   }
 
@@ -97,11 +95,9 @@ abstract class BaseContext extends DbContext<IEntity> {
         throw ArgumentError(
             'No Upgrade queries found. If you added new entities, make sure they are are added in EntitiesDbConfig.tables');
       }
-      var result = await batch.commit();
-      if (kDebugMode) {
-        print('***Database upgraded from $oldVersion to $newVersion');
-        _logBatchResult('onDbUpgrade', result);
-      }
+      var result = await batch.commit(noResult: false);
+      _logBatchResult('onDbUpgrade', result,
+          'Database upgraded from $oldVersion to $newVersion');
     });
     await db.transaction((txn) async {
       var batch = txn.batch();
@@ -113,19 +109,19 @@ abstract class BaseContext extends DbContext<IEntity> {
           });
         } else {}
       }
-      var result = await batch.commit();
-      _logBatchResult('After onDbUpgrade', result);
+      var result = await batch.commit(noResult: false);
+      _logBatchResult('After onDbUpgrade', result, null);
     });
   }
 
-  void _logBatchResult(String what, List<Object?> res) {
-    if (!kDebugMode) return;
+  void _logBatchResult(String what, List<Object?> res, String? moreInfo) {
     if (res.isNotEmpty) {
-      print('#################### $what ###############');
-      res.forEach((element) {
-        print(element);
-      });
-      print('#################### $what END ###############');
+      debugPrint('╔${'═' * 4} SQFLITE $what');
+      if (moreInfo != null) debugPrint('╟ $moreInfo');
+      for (final element in res) {
+        debugPrint('╟ $element');
+      }
+      debugPrint('╚${'═' * 80}╝');
     }
   }
 
@@ -137,10 +133,10 @@ abstract class BaseContext extends DbContext<IEntity> {
         final query = element.createTable(version);
         batch.execute(query);
       }
-      var result = await batch.commit();
-      if (kDebugMode)
-        print('***Database tables created with version from $version');
-      _logBatchResult('onDbCreate', result);
+      var result = await batch.commit(noResult: false);
+
+      _logBatchResult('onDbCreate', result,
+          'Database tables created with version from $version');
     });
     await db.transaction((txn) async {
       var batch = txn.batch();
@@ -152,8 +148,8 @@ abstract class BaseContext extends DbContext<IEntity> {
           });
         }
       }
-      var result = await batch.commit();
-      _logBatchResult('After onDbCreate', result);
+      var result = await batch.commit(noResult: false);
+      _logBatchResult('After onDbCreate', result, null);
     });
   }
 }
