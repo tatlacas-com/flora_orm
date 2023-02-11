@@ -133,12 +133,12 @@ abstract class BaseContext extends DbContext<IEntity> {
           _printMaxed(element.toString(), prefix: 'Query:');
         }
       }
-      debugPrint('╚${'═' * 60}╝');
+      debugPrint('╚${'═' * 80}╝');
     }
   }
 
   void _printMaxed(String str, {String? prefix}) {
-    if (str.length < 50) {
+    if (str.length < 78) {
       if (str.contains('\n')) {
         final ls = str.split('\n');
         for (final s in ls) {
@@ -149,8 +149,8 @@ abstract class BaseContext extends DbContext<IEntity> {
         debugPrint('╟ ${prefix ?? ''} $str');
       }
     } else {
-      _printMaxed(str.substring(0, 50), prefix: prefix);
-      _printMaxed(str.substring(50));
+      _printMaxed(str.substring(0, 78), prefix: prefix);
+      _printMaxed(str.substring(78));
     }
   }
 
