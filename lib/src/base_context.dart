@@ -138,7 +138,7 @@ abstract class BaseContext extends DbContext<IEntity> {
   }
 
   void _printMaxed(String str, {String? prefix}) {
-    if (str.length < 78) {
+    if (str.length <= 78) {
       if (str.contains('\n')) {
         final ls = str.split('\n');
         for (final s in ls) {
