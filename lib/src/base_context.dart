@@ -127,9 +127,20 @@ abstract class BaseContext extends DbContext<IEntity> {
       debugPrint('╔${'═' * 4} SQFLITE $what');
       if (moreInfo != null) debugPrint('╟ $moreInfo');
       for (final element in res) {
-        debugPrint('╟ $element');
+        if (element != null) {
+          _printMaxed(element.toString(), 'Query:');
+        }
       }
-      debugPrint('╚${'═' * 80}╝');
+      debugPrint('╚${'═' * 60}╝');
+    }
+  }
+
+  void _printMaxed(String str, String? prefix) {
+    if (str.length < 50) {
+      debugPrint('╟ ${prefix != null ? prefix : ''} $str');
+    } else {
+      debugPrint('╟ ${prefix != null ? prefix : ''} ${str.substring(0, 50)}');
+      _printMaxed(str.substring(50), null);
     }
   }
 
