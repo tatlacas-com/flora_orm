@@ -5,40 +5,44 @@ import 'sql_condition.dart';
 import 'sql_where_condition.dart';
 
 class SqlWhere extends Equatable {
-  final List<SqlWhereCondition> _filters;
-
-  List<SqlWhereCondition> get filters => List.unmodifiable(_filters);
+  late final List<SqlWhereCondition> filters;
 
   /// [lb] adds left bracket, [rb] adds right bracket
   SqlWhere(
-    SqlColumn column, {
+    SqlColumn? column, {
     SqlCondition condition = SqlCondition.EqualTo,
     dynamic value,
     dynamic value2,
     bool lb = false,
     bool rb = false,
     List<SqlWhereCondition> filters = const [],
-  }) : _filters = filters {
-    this._addFilter(
-      column,
-      condition: condition,
-      value: value,
-      value2: value2,
-      lb: lb,
-      rb: rb,
-    );
+  }) {
+    if (column != null) {
+      filters = [
+        ...filters,
+        this._addFilter(
+          column,
+          condition: condition,
+          value: value,
+          value2: value2,
+          lb: lb,
+          rb: rb,
+        )
+      ];
+    } else {
+      filters = filters;
+    }
   }
 
-  SqlWhere._({List<SqlWhereCondition> filters = const []}) : _filters = filters;
+  SqlWhere._({List<SqlWhereCondition> filters = const []})
+      : this.filters = filters;
 
   factory SqlWhere.lb() {
-    final sqlWhere = SqlWhere._();
-    sqlWhere._filters
-        .add(SqlWhereCondition(leftBracket: true, isBracketOnly: true));
-    return sqlWhere;
+    return SqlWhere._(
+        filters: [SqlWhereCondition(leftBracket: true, isBracketOnly: true)]);
   }
 
-  void _addFilter(
+  SqlWhereCondition _addFilter(
     SqlColumn column, {
     SqlCondition condition = SqlCondition.EqualTo,
     dynamic value,
@@ -49,7 +53,7 @@ class SqlWhere extends Equatable {
     bool and = false,
     bool or = false,
   }) {
-    _filters.add(SqlWhereCondition(
+    return SqlWhereCondition(
       column: column,
       condition: condition,
       value: value,
@@ -59,17 +63,21 @@ class SqlWhere extends Equatable {
       isBracketOnly: isBracketOnly,
       and: and,
       or: or,
-    ));
+    );
   }
 
   SqlWhere lb() {
-    _filters.add(SqlWhereCondition(leftBracket: true, isBracketOnly: true));
-    return this;
+    return SqlWhere(null, filters: [
+      ...filters,
+      SqlWhereCondition(leftBracket: true, isBracketOnly: true)
+    ]);
   }
 
   SqlWhere rb() {
-    _filters.add(SqlWhereCondition(rightBracket: true, isBracketOnly: true));
-    return this;
+    return SqlWhere(null, filters: [
+      ...filters,
+      SqlWhereCondition(rightBracket: true, isBracketOnly: true)
+    ]);
   }
 
   SqlWhere and(SqlColumn column,
@@ -77,15 +85,17 @@ class SqlWhere extends Equatable {
       dynamic value,
       bool lb = false,
       bool rb = false}) {
-    this._addFilter(
-      column,
-      condition: condition,
-      value: value,
-      lb: lb,
-      rb: rb,
-      and: true,
-    );
-    return this;
+    return SqlWhere(null, filters: [
+      ...filters,
+      this._addFilter(
+        column,
+        condition: condition,
+        value: value,
+        lb: lb,
+        rb: rb,
+        and: true,
+      )
+    ]);
   }
 
   SqlWhere query(SqlColumn column,
@@ -93,14 +103,16 @@ class SqlWhere extends Equatable {
       dynamic value,
       bool lb = false,
       bool rb = false}) {
-    this._addFilter(
-      column,
-      condition: condition,
-      value: value,
-      lb: lb,
-      rb: rb,
-    );
-    return this;
+    return SqlWhere(null, filters: [
+      ...filters,
+      this._addFilter(
+        column,
+        condition: condition,
+        value: value,
+        lb: lb,
+        rb: rb,
+      )
+    ]);
   }
 
   SqlWhere or(SqlColumn column,
@@ -108,17 +120,19 @@ class SqlWhere extends Equatable {
       dynamic value,
       bool lb = false,
       bool rb = false}) {
-    this._addFilter(
-      column,
-      condition: condition,
-      value: value,
-      lb: lb,
-      rb: rb,
-      or: true,
-    );
-    return this;
+    return SqlWhere(null, filters: [
+      ...filters,
+      this._addFilter(
+        column,
+        condition: condition,
+        value: value,
+        lb: lb,
+        rb: rb,
+        or: true,
+      )
+    ]);
   }
 
   @override
-  List<Object?> get props => [_filters];
+  List<Object?> get props => [filters];
 }
