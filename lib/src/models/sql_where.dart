@@ -18,7 +18,7 @@ class SqlWhere extends Equatable {
     List<SqlWhereCondition> filters = const [],
   }) {
     if (column != null) {
-      filters = [
+      this.filters = [
         ...filters,
         this._addFilter(
           column,
@@ -30,7 +30,7 @@ class SqlWhere extends Equatable {
         )
       ];
     } else {
-      filters = filters;
+      this.filters = filters;
     }
   }
 
