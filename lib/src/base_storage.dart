@@ -4,7 +4,6 @@ import 'package:tatlacas_sqflite_storage/src/base_context.dart';
 import 'package:uuid/uuid.dart';
 
 import '../sql.dart';
-import 'models/sql_order.dart';
 
 class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     extends SqlStorage<TEntity, TDbContext> {
@@ -24,7 +23,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
       : super(dbContext: dbContext);
 
   Future<TEntity?> insert(TEntity item) async {
-    if (item.id == null) item = item.setBaseParams(id: Uuid().v4()) as TEntity;
+    if (item.id == null) item = item.copyWith(id: Uuid().v4()) as TEntity;
     item = item.updateDates() as TEntity;
     final db = await dbContext.database;
     final updated = await db.insert(item.tableName, item.toDb(),
@@ -40,7 +39,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
       var batch = txn.batch();
       items.forEach((element) {
         if (element.id == null)
-          element = element.setBaseParams(id: Uuid().v4()) as TEntity;
+          element = element.copyWith(id: Uuid().v4()) as TEntity;
         element = element.updateDates() as TEntity;
         batch.insert(element.tableName, element.toJson(),
             conflictAlgorithm: ConflictAlgorithm.abort);
@@ -53,7 +52,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
 
   Future<TEntity?> insertOrUpdate(TEntity item) async {
     final db = await dbContext.database;
-    if (item.id == null) item = item.setBaseParams(id: Uuid().v4()) as TEntity;
+    if (item.id == null) item = item.copyWith(id: Uuid().v4()) as TEntity;
     item = item.updateDates() as TEntity;
     final updated = await db.insert(item.tableName, item.toDb(),
         conflictAlgorithm: ConflictAlgorithm.replace);
@@ -90,7 +89,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     if (result.isNotEmpty) {
       final firstRow = result.first;
       if (firstRow.isNotEmpty && firstRow.values.first != null) {
-        return  asCast<T>(firstRow.values.first);
+        return asCast<T>(firstRow.values.first);
       }
     }
     return asCast<T>(0);
@@ -113,16 +112,14 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     return asCast<T>(0);
   }
 
-  T asCast<T>(dynamic value){
-    if(T == int && value is double){
-        return value.toInt() as T;
-    }else if(T == double && value is int){
-        return value.toDouble() as T;
+  T asCast<T>(dynamic value) {
+    if (T == int && value is double) {
+      return value.toInt() as T;
+    } else if (T == double && value is int) {
+      return value.toDouble() as T;
     }
     return value as T;
   }
-
-
 
   Future<List<Map<String, dynamic>>> getEntities(
     TEntity type, {
@@ -153,7 +150,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
       var batch = txn.batch();
       items.forEach((element) {
         if (element.id == null)
-          element = element.setBaseParams(id: Uuid().v4()) as TEntity;
+          element = element.copyWith(id: Uuid().v4()) as TEntity;
         element = element.updateDates() as TEntity;
         updatedItems.add(element);
         batch.insert(element.tableName, element.toJson(),
@@ -264,7 +261,8 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
         columns: cols,
         where: formattedQuery.where,
         whereArgs: formattedQuery.whereArgs,
-        orderBy: orderByFilter, limit: limit,
+        orderBy: orderByFilter,
+        limit: limit,
         offset: offset,
       );
     }

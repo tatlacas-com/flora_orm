@@ -19,7 +19,7 @@ abstract class IEntity {
 
   IEntity updateDates();
 
-  IEntity setBaseParams({
+  IEntity copyWith({
     String? id,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -91,7 +91,7 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
           .followedBy(columns);
 
   @override
-  TEntity setBaseParams({
+  TEntity copyWith({
     String? id,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -101,23 +101,21 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
         'id',
         primaryKey: true,
         read: (entity) => entity.id,
-        write: (entity, value) => entity.setBaseParams(id: value) as TEntity,
+        write: (entity, value) => entity.copyWith(id: value) as TEntity,
       );
 
   SqlColumn<TEntity, DateTime> get columnCreatedAt =>
       SqlColumn<TEntity, DateTime>(
         'createdAt',
         read: (entity) => entity.createdAt,
-        write: (entity, value) =>
-            entity.setBaseParams(createdAt: value) as TEntity,
+        write: (entity, value) => entity.copyWith(createdAt: value) as TEntity,
       );
 
   SqlColumn<TEntity, DateTime> get columnUpdatedAt =>
       SqlColumn<TEntity, DateTime>(
         'updatedAt',
         read: (entity) => entity.updatedAt,
-        write: (entity, value) =>
-            entity.setBaseParams(updatedAt: value) as TEntity,
+        write: (entity, value) => entity.copyWith(updatedAt: value) as TEntity,
       );
 
   List<SqlColumn<TEntity, dynamic>> get compositePrimaryKey =>
@@ -126,7 +124,7 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
   TEntity updateDates() {
     var createdAt = this.createdAt ?? DateTime.now().toUtc();
     var updatedAt = DateTime.now().toUtc();
-    return setBaseParams(
+    return copyWith(
       createdAt: createdAt,
       updatedAt: updatedAt,
     );

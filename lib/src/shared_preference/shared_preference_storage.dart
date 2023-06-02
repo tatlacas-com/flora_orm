@@ -35,7 +35,7 @@ class SharedPreferenceStorage<TEntity extends IEntity>
 
   @override
   Future<TEntity?> insert(TEntity item) async {
-    if (item.id == null) item = item.setBaseParams(id: Uuid().v4()) as TEntity;
+    if (item.id == null) item = item.copyWith(id: Uuid().v4()) as TEntity;
     item = item.updateDates() as TEntity;
     final json = jsonEncode(item.toJson());
     await write(key: item.id!, value: json);
@@ -43,13 +43,13 @@ class SharedPreferenceStorage<TEntity extends IEntity>
   }
 
   Future<Map<String, dynamic>?> getEntity(
-      TEntity type, {
-        Iterable<SqlColumn>? columns,
-        List<SqlOrder>? orderBy,
-        required SqlWhere where,
-        int? offset,
-      }) async {
-
+    TEntity type, {
+    Iterable<SqlColumn>? columns,
+    List<SqlOrder>? orderBy,
+    required SqlWhere where,
+    int? offset,
+  }) async {
+    return null;
   }
 
   @override
@@ -59,7 +59,7 @@ class SharedPreferenceStorage<TEntity extends IEntity>
 
   @override
   Future<TEntity?> insertOrUpdate(TEntity item) async {
-    if (item.id == null) item = item.setBaseParams(id: Uuid().v4()) as TEntity;
+    if (item.id == null) item = item.copyWith(id: Uuid().v4()) as TEntity;
     item = item.updateDates() as TEntity;
     final json = jsonEncode(item.toJson());
     await write(key: item.id!, value: json);

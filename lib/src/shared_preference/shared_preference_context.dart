@@ -1,4 +1,3 @@
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tatlacas_sqflite_storage/sql.dart';
 import 'package:tatlacas_sqflite_storage/src/base_context.dart';
 
