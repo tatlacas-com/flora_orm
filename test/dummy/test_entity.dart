@@ -65,6 +65,7 @@ class TestEntity extends Entity<TestEntity> {
     this.testDouble,
   }) : super(id: id, createdAt: createdAt, updatedAt: updatedAt);
 
+  @override
   TestEntity copyWith({
     String? id,
     DateTime? createdAt,
@@ -100,16 +101,6 @@ class TestEntity extends Entity<TestEntity> {
         columnTestIntWithDefault,
         columnTestInt,
       ];
-
-  @override
-  TestEntity setBaseParams(
-      {String? id, DateTime? createdAt, DateTime? updatedAt}) {
-    return this.copyWith(
-      id: id ?? this.id,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-    );
-  }
 
   @override
   String get tableName => 'test_entity';

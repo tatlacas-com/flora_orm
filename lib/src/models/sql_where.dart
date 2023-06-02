@@ -5,17 +5,20 @@ import 'sql_condition.dart';
 import 'sql_where_condition.dart';
 
 class SqlWhere extends Equatable {
-  List<SqlWhereCondition> _filters = [];
+  final List<SqlWhereCondition> _filters;
 
   List<SqlWhereCondition> get filters => List.unmodifiable(_filters);
 
   /// [lb] adds left bracket, [rb] adds right bracket
-  SqlWhere(SqlColumn column,
-      {SqlCondition condition = SqlCondition.EqualTo,
-      dynamic value,
-      dynamic value2,
-      bool lb = false,
-      bool rb = false}) {
+  SqlWhere(
+    SqlColumn column, {
+    SqlCondition condition = SqlCondition.EqualTo,
+    dynamic value,
+    dynamic value2,
+    bool lb = false,
+    bool rb = false,
+    List<SqlWhereCondition> filters = const [],
+  }) : _filters = filters {
     this._addFilter(
       column,
       condition: condition,
@@ -26,7 +29,7 @@ class SqlWhere extends Equatable {
     );
   }
 
-  SqlWhere._();
+  SqlWhere._({List<SqlWhereCondition> filters = const []}) : _filters = filters;
 
   factory SqlWhere.lb() {
     final sqlWhere = SqlWhere._();
