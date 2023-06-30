@@ -17,7 +17,7 @@ class SqlColumn<TEntity extends IEntity, TType> extends Equatable {
 
   ColumnType get columnType => _columnType;
   final TType? defaultValue;
-  final dynamic Function(TEntity entity) saveToDb;
+  final TType? Function(TEntity entity) saveToDb;
   final TEntity Function(TEntity entity, dynamic value) readFromDb;
 
   @override
@@ -45,7 +45,7 @@ class SqlColumn<TEntity extends IEntity, TType> extends Equatable {
     this.autoIncrementPrimary = false,
     this.notNull = false,
     this.defaultValue,
-    required dynamic Function(TEntity entity) saveToDb,
+    required TType? Function(TEntity entity) saveToDb,
     required TEntity Function(TEntity entity, dynamic value) readFromDb,
   })  : _columnType = computeColumnType<TType>(),
         saveToDb = saveToDb,
