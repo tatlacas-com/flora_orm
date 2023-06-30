@@ -17,8 +17,8 @@ class SqlColumn<TEntity extends IEntity, TType> extends Equatable {
 
   ColumnType get columnType => _columnType;
   final TType? defaultValue;
-  final TType? Function(TEntity entity) read;
-  final TEntity Function(TEntity entity, dynamic value) write;
+  final dynamic Function(TEntity entity) saveToDb;
+  final TEntity Function(TEntity entity, dynamic value) readFromDb;
 
   @override
   List<Object?> get props => [
@@ -45,11 +45,11 @@ class SqlColumn<TEntity extends IEntity, TType> extends Equatable {
     this.autoIncrementPrimary = false,
     this.notNull = false,
     this.defaultValue,
-    required TType? Function(TEntity entity) read,
-    required TEntity Function(TEntity entity, dynamic value) write,
+    required dynamic Function(TEntity entity) saveToDb,
+    required TEntity Function(TEntity entity, dynamic value) readFromDb,
   })  : _columnType = computeColumnType<TType>(),
-        read = read,
-        write = write;
+        saveToDb = saveToDb,
+        readFromDb = readFromDb;
 
   static ColumnType computeColumnType<TType>() {
     if (TType == String) {
@@ -82,7 +82,7 @@ class SqlColumn<TEntity extends IEntity, TType> extends Equatable {
   }
 
   void commitValue(TEntity entity, Map<String, dynamic> map) {
-    setValue(map, read(entity));
+    setValue(map, saveToDb(entity));
   }
 }
 

@@ -100,22 +100,24 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
   SqlColumn<TEntity, String> get columnId => SqlColumn<TEntity, String>(
         'id',
         primaryKey: true,
-        read: (entity) => entity.id,
-        write: (entity, value) => entity.copyWith(id: value) as TEntity,
+        saveToDb: (entity) => entity.id,
+        readFromDb: (entity, value) => entity.copyWith(id: value) as TEntity,
       );
 
   SqlColumn<TEntity, DateTime> get columnCreatedAt =>
       SqlColumn<TEntity, DateTime>(
         'createdAt',
-        read: (entity) => entity.createdAt,
-        write: (entity, value) => entity.copyWith(createdAt: value) as TEntity,
+        saveToDb: (entity) => entity.createdAt,
+        readFromDb: (entity, value) =>
+            entity.copyWith(createdAt: value) as TEntity,
       );
 
   SqlColumn<TEntity, DateTime> get columnUpdatedAt =>
       SqlColumn<TEntity, DateTime>(
         'updatedAt',
-        read: (entity) => entity.updatedAt,
-        write: (entity, value) => entity.copyWith(updatedAt: value) as TEntity,
+        saveToDb: (entity) => entity.updatedAt,
+        readFromDb: (entity, value) =>
+            entity.copyWith(updatedAt: value) as TEntity,
       );
 
   List<SqlColumn<TEntity, dynamic>> get compositePrimaryKey =>
@@ -153,9 +155,9 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
       try {
         final value = column.getValueFrom(json);
         if (column is SqlColumn<TEntity, double> && value is int) {
-          entity = column.write(entity, value.toDouble());
+          entity = column.readFromDb(entity, value.toDouble());
         } else {
-          entity = column.write(entity, value);
+          entity = column.readFromDb(entity, value);
         }
       } catch (e) {
         throw ArgumentError(

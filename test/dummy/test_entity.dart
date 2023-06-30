@@ -11,45 +11,46 @@ class TestEntity extends Entity<TestEntity> {
 
   get columnTestString => SqlColumn<TestEntity, String>(
         'testString',
-        read: (entity) => entity.testString,
-        write: (entity, value) => entity.copyWith(testString: value),
+        saveToDb: (entity) => entity.testString,
+        readFromDb: (entity, value) => entity.copyWith(testString: value),
       );
 
   get columnTestUpgrade => SqlColumn<TestEntity, String>(
         'testUpgrade',
-        read: (entity) => entity.testUpgrade,
-        write: (entity, value) => entity.copyWith(testUpgrade: value),
+        saveToDb: (entity) => entity.testUpgrade,
+        readFromDb: (entity, value) => entity.copyWith(testUpgrade: value),
       );
 
   get columTestDateTime => SqlColumn<TestEntity, DateTime>(
         'testDateTime',
-        read: (entity) => entity.testDateTime,
-        write: (entity, value) => entity.copyWith(testDateTime: value),
+        saveToDb: (entity) => entity.testDateTime,
+        readFromDb: (entity, value) => entity.copyWith(testDateTime: value),
       );
 
   get columnTestInt => SqlColumn<TestEntity, int>(
         'testInt',
-        read: (entity) => entity.testInt,
-        write: (entity, value) => entity.copyWith(testInt: value),
+        saveToDb: (entity) => entity.testInt,
+        readFromDb: (entity, value) => entity.copyWith(testInt: value),
       );
 
   get columnTestIntWithDefault => SqlColumn<TestEntity, int>(
         'testIntWithDefault',
-        read: (entity) => entity.testIntWithDefault,
+        saveToDb: (entity) => entity.testIntWithDefault,
         defaultValue: 100,
-        write: (entity, value) => entity.copyWith(testIntWithDefault: value),
+        readFromDb: (entity, value) =>
+            entity.copyWith(testIntWithDefault: value),
       );
 
   get columnTestBool => SqlColumn<TestEntity, bool>(
         'testBool',
-        read: (entity) => entity.testBool,
-        write: (entity, value) => entity.copyWith(testBool: value),
+        saveToDb: (entity) => entity.testBool,
+        readFromDb: (entity, value) => entity.copyWith(testBool: value),
       );
 
   get columnTestDouble => SqlColumn<TestEntity, double>(
         'testDouble',
-        read: (entity) => entity.testDouble,
-        write: (entity, value) => entity.copyWith(testDouble: value),
+        saveToDb: (entity) => entity.testDouble,
+        readFromDb: (entity, value) => entity.copyWith(testDouble: value),
       );
 
   const TestEntity({
