@@ -1,3 +1,0 @@
-class DbColumn {
-  const DbColumn();
-}

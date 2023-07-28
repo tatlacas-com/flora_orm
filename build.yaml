@@ -4,7 +4,7 @@ builders:
   db_columns:
     import: "package:tatlacas_sqflite_storage/builder.dart"
     builder_factories: ["dbColumnsBuilder"]
-    build_extensions: {".dart": [".cols.part"]}
+    build_extensions: {".dart": [".g.part"]}
     auto_apply: dependents
     build_to: source
     applies_builders: ["source_gen|combining_builder"]
