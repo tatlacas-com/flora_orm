@@ -8,10 +8,3 @@ builders:
     auto_apply: dependents
     build_to: source
     applies_builders: ["source_gen|combining_builder"]
-
-targets:
-  $default:
-    builders:
-      tatlacas_sqflite_storage|db_columns:
-        generate_for:
-          - lib/**/*.entity.dart
