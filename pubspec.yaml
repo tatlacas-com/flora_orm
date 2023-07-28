@@ -16,6 +16,9 @@ dependencies:
   equatable: ^2.0.3
   meta: ^1.7.0
   shared_preferences: ^2.0.15
+  source_gen: ^1.4.0
+  analyzer: ^6.0.0
+  build: ^2.4.1
 
 dev_dependencies:
   flutter_test:
