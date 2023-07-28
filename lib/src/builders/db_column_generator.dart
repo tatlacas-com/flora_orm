@@ -18,8 +18,12 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     final generatedCode = StringBuffer();
     final columnsList = StringBuffer();
 
-    generatedCode.writeln('extension ${className}Extension on $className {');
+    generatedCode.writeln('mixin _${className}Mixin on $className {');
 
+    generatedCode.writeln('''
+  @override
+  String get tableName => '${convertClassNameToSnakeCase(className)}';
+    ''');
     for (final field in fields) {
       if (TypeChecker.fromRuntime(DbColumn).hasAnnotationOfExact(field)) {
         final fieldName = field.name;
@@ -51,5 +55,24 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
   // Helper function to convert the first letter of a string to uppercase
   String _toUpperCamelCase(String input) {
     return input[0].toUpperCase() + input.substring(1);
+  }
+
+  String convertClassNameToSnakeCase(String className) {
+    final buffer = StringBuffer();
+    bool isFirstLetter = true;
+
+    for (final char in className.runes) {
+      if (isFirstLetter) {
+        buffer.write(String.fromCharCode(char).toLowerCase());
+        isFirstLetter = false;
+      } else if (String.fromCharCode(char).toUpperCase() ==
+          String.fromCharCode(char)) {
+        buffer.write('_${String.fromCharCode(char).toLowerCase()}');
+      } else {
+        buffer.write(String.fromCharCode(char));
+      }
+    }
+
+    return buffer.toString();
   }
 }
