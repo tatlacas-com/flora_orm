@@ -23,11 +23,12 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     for (final field in fields) {
       if (TypeChecker.fromRuntime(DbColumn).hasAnnotationOfExact(field)) {
         final fieldName = field.name;
+        final fieldNameCamel = _toUpperCamelCase(fieldName);
         final fieldType = field.type.getDisplayString(withNullability: false);
 
-        columnsList.writeln('column$fieldName,');
+        columnsList.writeln('column$fieldNameCamel,');
         generatedCode.writeln('''
-      SqlColumn<$className, $fieldType> get column$fieldName =>
+      SqlColumn<$className, $fieldType> get column$fieldNameCamel =>
         SqlColumn<$className, $fieldType>(
           '$fieldName',
           saveToDb: (entity) => entity.$fieldName,
@@ -36,7 +37,6 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     ''');
       }
     }
-    generatedCode.writeln('');
     generatedCode.writeln('''
       @override
       static final Iterable<SqlColumn<$className, dynamic>> columns = [
@@ -46,5 +46,10 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     generatedCode.writeln('}');
 
     return generatedCode.toString();
+  }
+
+  // Helper function to convert the first letter of a string to uppercase
+  String _toUpperCamelCase(String input) {
+    return input[0].toUpperCase() + input.substring(1);
   }
 }
