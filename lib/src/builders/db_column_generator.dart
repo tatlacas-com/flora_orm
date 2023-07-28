@@ -39,7 +39,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     }
     generatedCode.writeln('''
       @override
-      Iterable<SqlColumn<$className, dynamic>> columns => [
+      Iterable<SqlColumn<$className, dynamic>> get columns => [
       $columnsList
       ];''');
 
