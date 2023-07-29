@@ -22,8 +22,10 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
 
     final generatedCode = StringBuffer();
     final columnsList = StringBuffer();
+    final extendedClassName =
+        element.supertype?.getDisplayString(withNullability: false);
 
-    generatedCode.writeln('mixin _${className}Mixin on $className {');
+    generatedCode.writeln('mixin _${className}Mixin on $extendedClassName {');
 
     generatedCode.writeln('''
   @override
