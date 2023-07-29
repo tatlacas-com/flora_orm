@@ -2,6 +2,8 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:tatlacas_sqflite_storage/src/annotations.dart';
+import 'package:analyzer/dart/element/type.dart';
+import 'package:tatlacas_sqflite_storage/src/models/entity.dart';
 
 class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
   @override
@@ -11,8 +13,11 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     BuildStep buildStep,
   ) {
     final classElement = element as ClassElement;
-
     final className = classElement.name;
+    if (!TypeChecker.fromRuntime(Entity).isAssignableFrom(element)) {
+      throw new Exception('$className is not an Entity class');
+    }
+
     final fields = classElement.fields;
 
     final generatedCode = StringBuffer();
