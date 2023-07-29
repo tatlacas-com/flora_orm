@@ -1,7 +1,7 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
-import 'package:tatlacas_sqflite_storage/src/annotations.dart';
+import 'package:tatlacas_sqflite_storage/src/builders/annotations.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:tatlacas_sqflite_storage/src/models/entity.dart';
 
