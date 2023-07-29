@@ -61,7 +61,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           final bool unique =
               dbColumnAnnotation.getField('unique')?.toBoolValue() ?? false;
           final dynamic defaultValue =
-              dbColumnAnnotation.getField('defaultValue')?.toStringValue();
+              dbColumnAnnotation.getField('defaultValue')?.toString();
 
           generatedCode.writeln('''
       SqlColumn<$className, $fieldType> get column$fieldNameCamel =>
