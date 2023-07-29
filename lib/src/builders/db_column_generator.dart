@@ -60,8 +60,20 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
               dbColumnAnnotation.getField('notNull')?.toBoolValue() ?? false;
           final bool unique =
               dbColumnAnnotation.getField('unique')?.toBoolValue() ?? false;
-          final dynamic defaultValue =
-              dbColumnAnnotation.getField('defaultValue')?.toString();
+          dynamic defaultValue = dbColumnAnnotation.getField('defaultValue');
+          if (field.type.isDartCoreBool) {
+            defaultValue =
+                dbColumnAnnotation.getField('defaultValue')?.toBoolValue();
+          } else if (field.type.isDartCoreInt) {
+            defaultValue =
+                dbColumnAnnotation.getField('defaultValue')?.toIntValue();
+          } else if (field.type.isDartCoreDouble) {
+            defaultValue =
+                dbColumnAnnotation.getField('defaultValue')?.toDoubleValue();
+          } else {
+            defaultValue =
+                dbColumnAnnotation.getField('defaultValue')?.toStringValue();
+          }
 
           generatedCode.writeln('''
       SqlColumn<$className, $fieldType> get column$fieldNameCamel =>
