@@ -39,87 +39,81 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
         final fieldType = field.type.getDisplayString(withNullability: false);
 
         columnsList.writeln('column$fieldNameCamel,');
-        final metadata = field.metadata;
-        for (final annotationElement in metadata) {
-          final element = annotationElement.element;
-          if (element != null &&
-              TypeChecker.fromRuntime(DbColumn).isExactly(element)) {
-            // Get the constructor arguments of the DbColumn annotation
-            final constantObj = annotationElement.computeConstantValue();
+        final dbColumnAnnotations =
+            TypeChecker.fromRuntime(DbColumn).annotationsOf(field);
 
-            final String name =
-                constantObj?.getField('name')?.toStringValue() ?? fieldName;
-            final String? alias =
-                constantObj?.getField('alias')?.toStringValue();
-            final bool jsonEncodeAlias =
-                constantObj?.getField('jsonEncodeAlias')?.toBoolValue() ??
-                    false;
-            final bool primaryKey =
-                constantObj?.getField('primaryKey')?.toBoolValue() ?? false;
-            final bool autoIncrementPrimary =
-                constantObj?.getField('autoIncrementPrimary')?.toBoolValue() ??
-                    false;
-            final bool notNull =
-                constantObj?.getField('notNull')?.toBoolValue() ?? false;
-            final bool unique =
-                constantObj?.getField('unique')?.toBoolValue() ?? false;
-            final dynamic defaultValue =
-                constantObj?.getField('defaultValue')?.toStringValue();
+        for (final dbColumnAnnotation in dbColumnAnnotations) {
+          final String name =
+              dbColumnAnnotation.getField('name')?.toStringValue() ?? fieldName;
+          final String? alias =
+              dbColumnAnnotation.getField('alias')?.toStringValue();
+          final bool jsonEncodeAlias =
+              dbColumnAnnotation.getField('jsonEncodeAlias')?.toBoolValue() ??
+                  false;
+          final bool primaryKey =
+              dbColumnAnnotation.getField('primaryKey')?.toBoolValue() ?? false;
+          final bool autoIncrementPrimary = dbColumnAnnotation
+                  .getField('autoIncrementPrimary')
+                  ?.toBoolValue() ??
+              false;
+          final bool notNull =
+              dbColumnAnnotation.getField('notNull')?.toBoolValue() ?? false;
+          final bool unique =
+              dbColumnAnnotation.getField('unique')?.toBoolValue() ?? false;
+          final dynamic defaultValue =
+              dbColumnAnnotation.getField('defaultValue')?.toStringValue();
 
-            generatedCode.writeln('''
+          generatedCode.writeln('''
       SqlColumn<$className, $fieldType> get column$fieldNameCamel =>
         SqlColumn<$className, $fieldType>(
           '$name',
     ''');
-            if (alias != null) {
-              generatedCode.writeln('''
+          if (alias != null) {
+            generatedCode.writeln('''
            alias: '$alias',
     ''');
-            }
-            if (jsonEncodeAlias == true) {
-              generatedCode.writeln('''
+          }
+          if (jsonEncodeAlias == true) {
+            generatedCode.writeln('''
            jsonEncodeAlias: $jsonEncodeAlias,
     ''');
-            }
-            if (primaryKey == true) {
-              generatedCode.writeln('''
+          }
+          if (primaryKey == true) {
+            generatedCode.writeln('''
            primaryKey: $primaryKey,
     ''');
-            }
-            if (unique == true) {
-              generatedCode.writeln('''
+          }
+          if (unique == true) {
+            generatedCode.writeln('''
            unique: $unique,
     ''');
-            }
-            if (autoIncrementPrimary == true) {
-              generatedCode.writeln('''
+          }
+          if (autoIncrementPrimary == true) {
+            generatedCode.writeln('''
            autoIncrementPrimary: $autoIncrementPrimary,
     ''');
-            }
-            if (notNull == true) {
-              generatedCode.writeln('''
+          }
+          if (notNull == true) {
+            generatedCode.writeln('''
            notNull: $notNull,
     ''');
-            }
-            if (defaultValue != null) {
-              if (field.type.isDartCoreString) {
-                generatedCode.writeln('''
+          }
+          if (defaultValue != null) {
+            if (field.type.isDartCoreString) {
+              generatedCode.writeln('''
            defaultValue: '$defaultValue',
     ''');
-              } else {
-                generatedCode.writeln('''
+            } else {
+              generatedCode.writeln('''
            defaultValue: $defaultValue,
     ''');
-              }
             }
-            generatedCode.writeln('''
+          }
+          generatedCode.writeln('''
           saveToDb: (entity) => entity.$fieldName,
           readFromDb: (entity, value) => entity.copyWith($fieldName: value),
         );
     ''');
-
-            break;
-          }
         }
       }
     }
