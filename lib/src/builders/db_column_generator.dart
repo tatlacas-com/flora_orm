@@ -14,6 +14,8 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     final classElement = element as ClassElement;
     final className = classElement.name;
     final tableName = annotation.read('tableName').literalValue as String?;
+    final hasSuperColumns =
+        annotation.read('hasSuperColumns').literalValue as bool? ?? false;
 
     if (!TypeChecker.fromRuntime(Entity).isAssignableFrom(element)) {
       throw new Exception('$className is not an Entity class');
@@ -181,6 +183,13 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     generatedCode.writeln('''
       @override
       Iterable<SqlColumn<$className, dynamic>> get columns => [
+      ''');
+    if (hasSuperColumns) {
+      generatedCode.writeln('''
+      ...super.columns,
+      ''');
+    }
+    generatedCode.writeln('''
       $columnsList
       ];''');
 

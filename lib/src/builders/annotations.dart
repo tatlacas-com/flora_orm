@@ -25,6 +25,10 @@ class DbColumn<TColumnType> {
 }
 
 class DbEntity {
-  const DbEntity({this.tableName});
+  const DbEntity({
+    this.tableName,
+    this.hasSuperColumns = false,
+  });
   final String? tableName;
+  final bool hasSuperColumns;
 }
