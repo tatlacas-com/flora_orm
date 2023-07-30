@@ -8,6 +8,7 @@ class DbColumn {
     this.unique = false,
     this.autoIncrementPrimary = false,
     this.hasReadFromDb = false,
+    this.hasSaveToDb = false,
     this.notNull = false,
     this.defaultValue,
   });
@@ -17,6 +18,7 @@ class DbColumn {
   final bool primaryKey;
   final bool autoIncrementPrimary;
   final bool hasReadFromDb;
+  final bool hasSaveToDb;
   final bool notNull;
   final bool unique;
   final dynamic defaultValue;
