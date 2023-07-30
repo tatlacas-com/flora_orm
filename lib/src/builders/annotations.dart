@@ -7,6 +7,7 @@ class DbColumn {
     this.primaryKey = false,
     this.unique = false,
     this.autoIncrementPrimary = false,
+    this.hasReadFromDb = false,
     this.notNull = false,
     this.defaultValue,
   });
@@ -15,6 +16,7 @@ class DbColumn {
   final bool jsonEncodeAlias;
   final bool primaryKey;
   final bool autoIncrementPrimary;
+  final bool hasReadFromDb;
   final bool notNull;
   final bool unique;
   final dynamic defaultValue;

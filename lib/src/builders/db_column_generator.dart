@@ -50,6 +50,9 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           final bool jsonEncodeAlias =
               dbColumnAnnotation.getField('jsonEncodeAlias')?.toBoolValue() ??
                   false;
+          final bool hasReadFromDb =
+              dbColumnAnnotation.getField('jsonEncodeAlias')?.toBoolValue() ??
+                  false;
           final bool primaryKey =
               dbColumnAnnotation.getField('primaryKey')?.toBoolValue() ?? false;
           final bool autoIncrementPrimary = dbColumnAnnotation
@@ -73,6 +76,12 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           } else {
             defaultValue =
                 dbColumnAnnotation.getField('defaultValue')?.toStringValue();
+          }
+
+          if (hasReadFromDb) {
+            generatedCode.writeln('''
+  $className read${fieldNameCamel}FromDb(value, $className entity);
+ ''');
           }
 
           generatedCode.writeln('''
@@ -123,9 +132,18 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           }
           generatedCode.writeln('''
           saveToDb: (entity) => entity.$fieldName,
+    ''');
+          if (hasReadFromDb) {
+            generatedCode.writeln('''
+          readFromDb: (entity, value) => read${fieldNameCamel}FromDb(value, entity),
+        );
+    ''');
+          } else {
+            generatedCode.writeln('''
           readFromDb: (entity, value) => entity.copyWith($fieldName: value),
         );
     ''');
+          }
         }
       }
     }
