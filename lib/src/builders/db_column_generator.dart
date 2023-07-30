@@ -155,7 +155,6 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           if (hasSaveToDb) {
             generatedCode.writeln('''
           saveToDb: (entity) => save${fieldNameCamel}ToDb(entity),
-        );
     ''');
           } else {
             generatedCode.writeln('''
