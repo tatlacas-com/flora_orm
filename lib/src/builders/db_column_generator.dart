@@ -102,7 +102,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           }
           if (hasSaveToDb) {
             generatedCode.writeln('''
-  $className save${fieldNameCamel}ToDb($className entity);
+  $columnType save${fieldNameCamel}ToDb($className entity);
  ''');
           }
 
