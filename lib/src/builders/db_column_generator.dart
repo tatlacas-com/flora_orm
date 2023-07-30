@@ -87,14 +87,10 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           }
           var columnType = fieldType;
           final annotationSource = annotation.toSource().trim();
-          generatedCode.writeln('''
-/*
-$annotationSource
-*/
- ''');
+
           final start = annotationSource.indexOf('<');
           final end = annotationSource.indexOf('>');
-          if (start == '@DbColumn'.length) {
+          if (start != -1) {
             columnType = annotationSource.substring(start + 1, end);
           }
 
