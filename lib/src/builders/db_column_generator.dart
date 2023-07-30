@@ -41,8 +41,16 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
         columnsList.writeln('column$fieldNameCamel,');
         final dbColumnAnnotations =
             TypeChecker.fromRuntime(DbColumn).annotationsOf(field);
+        final fieldAnnotations = field.metadata.where((annotation) {
+          final tp = annotation.computeConstantValue()?.type;
+          return tp != null &&
+              TypeChecker.fromRuntime(DbColumn).isExactlyType(tp);
+        });
 
-        for (final dbColumnAnnotation in dbColumnAnnotations) {
+        for (final annotation in fieldAnnotations) {
+          final typeArguments = annotation.element as TypeParameterizedElement;
+          final dbColumnAnnotation = annotation.computeConstantValue()!;
+
           final String name =
               dbColumnAnnotation.getField('name')?.toStringValue() ?? fieldName;
           final String? alias =
@@ -80,6 +88,12 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
             defaultValue =
                 dbColumnAnnotation.getField('defaultValue')?.toStringValue();
           }
+          var columnType = fieldType;
+
+          if (typeArguments.typeParameters.isNotEmpty) {
+            columnType = typeArguments.typeParameters[0]
+                .getDisplayString(withNullability: false);
+          }
 
           if (hasReadFromDb) {
             generatedCode.writeln('''
@@ -93,8 +107,8 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           }
 
           generatedCode.writeln('''
-      SqlColumn<$className, $fieldType> get column$fieldNameCamel =>
-        SqlColumn<$className, $fieldType>(
+      SqlColumn<$className, $columnType> get column$fieldNameCamel =>
+        SqlColumn<$className, $columnType>(
           '$name',
     ''');
           if (alias != null) {
