@@ -39,8 +39,6 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
         final fieldType = field.type.getDisplayString(withNullability: false);
 
         columnsList.writeln('column$fieldNameCamel,');
-        final dbColumnAnnotations =
-            TypeChecker.fromRuntime(DbColumn).annotationsOf(field);
         final fieldAnnotations = field.metadata.where((annotation) {
           final tp = annotation.computeConstantValue()?.type;
           return tp != null &&
@@ -89,6 +87,11 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           }
           var columnType = fieldType;
           final annotationSource = annotation.toSource();
+          generatedCode.writeln('''
+/*
+$annotationSource
+*/
+ ''');
           final start = annotationSource.indexOf('<');
           final end = annotationSource.indexOf('>');
           if (start == 'DbColumn'.length) {
@@ -102,7 +105,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           }
           if (hasSaveToDb) {
             generatedCode.writeln('''
-  $columnType save${fieldNameCamel}ToDb($className entity);
+  $columnType? save${fieldNameCamel}ToDb($className entity);
  ''');
           }
 
