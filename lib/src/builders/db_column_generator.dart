@@ -48,7 +48,6 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
         });
 
         for (final annotation in fieldAnnotations) {
-          final typeArguments = annotation.element as TypeParameterizedElement;
           final dbColumnAnnotation = annotation.computeConstantValue()!;
 
           final String name =
@@ -89,10 +88,11 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
                 dbColumnAnnotation.getField('defaultValue')?.toStringValue();
           }
           var columnType = fieldType;
-
-          if (typeArguments.typeParameters.isNotEmpty) {
-            columnType = typeArguments.typeParameters[0]
-                .getDisplayString(withNullability: false);
+          final annotationSource = annotation.toSource();
+          final start = annotationSource.indexOf('<');
+          final end = annotationSource.indexOf('>');
+          if (start == 'DbColumn'.length) {
+            columnType = annotationSource.substring(start + 1, end);
           }
 
           if (hasReadFromDb) {
