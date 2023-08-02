@@ -167,10 +167,22 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     ''');
           }
           if (hasReadFromDb) {
-            generatedCode.writeln('''
+            if (jsonEncodeAlias) {
+              generatedCode.writeln('''
+          readFromDb: (entity, value){
+            if ('null' == value){
+              return read${fieldNameCamel}FromDb(null, entity);
+            }
+            return read${fieldNameCamel}FromDb(value, entity);
+          },
+        );
+    ''');
+            } else {
+              generatedCode.writeln('''
           readFromDb: (entity, value) => read${fieldNameCamel}FromDb(value, entity),
         );
     ''');
+            }
           } else {
             generatedCode.writeln('''
           readFromDb: (entity, value) => entity.copyWith($fieldName: value),
