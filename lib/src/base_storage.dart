@@ -41,7 +41,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
         if (element.id == null)
           element = element.copyWith(id: Uuid().v4()) as TEntity;
         element = element.updateDates() as TEntity;
-        batch.insert(element.tableName, element.toJson(),
+        batch.insert(element.tableName, element.toMap(),
             conflictAlgorithm: ConflictAlgorithm.abort);
         updatedItems.add(element);
       });
@@ -153,7 +153,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
           element = element.copyWith(id: Uuid().v4()) as TEntity;
         element = element.updateDates() as TEntity;
         updatedItems.add(element);
-        batch.insert(element.tableName, element.toJson(),
+        batch.insert(element.tableName, element.toMap(),
             conflictAlgorithm: ConflictAlgorithm.replace);
       });
       result = await _finishBatch(batch, updatedItems);

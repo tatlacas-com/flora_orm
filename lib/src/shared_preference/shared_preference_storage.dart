@@ -37,7 +37,7 @@ class SharedPreferenceStorage<TEntity extends IEntity>
   Future<TEntity?> insert(TEntity item) async {
     if (item.id == null) item = item.copyWith(id: Uuid().v4()) as TEntity;
     item = item.updateDates() as TEntity;
-    final json = jsonEncode(item.toJson());
+    final json = jsonEncode(item.toMap());
     await write(key: item.id!, value: json);
     return item;
   }
@@ -61,7 +61,7 @@ class SharedPreferenceStorage<TEntity extends IEntity>
   Future<TEntity?> insertOrUpdate(TEntity item) async {
     if (item.id == null) item = item.copyWith(id: Uuid().v4()) as TEntity;
     item = item.updateDates() as TEntity;
-    final json = jsonEncode(item.toJson());
+    final json = jsonEncode(item.toMap());
     await write(key: item.id!, value: json);
     return item;
   }
@@ -94,7 +94,7 @@ class SharedPreferenceStorage<TEntity extends IEntity>
     var query =
         where.filters.where((element) => element.column?.name == 'id').toList();
     if (query.isNotEmpty == true) {
-      final json = jsonEncode(item.toJson());
+      final json = jsonEncode(item.toMap());
       await write(key: query[0].value, value: json);
       return 1;
     }

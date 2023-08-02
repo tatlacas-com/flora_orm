@@ -49,7 +49,7 @@ abstract class IEntity {
 
   String createTable(int version);
 
-  Map<String, dynamic> toJson();
+  Map<String, dynamic> toMap();
 
   Map<String, dynamic> toDb();
 
@@ -77,7 +77,7 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
       ];
 
   @override
-  String toString() => indentedString({runtimeType.toString(): toJson()});
+  String toString() => indentedString({runtimeType.toString(): toMap()});
 
   String indentedString(json) {
     var encoder = new JsonEncoder.withIndent("     ");
@@ -132,7 +132,7 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {};
     allColumns.forEach((column) {
       column.commitValue(this as TEntity, map);
