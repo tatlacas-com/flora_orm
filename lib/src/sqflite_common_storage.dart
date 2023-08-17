@@ -5,7 +5,7 @@ import 'sqflite_common_db_context.dart';
 
 class SqfliteCommonStorage<TEntity extends IEntity>
     extends BaseStorage<TEntity, SqfliteCommonDbContext> {
-  const SqfliteCommonStorage(TEntity entityType,
+  const SqfliteCommonStorage(TEntity typeProvider,
       {required SqfliteCommonDbContext dbContext})
-      : super(entityType, dbContext: dbContext);
+      : super(typeProvider, dbContext: dbContext);
 }

@@ -12,9 +12,9 @@ class SharedPreferenceStorage<TEntity extends IEntity>
   @protected
   final Future<SharedPreferences> prefs = SharedPreferences.getInstance();
 
-  SharedPreferenceStorage(TEntity entityType,
+  SharedPreferenceStorage(TEntity typeProvider,
       {required SharedPreferenceContext dbContext})
-      : super(entityType, dbContext: dbContext);
+      : super(typeProvider, dbContext: dbContext);
 
   @protected
   Future<String?> read({required String key}) async {
@@ -47,7 +47,7 @@ class SharedPreferenceStorage<TEntity extends IEntity>
   Future<Map<String, dynamic>?> getEntity({
     Iterable<SqlColumn>? columns,
     List<SqlOrder>? orderBy,
-    required SqlWhere where,
+    required SqlWhere Function(TEntity typeProvider) where,
     int? offset,
   }) async {
     return null;
@@ -74,10 +74,12 @@ class SharedPreferenceStorage<TEntity extends IEntity>
 
   @override
   Future<int> delete({
-    required SqlWhere where,
+    required SqlWhere Function(TEntity typeProvider) where,
   }) async {
-    var item =
-        where.filters.where((element) => element.column?.name == 'id').toList();
+    var item = where(typeProvider)
+        .filters
+        .where((element) => element.column?.name == 'id')
+        .toList();
     if (item.isNotEmpty == true) {
       // await _delete(key: item[0].value); todo
       return 1;
@@ -87,23 +89,25 @@ class SharedPreferenceStorage<TEntity extends IEntity>
 
   @override
   Future<int> update({
-    required SqlWhere where,
+    required SqlWhere Function(TEntity typeProvider) where,
     TEntity? entity,
     Map<SqlColumn, dynamic>? columnValues,
   }) async {
-    var query =
-        where.filters.where((element) => element.column?.name == 'id').toList();
+    var query = where(typeProvider)
+        .filters
+        .where((element) => element.column?.name == 'id')
+        .toList();
     if (query.isNotEmpty == true) {
       var createdAt = entity?.createdAt;
       if (entity == null) {
         final res = await getEntity(
-            where: where, columns: [entityType.columnCreatedAt]);
-        if (res?.containsKey(entityType.columnCreatedAt.name) == true) {
-          createdAt = res![entityType.columnCreatedAt.name];
+            where: where, columns: [typeProvider.columnCreatedAt]);
+        if (res?.containsKey(typeProvider.columnCreatedAt.name) == true) {
+          createdAt = res![typeProvider.columnCreatedAt.name];
         }
       }
       entity =
-          (entity ?? entityType).updateDates(createdAt: createdAt) as TEntity;
+          (entity ?? typeProvider).updateDates(createdAt: createdAt) as TEntity;
       final update = columnValues != null
           ? entity.toStorageJson(columnValues: columnValues)
           : entity.toMap();
@@ -116,7 +120,7 @@ class SharedPreferenceStorage<TEntity extends IEntity>
 
   @override
   Future<List<Map<String, dynamic>>> query({
-    SqlWhere? where,
+    SqlWhere Function(TEntity typeProvider)? where,
     Iterable<SqlColumn>? columns,
     List<SqlOrder>? orderBy,
     int? limit,
@@ -127,7 +131,7 @@ class SharedPreferenceStorage<TEntity extends IEntity>
 
   @override
   Future<List<Map<String, Object?>>> rawQuery(
-    SqlWhere? where,
+    SqlWhere Function(TEntity typeProvider)? where,
     String query,
   ) async {
     return [];
