@@ -4,7 +4,7 @@ class DbColumn<TColumnType> {
   const DbColumn({
     this.name,
     this.alias,
-    this.encodeWhat,
+    this.encodedJson = false,
     this.primaryKey = false,
     this.unique = false,
     this.autoIncrementPrimary = false,
@@ -15,7 +15,7 @@ class DbColumn<TColumnType> {
   });
   final String? name;
   final String? alias;
-  final Function(TColumnType t)? encodeWhat;
+  final bool encodedJson;
   final bool primaryKey;
   final bool autoIncrementPrimary;
   final bool hasReadFromDb;
