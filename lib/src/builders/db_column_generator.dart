@@ -52,9 +52,9 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
 
           final String name =
               dbColumnAnnotation.getField('name')?.toStringValue() ?? fieldName;
-          final ExecutableElement? jsonEncodeWhat =
-              dbColumnAnnotation.getField('jsonEncodeWhat')?.toFunctionValue();
-          final jsonEncoded = jsonEncodeWhat != null;
+          final ExecutableElement? encodeWhat =
+              dbColumnAnnotation.getField('encodeWhat')?.toFunctionValue();
+          final jsonEncoded = encodeWhat != null;
           final String? alias = dbColumnAnnotation
                   .getField('alias')
                   ?.toStringValue() ??
@@ -106,7 +106,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           } else if (jsonEncoded) {
             generatedCode.writeln('''
   $className read${fieldNameCamel}FromDb(value, $className entity){
-    ${jsonEncodeWhat.returnType}? $alias;
+    ${encodeWhat.returnType}? $alias;
     if (value != null) {
       Map<String, dynamic> map = jsonDecode(value);
       $alias = $className.fromMap(map);
