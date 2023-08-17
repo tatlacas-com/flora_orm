@@ -95,7 +95,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
 
           final start = annotationSource.indexOf('<');
           final end = annotationSource.indexOf('>');
-          if (start != -1) {
+          if (!jsonEncoded && start != -1) {
             columnType = annotationSource.substring(start + 1, end);
           }
 
