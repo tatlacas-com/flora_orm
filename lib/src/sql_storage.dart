@@ -9,8 +9,9 @@ import 'models/sql_order.dart';
 abstract class SqlStorage<TEntity extends IEntity,
     TDbContext extends DbContext<IEntity>> extends Equatable {
   final TDbContext dbContext;
+  final TEntity entityType;
 
-  const SqlStorage({required this.dbContext});
+  const SqlStorage(this.entityType, {required this.dbContext});
 
   Future<TEntity?> insert(TEntity item);
 
@@ -20,54 +21,47 @@ abstract class SqlStorage<TEntity extends IEntity,
 
   Future<List<TEntity>?> insertOrUpdateList(Iterable<TEntity> items);
 
-  Future<Map<String, dynamic>?> getEntity(
-    TEntity type, {
+  Future<Map<String, dynamic>?> getEntity({
     List<SqlColumn>? columns,
     List<SqlOrder>? orderBy,
     required SqlWhere where,
     int? offset,
   });
 
-  Future<T> getSum<T>(
-    TEntity type, {
+  Future<T> getSum<T>({
     required SqlColumn column,
     SqlWhere? where,
   });
 
-  Future<T> getSumProduct<T>(
-    TEntity type, {
+  Future<T> getSumProduct<T>({
     required List<SqlColumn> columns,
     SqlWhere? where,
   });
 
-  Future<int> getCount(
-    TEntity type, {
+  Future<int> getCount({
     SqlWhere? where,
   });
 
-  Future<int> delete(
-    TEntity type, {
+  Future<int> delete({
     required SqlWhere where,
   });
 
-  Future<int> update(
-    TEntity item, {
+  Future<int> update({
     required SqlWhere where,
+    TEntity entity,
     Map<SqlColumn, dynamic>? columnValues,
   });
 
   @protected
   Future<List<Map<String, dynamic>>> query({
     SqlWhere? where,
-    required TEntity type,
     List<SqlColumn>? columns,
     List<SqlOrder>? orderBy,
     int? limit,
     int? offset,
   });
 
-  Future<List<Map<String, dynamic>>> getEntities(
-    TEntity type, {
+  Future<List<Map<String, dynamic>>> getEntities({
     List<SqlColumn>? columns,
     List<SqlOrder>? orderBy,
     SqlWhere? where,

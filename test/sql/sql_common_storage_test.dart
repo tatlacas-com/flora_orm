@@ -1,4 +1,5 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sqlite_api.dart';
@@ -11,13 +12,23 @@ import 'sql_storage_test_runs.dart';
 clearDb(Database database) {}
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('Test Sql Common Storage', () {
+    setUp(() {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+              const MethodChannel('plugins.flutter.io/path_provider'),
+              (MethodCall methodCall) async {
+        return '.';
+      });
+    });
     var dbContext = SqfliteCommonDbContext(
       dbVersion: 1,
       dbName: 'common_storage_db',
       tables: [TestEntity()],
     );
-    var storage = SqfliteCommonStorage(dbContext: dbContext);
+    var storage = SqfliteCommonStorage(TestEntity(), dbContext: dbContext);
     test('drop database', () async {
       var database = await dbContext.database;
       try {
@@ -30,7 +41,7 @@ void main() {
       dbContext = dbContext.copyWith(
         dbVersion: 2,
       );
-      storage = SqfliteCommonStorage(dbContext: dbContext);
+      storage = SqfliteCommonStorage(TestEntity(), dbContext: dbContext);
       await dbContext.open();
       final dbVersion = await (await dbContext.database).getVersion();
       expect(dbVersion, 2);
@@ -50,7 +61,7 @@ void main() {
         dbContext = dbContext.copyWith(
           dbVersion: 4,
         );
-        storage = SqfliteCommonStorage(dbContext: dbContext);
+        storage = SqfliteCommonStorage(TestEntity(), dbContext: dbContext);
         await dbContext.open();
         storage.insert(TestEntity(testString: 'Okay'));
         final dbVersion = await (await dbContext.database).getVersion();
@@ -64,7 +75,7 @@ void main() {
         dbContext = dbContext.copyWith(
           dbVersion: 3,
         );
-        storage = SqfliteCommonStorage(dbContext: dbContext);
+        storage = SqfliteCommonStorage(TestEntity(), dbContext: dbContext);
         await dbContext.open();
         storage.insert(TestEntity(testString: 'Okay'));
         final dbVersion = await (await dbContext.database).getVersion();

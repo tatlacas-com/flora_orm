@@ -12,8 +12,9 @@ class SharedPreferenceStorage<TEntity extends IEntity>
   @protected
   final Future<SharedPreferences> prefs = SharedPreferences.getInstance();
 
-  SharedPreferenceStorage({required SharedPreferenceContext dbContext})
-      : super(dbContext: dbContext);
+  SharedPreferenceStorage(TEntity entityType,
+      {required SharedPreferenceContext dbContext})
+      : super(entityType, dbContext: dbContext);
 
   @protected
   Future<String?> read({required String key}) async {
@@ -42,8 +43,8 @@ class SharedPreferenceStorage<TEntity extends IEntity>
     return item;
   }
 
-  Future<Map<String, dynamic>?> getEntity(
-    TEntity type, {
+  @override
+  Future<Map<String, dynamic>?> getEntity({
     Iterable<SqlColumn>? columns,
     List<SqlOrder>? orderBy,
     required SqlWhere where,
@@ -72,8 +73,7 @@ class SharedPreferenceStorage<TEntity extends IEntity>
   }
 
   @override
-  Future<int> delete(
-    TEntity type, {
+  Future<int> delete({
     required SqlWhere where,
   }) async {
     var item =
@@ -86,15 +86,28 @@ class SharedPreferenceStorage<TEntity extends IEntity>
   }
 
   @override
-  Future<int> update(
-    TEntity item, {
+  Future<int> update({
     required SqlWhere where,
+    TEntity? entity,
     Map<SqlColumn, dynamic>? columnValues,
   }) async {
     var query =
         where.filters.where((element) => element.column?.name == 'id').toList();
     if (query.isNotEmpty == true) {
-      final json = jsonEncode(item.toMap());
+      var createdAt = entity?.createdAt;
+      if (entity == null) {
+        final res = await getEntity(
+            where: where, columns: [entityType.columnCreatedAt]);
+        if (res?.containsKey(entityType.columnCreatedAt.name) == true) {
+          createdAt = res![entityType.columnCreatedAt.name];
+        }
+      }
+      entity =
+          (entity ?? entityType).updateDates(createdAt: createdAt) as TEntity;
+      final update = columnValues != null
+          ? entity.toStorageJson(columnValues: columnValues)
+          : entity.toMap();
+      final json = jsonEncode(update);
       await write(key: query[0].value, value: json);
       return 1;
     }
@@ -104,7 +117,6 @@ class SharedPreferenceStorage<TEntity extends IEntity>
   @override
   Future<List<Map<String, dynamic>>> query({
     SqlWhere? where,
-    required TEntity type,
     Iterable<SqlColumn>? columns,
     List<SqlOrder>? orderBy,
     int? limit,

@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'dummy/test_entity.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   group('Test TestEntity', () {
     late TestEntity entity;
     setUp(() {

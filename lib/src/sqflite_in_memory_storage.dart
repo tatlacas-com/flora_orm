@@ -5,6 +5,7 @@ import 'sqflite_in_memory_db_context.dart';
 
 class SqfliteInMemoryStorage<TEntity extends IEntity>
     extends BaseStorage<TEntity, SqfliteInMemoryDbContext> {
-  const SqfliteInMemoryStorage({required SqfliteInMemoryDbContext dbContext})
-      : super(dbContext: dbContext);
+  const SqfliteInMemoryStorage(TEntity entityType,
+      {required SqfliteInMemoryDbContext dbContext})
+      : super(entityType, dbContext: dbContext);
 }

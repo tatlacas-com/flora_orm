@@ -17,7 +17,7 @@ abstract class IEntity {
     this.updatedAt,
   });
 
-  IEntity updateDates();
+  IEntity updateDates({DateTime? createdAt});
 
   IEntity copyWith({
     String? id,
@@ -123,8 +123,9 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
   List<SqlColumn<TEntity, dynamic>> get compositePrimaryKey =>
       <SqlColumn<TEntity, dynamic>>[];
 
-  TEntity updateDates() {
-    var createdAt = this.createdAt ?? DateTime.now().toUtc();
+  @override
+  TEntity updateDates({DateTime? createdAt}) {
+    createdAt ??= this.createdAt ?? DateTime.now().toUtc();
     var updatedAt = DateTime.now().toUtc();
     return copyWith(
       createdAt: createdAt,
