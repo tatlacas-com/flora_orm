@@ -55,10 +55,9 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           final jsonEncoded =
               dbColumnAnnotation.getField('encodedJson')?.toBoolValue() ??
                   false;
-          final String? alias = dbColumnAnnotation
-                  .getField('alias')
-                  ?.toStringValue() ??
-              (jsonEncoded ? fieldName.replaceAll('Json', 'replace') : null);
+          final String? alias =
+              dbColumnAnnotation.getField('alias')?.toStringValue() ??
+                  (jsonEncoded ? fieldName.replaceAll('Json', '') : null);
 
           final bool hasReadFromDb =
               dbColumnAnnotation.getField('hasReadFromDb')?.toBoolValue() ??
