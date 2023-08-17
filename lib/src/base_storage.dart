@@ -19,8 +19,8 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     return null;
   }
 
-  const BaseStorage(TEntity typeProvider, {required TDbContext dbContext})
-      : super(typeProvider, dbContext: dbContext);
+  const BaseStorage(TEntity t, {required TDbContext dbContext})
+      : super(t, dbContext: dbContext);
 
   Future<TEntity?> insert(TEntity item) async {
     if (item.id == null) item = item.copyWith(id: Uuid().v4()) as TEntity;
@@ -64,12 +64,12 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   Future<Map<String, dynamic>?> getEntity({
     Iterable<SqlColumn>? columns,
     List<SqlOrder>? orderBy,
-    required SqlWhere Function(TEntity typeProvider) where,
+    required SqlWhere Function(TEntity t) where,
     int? offset,
   }) async {
     List<Map<String, dynamic>> maps = await query(
         where: where,
-        columns: columns ?? typeProvider.allColumns,
+        columns: columns ?? t.allColumns,
         limit: 1,
         offset: offset,
         orderBy: orderBy);
@@ -82,10 +82,10 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   @override
   Future<T> getSum<T>({
     required SqlColumn column,
-    SqlWhere Function(TEntity typeProvider)? where,
+    SqlWhere Function(TEntity t)? where,
   }) async {
     List<Map> result = await rawQuery(
-        where, 'SELECT SUM (${column.name}) FROM ${typeProvider.tableName}');
+        where, 'SELECT SUM (${column.name}) FROM ${t.tableName}');
     if (result.isNotEmpty) {
       final firstRow = result.first;
       if (firstRow.isNotEmpty && firstRow.values.first != null) {
@@ -98,11 +98,11 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   @override
   Future<T> getSumProduct<T>({
     required Iterable<SqlColumn> columns,
-    SqlWhere Function(TEntity typeProvider)? where,
+    SqlWhere Function(TEntity t)? where,
   }) async {
     final cols = columns.map((e) => e.name).join(' * ');
-    List<Map> result = await rawQuery(
-        where, 'SELECT SUM ($cols) FROM ${typeProvider.tableName}');
+    List<Map> result =
+        await rawQuery(where, 'SELECT SUM ($cols) FROM ${t.tableName}');
     if (result.isNotEmpty) {
       final firstRow = result.first;
       if (firstRow.isNotEmpty && firstRow.values.first != null) {
@@ -125,7 +125,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   Future<List<Map<String, dynamic>>> getEntities({
     Iterable<SqlColumn>? columns,
     List<SqlOrder>? orderBy,
-    SqlWhere Function(TEntity typeProvider)? where,
+    SqlWhere Function(TEntity t)? where,
     int? limit,
     int? offset,
   }) async {
@@ -133,7 +133,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
         where: where,
         limit: limit,
         offset: offset,
-        columns: columns ?? typeProvider.allColumns,
+        columns: columns ?? t.allColumns,
         orderBy: orderBy);
     if (maps.isNotEmpty) {
       return maps;
@@ -177,10 +177,10 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
 
   @override
   Future<int> getCount({
-    SqlWhere Function(TEntity typeProvider)? where,
+    SqlWhere Function(TEntity t)? where,
   }) async {
-    List<Map<String, Object?>> result = await rawQuery(
-        where, 'SELECT COUNT (*) FROM ${typeProvider.tableName}');
+    List<Map<String, Object?>> result =
+        await rawQuery(where, 'SELECT COUNT (*) FROM ${t.tableName}');
     if (result.isNotEmpty) {
       final firstRow = result.first;
       if (firstRow.isNotEmpty) {
@@ -192,12 +192,12 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
 
   @override
   Future<int> delete({
-    required SqlWhere Function(TEntity typeProvider) where,
+    required SqlWhere Function(TEntity t) where,
   }) async {
     final db = await dbContext.database;
     final formattedQuery = whereString(where);
     return await db.delete(
-      typeProvider.tableName,
+      t.tableName,
       where: formattedQuery.where,
       whereArgs: formattedQuery.whereArgs,
     );
@@ -205,7 +205,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
 
   @override
   Future<int> update({
-    required SqlWhere Function(TEntity typeProvider) where,
+    required SqlWhere Function(TEntity t) where,
     TEntity? entity,
     Map<SqlColumn, dynamic>? columnValues,
   }) async {
@@ -214,14 +214,12 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     final formattedQuery = whereString(where);
     var createdAt = entity?.createdAt;
     if (entity == null) {
-      final res = await getEntity(
-          where: where, columns: [typeProvider.columnCreatedAt]);
-      if (res?.containsKey(typeProvider.columnCreatedAt.name) == true) {
-        createdAt = DateTime.parse(res![typeProvider.columnCreatedAt.name]);
+      final res = await getEntity(where: where, columns: [t.columnCreatedAt]);
+      if (res?.containsKey(t.columnCreatedAt.name) == true) {
+        createdAt = DateTime.parse(res![t.columnCreatedAt.name]);
       }
     }
-    entity =
-        (entity ?? typeProvider).updateDates(createdAt: createdAt) as TEntity;
+    entity = (entity ?? t).updateDates(createdAt: createdAt) as TEntity;
     final update = columnValues != null
         ? entity.toStorageJson(columnValues: columnValues)
         : entity.toDb();
@@ -236,7 +234,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   @override
   @protected
   Future<List<Map<String, dynamic>>> query({
-    SqlWhere Function(TEntity typeProvider)? where,
+    SqlWhere Function(TEntity t)? where,
     Iterable<SqlColumn>? columns,
     List<SqlOrder>? orderBy,
     int? limit,
@@ -259,7 +257,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     }
     if (where == null)
       maps = await db.query(
-        typeProvider.tableName,
+        t.tableName,
         columns: cols,
         orderBy: orderByFilter,
         limit: limit,
@@ -268,7 +266,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     else {
       final formattedQuery = whereString(where);
       maps = await db.query(
-        typeProvider.tableName,
+        t.tableName,
         columns: cols,
         where: formattedQuery.where,
         whereArgs: formattedQuery.whereArgs,
@@ -282,7 +280,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
 
   @protected
   Future<List<Map<String, Object?>>> rawQuery(
-    SqlWhere Function(TEntity typeProvider)? where,
+    SqlWhere Function(TEntity t)? where,
     String query,
   ) async {
     final db = await dbContext.database;

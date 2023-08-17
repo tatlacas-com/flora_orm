@@ -58,8 +58,8 @@ void run(BaseStorage storage) {
     expect(insertedEntity, isNotNull);
     var fxn = () async => await storage.getEntity(
           columns: [],
-          where: (typeProvider) => SqlWhere(
-            typeProvider.columnId,
+          where: (t) => SqlWhere(
+            t.columnId,
             value: insertedEntity!.id,
           )
               .and(
@@ -93,7 +93,7 @@ void run(BaseStorage storage) {
     var insertedEntity = await storage.insert(entity) as TestEntity?;
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
-      where: (typeProvider) => SqlWhere(
+      where: (t) => SqlWhere(
         entity.columnId,
         value: insertedEntity!.id,
       )
@@ -130,7 +130,7 @@ void run(BaseStorage storage) {
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
       columns: [entity.columnTestInt],
-      where: (typeProvider) => SqlWhere(
+      where: (t) => SqlWhere(
         entity.columnId,
         value: insertedEntity!.id,
       )
@@ -172,7 +172,7 @@ void run(BaseStorage storage) {
           direction: OrderDirection.Desc,
         )
       ],
-      where: (typeProvider) => SqlWhere(
+      where: (t) => SqlWhere(
         entity.columnId,
         condition: SqlCondition.NotEqualTo,
         value: '12',
@@ -197,7 +197,7 @@ void run(BaseStorage storage) {
           direction: OrderDirection.Desc,
         )
       ],
-      where: (typeProvider) => SqlWhere(
+      where: (t) => SqlWhere(
         entity.columnTestInt,
         condition: SqlCondition.Null,
       ).and(
@@ -224,7 +224,7 @@ void run(BaseStorage storage) {
           direction: OrderDirection.Desc,
         )
       ],
-      where: (typeProvider) => SqlWhere(
+      where: (t) => SqlWhere(
         entity.columnTestString,
         condition: SqlCondition.NotNull,
       ),
@@ -249,7 +249,7 @@ void run(BaseStorage storage) {
           direction: OrderDirection.Desc,
         )
       ],
-      where: (typeProvider) => SqlWhere(
+      where: (t) => SqlWhere(
         entity.columnTestInt,
         condition: SqlCondition.LessThan,
         value: -14,
@@ -275,7 +275,7 @@ void run(BaseStorage storage) {
           direction: OrderDirection.Desc,
         )
       ],
-      where: (typeProvider) => SqlWhere(
+      where: (t) => SqlWhere(
         entity.columnTestInt,
         condition: SqlCondition.GreaterThan,
         value: 19999,
@@ -301,7 +301,7 @@ void run(BaseStorage storage) {
           direction: OrderDirection.Desc,
         )
       ],
-      where: (typeProvider) => SqlWhere(
+      where: (t) => SqlWhere(
         entity.columnTestInt,
         condition: SqlCondition.GreaterThanOrEqual,
         value: 100,
@@ -327,7 +327,7 @@ void run(BaseStorage storage) {
           direction: OrderDirection.Desc,
         )
       ],
-      where: (typeProvider) => SqlWhere(
+      where: (t) => SqlWhere(
         entity.columnTestInt,
         condition: SqlCondition.GreaterThanOrEqual,
         value: -10,
@@ -353,7 +353,7 @@ void run(BaseStorage storage) {
           direction: OrderDirection.Desc,
         )
       ],
-      where: (typeProvider) => SqlWhere(
+      where: (t) => SqlWhere(
         entity.columnTestInt,
         condition: SqlCondition.Between,
         value: 1000,
@@ -380,7 +380,7 @@ void run(BaseStorage storage) {
           direction: OrderDirection.Desc,
         )
       ],
-      where: (typeProvider) => SqlWhere(
+      where: (t) => SqlWhere(
         entity.columnTestInt,
         condition: SqlCondition.NotBetween,
         value: -500,
@@ -407,7 +407,7 @@ void run(BaseStorage storage) {
           direction: OrderDirection.Desc,
         )
       ],
-      where: (typeProvider) => SqlWhere(
+      where: (t) => SqlWhere(
         entity.columnTestInt,
         condition: SqlCondition.In,
         value: [11001],
@@ -433,7 +433,7 @@ void run(BaseStorage storage) {
           direction: OrderDirection.Desc,
         )
       ],
-      where: (typeProvider) => SqlWhere(
+      where: (t) => SqlWhere(
         entity.columnTestInt,
         condition: SqlCondition.NotIn,
         value: [11001, 11005],
@@ -459,7 +459,7 @@ void run(BaseStorage storage) {
           direction: OrderDirection.Desc,
         )
       ],
-      where: (typeProvider) => SqlWhere(
+      where: (t) => SqlWhere(
         entity.columnTestString,
         condition: SqlCondition.Like,
         value: '%Like%',
@@ -485,7 +485,7 @@ void run(BaseStorage storage) {
           direction: OrderDirection.Desc,
         )
       ],
-      where: (typeProvider) => SqlWhere(
+      where: (t) => SqlWhere(
         entity.columnTestString,
         condition: SqlCondition.NotLike,
         value: '%Dummy%',
@@ -512,7 +512,7 @@ void run(BaseStorage storage) {
           direction: OrderDirection.Desc,
         )
       ],
-      where: (typeProvider) => SqlWhere.lb()
+      where: (t) => SqlWhere.lb()
           .query(
             entity.columnTestString,
             condition: SqlCondition.Like,
@@ -558,7 +558,7 @@ void run(BaseStorage storage) {
     expect(insertedEntity1, isNotNull);
     var json = await storage.getEntities(
       orderBy: [SqlOrder(column: entity.columnTestInt)],
-      where: (typeProvider) => SqlWhere(
+      where: (t) => SqlWhere(
         entity.columnId,
         value: insertedEntity!.id,
       ).or(
@@ -579,7 +579,7 @@ void run(BaseStorage storage) {
     final entity = TestEntity();
     var json = await storage.getEntities(
       orderBy: [SqlOrder(column: entity.columnTestInt)],
-      where: (typeProvider) => SqlWhere(
+      where: (t) => SqlWhere(
         entity.columnId,
         value: 'xyzNotFound',
       ),
@@ -630,7 +630,7 @@ void run(BaseStorage storage) {
           direction: OrderDirection.Desc,
         )
       ],
-      where: (typeProvider) => SqlWhere(
+      where: (t) => SqlWhere(
         entity.columnId,
         value: insertedEntity!.id,
       ).or(
@@ -684,7 +684,7 @@ void run(BaseStorage storage) {
     entity = (insertedEntity as TestEntity).copyWith(testString: 'Updated a');
     var total = await storage.update(
       entity: entity,
-      where: (typeProvider) => SqlWhere(
+      where: (t) => SqlWhere(
         entity.columnId,
         value: entity.id,
       ),
@@ -702,15 +702,14 @@ void run(BaseStorage storage) {
     var insertedEntity = await storage.insert(entity) as TestEntity?;
     expect(insertedEntity, isNotNull);
     var total = await storage.update(
-        where: (typeProvider) => SqlWhere(
+        where: (t) => SqlWhere(
               entity.columnId,
               value: insertedEntity!.id,
             ),
         columnValues: {entity.columnTestString: 'Updated ax1'});
     expect(total, 1);
     var json = await storage.getEntity(
-        where: (typeProvider) =>
-            SqlWhere(entity.columnId, value: insertedEntity?.id));
+        where: (t) => SqlWhere(entity.columnId, value: insertedEntity?.id));
     insertedEntity = insertedEntity?.copyWith(testString: 'Updated ax1');
     entity = TestEntity().load(json!);
     expect(entity, insertedEntity);
@@ -792,7 +791,7 @@ void run(BaseStorage storage) {
     expect(insertedEntity, isNotNull);
     expect(insertedEntity!.length, 2);
     var total = await storage.getCount(
-      where: (typeProvider) => SqlWhere(
+      where: (t) => SqlWhere(
         entity.columnId,
         value: insertedEntity[0].id,
       ).or(
@@ -821,7 +820,7 @@ void run(BaseStorage storage) {
     expect(insertedEntity, isNotNull);
     expect(insertedEntity!.length, 2);
     var total = await storage.delete(
-      where: (typeProvider) => SqlWhere(
+      where: (t) => SqlWhere(
         entity.columnId,
         value: insertedEntity[0].id,
       ).or(
@@ -851,7 +850,7 @@ void run(BaseStorage storage) {
     expect(insertedEntity1, isNotNull);
     var sum = await storage.getSum<int>(
       column: entity.columnTestInt,
-      where: (typeProvider) => SqlWhere(
+      where: (t) => SqlWhere(
         entity.columnId,
         value: insertedEntity!.id,
       ).or(
@@ -888,7 +887,7 @@ void run(BaseStorage storage) {
         entity.columnTestInt,
         entity.columnTestDouble,
       ],
-      where: (typeProvider) => SqlWhere(
+      where: (t) => SqlWhere(
         entity.columnId,
         value: insertedEntity!.id,
       ).or(
@@ -918,7 +917,7 @@ void run(BaseStorage storage) {
     expect(insertedEntity1, isNotNull);
     var json = await storage.getSum<double>(
       column: entity.columnTestDouble,
-      where: (typeProvider) => SqlWhere(
+      where: (t) => SqlWhere(
         entity.columnId,
         value: insertedEntity!.id,
       ).or(

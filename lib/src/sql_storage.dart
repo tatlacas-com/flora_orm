@@ -9,9 +9,9 @@ import 'models/sql_order.dart';
 abstract class SqlStorage<TEntity extends IEntity,
     TDbContext extends DbContext<IEntity>> extends Equatable {
   final TDbContext dbContext;
-  final TEntity typeProvider;
+  final TEntity t;
 
-  const SqlStorage(this.typeProvider, {required this.dbContext});
+  const SqlStorage(this.t, {required this.dbContext});
 
   Future<TEntity?> insert(TEntity item);
 
@@ -24,37 +24,37 @@ abstract class SqlStorage<TEntity extends IEntity,
   Future<Map<String, dynamic>?> getEntity({
     List<SqlColumn>? columns,
     List<SqlOrder>? orderBy,
-    required SqlWhere Function(TEntity typeProvider) where,
+    required SqlWhere Function(TEntity t) where,
     int? offset,
   });
 
   Future<T> getSum<T>({
     required SqlColumn column,
-    SqlWhere Function(TEntity typeProvider)? where,
+    SqlWhere Function(TEntity t)? where,
   });
 
   Future<T> getSumProduct<T>({
     required List<SqlColumn> columns,
-    SqlWhere Function(TEntity typeProvider)? where,
+    SqlWhere Function(TEntity t)? where,
   });
 
   Future<int> getCount({
-    SqlWhere Function(TEntity typeProvider)? where,
+    SqlWhere Function(TEntity t)? where,
   });
 
   Future<int> delete({
-    required SqlWhere Function(TEntity typeProvider) where,
+    required SqlWhere Function(TEntity t) where,
   });
 
   Future<int> update({
-    required SqlWhere Function(TEntity typeProvider) where,
+    required SqlWhere Function(TEntity t) where,
     TEntity entity,
     Map<SqlColumn, dynamic>? columnValues,
   });
 
   @protected
   Future<List<Map<String, dynamic>>> query({
-    SqlWhere Function(TEntity typeProvider)? where,
+    SqlWhere Function(TEntity t)? where,
     List<SqlColumn>? columns,
     List<SqlOrder>? orderBy,
     int? limit,
@@ -64,22 +64,22 @@ abstract class SqlStorage<TEntity extends IEntity,
   Future<List<Map<String, dynamic>>> getEntities({
     List<SqlColumn>? columns,
     List<SqlOrder>? orderBy,
-    SqlWhere Function(TEntity typeProvider)? where,
+    SqlWhere Function(TEntity t)? where,
   });
 
   @protected
   Future<List<Map<String, Object?>>> rawQuery(
-    SqlWhere Function(TEntity typeProvider)? where,
+    SqlWhere Function(TEntity t)? where,
     String query,
   );
 
   @protected
   FormattedQuery whereString(
-    SqlWhere Function(TEntity typeProvider) where,
+    SqlWhere Function(TEntity t) where,
   ) {
     StringBuffer query = StringBuffer();
     final whereArgs = <dynamic>[];
-    where(typeProvider).filters.forEach((element) {
+    where(t).filters.forEach((element) {
       if (element.isBracketOnly) {
         if (element.leftBracket) query.write('(');
         if (element.rightBracket) query.write(')');

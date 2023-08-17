@@ -1,16 +1,16 @@
 import 'entity.dart';
 import 'sql_column.dart';
 
-extension SqlColumnX<TEntity extends IEntity, TType> on SqlColumn<TEntity,TType>{
+extension SqlColumnX<TEntity extends IEntity, TType>
+    on SqlColumn<TEntity, TType> {
   void setValue(Map<String, dynamic> map, TType? value) {
-    if (columnType == ColumnType.Boolean)
-      map[name] = (value == true || value == 1) ? 1 : 0;
-    else if (columnType == ColumnType.DateTime) {
-      if (value is DateTime)
-        map[name] = value.toIso8601String();
-      else
-        map[name] = value;
-    } else
-      map[name] = value;
+    map[name] = switch (columnType) {
+      ColumnType.Boolean => (value == true || value == 1) ? 1 : 0,
+      ColumnType.DateTime => switch (value) {
+          DateTime() => value.toIso8601String(),
+          _ => value
+        },
+      _ => value
+    };
   }
 }
