@@ -112,12 +112,13 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
             generatedCode.writeln('''
   $className read${fieldNameCamel}FromDb(value, $className entity){
     $jsonEncodedType? $alias;
-    if (value != null) {
-      Map<String, dynamic> map = jsonDecode(value);
+    final val = value != null && value != 'null' ? value : null;
+    if (val != null) {
+      Map<String, dynamic> map = jsonDecode(val);
       $alias = $jsonEncodedType.fromMap(map);
     }
     return entity.copyWith(
-      $fieldName: value,
+      $fieldName: val,
       $alias: $alias,
     );
   }
@@ -191,10 +192,22 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     ''');
           }
           if (hasReadFromDb) {
-            generatedCode.writeln('''
+            if (jsonEncoded) {
+              generatedCode.writeln('''
+          readFromDb: (entity, value){
+            if ('null' == value){
+              return read${fieldNameCamel}FromDb(null, entity);
+            }
+            return read${fieldNameCamel}FromDb(value, entity);
+          },
+        );
+    ''');
+            } else {
+              generatedCode.writeln('''
           readFromDb: (entity, value) => read${fieldNameCamel}FromDb(value, entity),
         );
     ''');
+            }
           } else if (jsonEncoded) {
             generatedCode.writeln('''
           readFromDb: (entity, value){
