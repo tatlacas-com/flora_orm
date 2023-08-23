@@ -191,7 +191,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           saveToDb: (entity) => entity.$fieldName,
     ''');
           }
-          if (hasReadFromDb) {
+          if (hasReadFromDb || jsonEncoded) {
             if (jsonEncoded) {
               generatedCode.writeln('''
           readFromDb: (entity, value){
@@ -208,16 +208,6 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
         );
     ''');
             }
-          } else if (jsonEncoded) {
-            generatedCode.writeln('''
-          readFromDb: (entity, value){
-            if ('null' == value){
-              return read${fieldNameCamel}FromDb(null, entity);
-            }
-            return read${fieldNameCamel}FromDb(value, entity);
-          },
-        );
-    ''');
           } else {
             generatedCode.writeln('''
           readFromDb: (entity, value) => entity.copyWith($fieldName: value),
