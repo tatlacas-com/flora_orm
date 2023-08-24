@@ -11,6 +11,7 @@ class DbColumn<TColumnType> {
     this.hasReadFromDb = false,
     this.hasSaveToDb = false,
     this.notNull = false,
+    this.nullable = false,
     this.defaultValue,
   });
   final String? name;
@@ -19,6 +20,7 @@ class DbColumn<TColumnType> {
   final bool primaryKey;
   final bool autoIncrementPrimary;
   final bool hasReadFromDb;
+  final bool nullable;
   final bool hasSaveToDb;
   final bool notNull;
   final bool unique;
