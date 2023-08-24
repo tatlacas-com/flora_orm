@@ -219,7 +219,7 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
 
   @protected
   String dropColumn(String name) {
-    return 'ALTER TABLE $tableName DROP $name';
+    return 'ALTER TABLE $tableName DROP COLUMN $name';
   }
 
   @protected
