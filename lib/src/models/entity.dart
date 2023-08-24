@@ -168,6 +168,13 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
     return entity;
   }
 
+  List<String> recreateTable(int newVersion) {
+    return [
+      dropTable(tableName),
+      createTable(newVersion),
+    ];
+  }
+
   String createTable(int version) {
     int indx = 1;
     StringBuffer stringBuffer = StringBuffer();
@@ -217,10 +224,10 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
     return 'ALTER TABLE $tableName ADD ${column.name} ${getColumnType(column.columnType)}${str.toString()}';
   }
 
-  @protected
+  /* @protected
   String dropColumn(String name) {
     return 'ALTER TABLE $tableName DROP COLUMN $name';
-  }
+  } */
 
   @protected
   String getColumnType(ColumnType columnType) {
