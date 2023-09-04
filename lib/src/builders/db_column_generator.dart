@@ -182,9 +182,10 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     ''');
           } else if (jsonEncoded) {
             generatedCode.writeln('''
-          saveToDb: (entity) => jsonEncode(entity.$alias,
-              ${jsonEncodedType == null ? '' : 'toEncodable: (value) => (value as $jsonEncodedType?)?.toMap(),'}
-              ),
+          saveToDb: (entity) {
+            final map = entity.$alias?.toMap();
+            return jsonEncode(map);
+            },
     ''');
           } else {
             generatedCode.writeln('''
