@@ -1,8 +1,25 @@
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type_system.dart';
+import 'package:analyzer/dart/element/visitor.dart';
 import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:tatlacas_sqflite_storage/src/builders/annotations.dart';
 import 'package:tatlacas_sqflite_storage/src/models/entity.dart';
+
+// Define a visitor class to search for a property with a specific name.
+class PropertyFinder extends RecursiveElementVisitor<void> {
+  final String propertyName;
+  FieldElement? foundProperty;
+
+  PropertyFinder(this.propertyName);
+
+  @override
+  void visitFieldElement(FieldElement element) {
+    if (element.name == propertyName) {
+      foundProperty = element;
+    }
+  }
+}
 
 class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
   @override
@@ -13,6 +30,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
   ) {
     final classElement = element as ClassElement;
     final className = classElement.name;
+
     final tableName = annotation.read('tableName').literalValue as String?;
     final hasSuperColumns =
         annotation.read('hasSuperColumns').literalValue as bool? ?? false;
@@ -185,7 +203,20 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           } else if (jsonEncoded) {
             generatedCode.writeln('''
           saveToDb: (entity) {
+    ''');
+            final finder = PropertyFinder(alias!);
+            classElement.accept(finder);
+            final property = finder.foundProperty!;
+            if (property.type.isDartCoreList) {
+              generatedCode.writeln('''
+            final map = entity.$alias?.map((p) => p.toMap()).toList();
+    ''');
+            } else {
+              generatedCode.writeln('''
             final map = entity.$alias?.toMap();
+    ''');
+            }
+            generatedCode.writeln('''
             return jsonEncode(map);
             },
     ''');
