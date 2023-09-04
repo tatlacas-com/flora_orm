@@ -73,6 +73,8 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
               false;
           final bool notNull =
               dbColumnAnnotation.getField('notNull')?.toBoolValue() ?? false;
+          final bool nullable =
+              dbColumnAnnotation.getField('nullable')?.toBoolValue() ?? false;
           final bool unique =
               dbColumnAnnotation.getField('unique')?.toBoolValue() ?? false;
           dynamic defaultValue = dbColumnAnnotation.getField('defaultValue');
@@ -209,6 +211,11 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
         );
     ''');
             }
+          } else if (nullable) {
+            generatedCode.writeln('''
+          readFromDb: (entity, value) => entity.copyWith($fieldName: CopyWith(value)),
+        );
+    ''');
           } else {
             generatedCode.writeln('''
           readFromDb: (entity, value) => entity.copyWith($fieldName: value),
