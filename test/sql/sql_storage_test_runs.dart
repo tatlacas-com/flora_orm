@@ -57,7 +57,7 @@ void run(BaseStorage storage) {
     var insertedEntity = await storage.insert(entity) as TestEntity?;
     expect(insertedEntity, isNotNull);
     var fxn = () async => await storage.getEntity(
-          columns: [],
+          columns: (t) => [],
           where: (t) => SqlWhere(
             t.columnId,
             value: insertedEntity!.id,
@@ -129,7 +129,7 @@ void run(BaseStorage storage) {
     var insertedEntity = await storage.insert(entity) as TestEntity?;
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
-      columns: [entity.columnTestInt],
+      columns: (t) => [entity.columnTestInt],
       where: (t) => SqlWhere(
         entity.columnId,
         value: insertedEntity!.id,
@@ -166,7 +166,7 @@ void run(BaseStorage storage) {
     var insertedEntity = await storage.insert(entity) as TestEntity?;
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
-      orderBy: [
+      orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
           direction: OrderDirection.Desc,
@@ -191,7 +191,7 @@ void run(BaseStorage storage) {
     var insertedEntity = await storage.insert(entity) as TestEntity?;
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
-      orderBy: [
+      orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
           direction: OrderDirection.Desc,
@@ -218,7 +218,7 @@ void run(BaseStorage storage) {
     var insertedEntity = await storage.insert(entity) as TestEntity?;
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
-      orderBy: [
+      orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
           direction: OrderDirection.Desc,
@@ -243,7 +243,7 @@ void run(BaseStorage storage) {
     var insertedEntity = await storage.insert(entity) as TestEntity?;
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
-      orderBy: [
+      orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
           direction: OrderDirection.Desc,
@@ -269,7 +269,7 @@ void run(BaseStorage storage) {
     var insertedEntity = await storage.insert(entity) as TestEntity?;
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
-      orderBy: [
+      orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
           direction: OrderDirection.Desc,
@@ -295,7 +295,7 @@ void run(BaseStorage storage) {
     var insertedEntity = await storage.insert(entity) as TestEntity?;
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
-      orderBy: [
+      orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
           direction: OrderDirection.Desc,
@@ -321,7 +321,7 @@ void run(BaseStorage storage) {
     var insertedEntity = await storage.insert(entity) as TestEntity?;
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
-      orderBy: [
+      orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
           direction: OrderDirection.Desc,
@@ -347,7 +347,7 @@ void run(BaseStorage storage) {
     var insertedEntity = await storage.insert(entity) as TestEntity?;
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
-      orderBy: [
+      orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
           direction: OrderDirection.Desc,
@@ -374,7 +374,7 @@ void run(BaseStorage storage) {
     var insertedEntity = await storage.insert(entity) as TestEntity?;
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
-      orderBy: [
+      orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
           direction: OrderDirection.Desc,
@@ -401,7 +401,7 @@ void run(BaseStorage storage) {
     var insertedEntity = await storage.insert(entity) as TestEntity?;
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
-      orderBy: [
+      orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
           direction: OrderDirection.Desc,
@@ -427,7 +427,7 @@ void run(BaseStorage storage) {
     var insertedEntity = await storage.insert(entity) as TestEntity?;
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
-      orderBy: [
+      orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
           direction: OrderDirection.Desc,
@@ -453,7 +453,7 @@ void run(BaseStorage storage) {
     var insertedEntity = await storage.insert(entity) as TestEntity?;
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
-      orderBy: [
+      orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
           direction: OrderDirection.Desc,
@@ -479,7 +479,7 @@ void run(BaseStorage storage) {
     var insertedEntity = await storage.insert(entity) as TestEntity?;
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
-      orderBy: [
+      orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
           direction: OrderDirection.Desc,
@@ -506,7 +506,7 @@ void run(BaseStorage storage) {
     var insertedEntity = await storage.insert(entity) as TestEntity?;
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
-      orderBy: [
+      orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
           direction: OrderDirection.Desc,
@@ -557,7 +557,7 @@ void run(BaseStorage storage) {
     var insertedEntity1 = await storage.insert(entity1) as TestEntity?;
     expect(insertedEntity1, isNotNull);
     var json = await storage.getEntities(
-      orderBy: [SqlOrder(column: entity.columnTestInt)],
+      orderBy: (t) => [SqlOrder(column: entity.columnTestInt)],
       where: (t) => SqlWhere(
         entity.columnId,
         value: insertedEntity!.id,
@@ -578,7 +578,7 @@ void run(BaseStorage storage) {
   test('getEntities() should return empty array', () async {
     final entity = TestEntity();
     var json = await storage.getEntities(
-      orderBy: [SqlOrder(column: entity.columnTestInt)],
+      orderBy: (t) => [SqlOrder(column: entity.columnTestInt)],
       where: (t) => SqlWhere(
         entity.columnId,
         value: 'xyzNotFound',
@@ -596,7 +596,7 @@ void run(BaseStorage storage) {
         testString: 'Testing a');
     var insertedEntity = await storage.insert(entity) as TestEntity?;
     var json = await storage.getEntities(
-      orderBy: [SqlOrder(column: entity.columnCreatedAt)],
+      orderBy: (t) => [SqlOrder(column: entity.columnCreatedAt)],
     );
     expect(json, isNotNull);
     expect(json.length, greaterThan(0));
@@ -624,7 +624,7 @@ void run(BaseStorage storage) {
     var insertedEntity1 = await storage.insert(entity1) as TestEntity?;
     expect(insertedEntity1, isNotNull);
     var json = await storage.getEntities(
-      orderBy: [
+      orderBy: (t) => [
         SqlOrder(
           column: entity.columnTestInt,
           direction: OrderDirection.Desc,
@@ -883,7 +883,7 @@ void run(BaseStorage storage) {
     var insertedEntity1 = await storage.insert(entity1) as TestEntity?;
     expect(insertedEntity1, isNotNull);
     var json = await storage.getSumProduct<double>(
-      columns: [
+      columns: (t) => [
         entity.columnTestInt,
         entity.columnTestDouble,
       ],
