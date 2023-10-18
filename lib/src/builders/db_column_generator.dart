@@ -42,6 +42,9 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
 
     final generatedCode = StringBuffer();
     final columnsList = StringBuffer();
+    final copyWithList = StringBuffer();
+    final copyWithPropsList = StringBuffer();
+    final propsList = StringBuffer();
     final extendedClassName =
         element.supertype?.getDisplayString(withNullability: false);
 
@@ -58,6 +61,9 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
         final fieldType = field.type.getDisplayString(withNullability: false);
 
         columnsList.writeln('column$fieldNameCamel,');
+        propsList.writeln('$fieldName,');
+        copyWithPropsList.writeln('$fieldType? $fieldName,');
+        copyWithList.writeln('$fieldName: $fieldName ?? this.$fieldName,');
         final fieldAnnotations = field.metadata.where((annotation) {
           final tp = annotation.computeConstantValue()?.type;
           return tp != null &&
@@ -257,6 +263,15 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     }
     generatedCode.writeln('''
       @override
+      List<Object?> get props => [
+        ...super.props,
+      ''');
+    generatedCode.writeln('''
+      $propsList
+      ];''');
+
+    generatedCode.writeln('''
+      @override
       Iterable<SqlColumn<$className, dynamic>> get columns => [
       ''');
     if (hasSuperColumns) {
@@ -268,6 +283,21 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
       $columnsList
       ];''');
 
+    generatedCode.writeln('''
+    @override
+  $className copyWith({
+    String? id,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    $copyWithPropsList
+  }){
+    return $className(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      $copyWithList
+    );
+  }''');
     generatedCode.writeln('}');
 
     return generatedCode.toString();

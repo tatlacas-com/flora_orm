@@ -224,11 +224,6 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
     return 'ALTER TABLE $tableName ADD ${column.name} ${getColumnType(column.columnType)}${str.toString()}';
   }
 
-  /* @protected
-  String dropColumn(String name) {
-    return 'ALTER TABLE $tableName DROP COLUMN $name';
-  } */
-
   @protected
   String getColumnType(ColumnType columnType) {
     switch (columnType) {
