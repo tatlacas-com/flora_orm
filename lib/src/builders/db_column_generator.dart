@@ -60,11 +60,13 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
         final fieldName = field.name;
         final fieldNameCamel = _toUpperCamelCase(fieldName);
         final fieldType = field.type.getDisplayString(withNullability: false);
+        final fieldTypeFull =
+            field.type.getDisplayString(withNullability: true);
 
         columnsList.writeln('column$fieldNameCamel,');
         propsList.writeln('$fieldName,');
         copyWithPropsList.writeln('$fieldType? $fieldName,');
-        getList.writeln('$fieldType? get $fieldName;');
+        getList.writeln('$fieldTypeFull get $fieldName;');
         copyWithList.writeln('$fieldName: $fieldName ?? this.$fieldName,');
         final fieldAnnotations = field.metadata.where((annotation) {
           final tp = annotation.computeConstantValue()?.type;
