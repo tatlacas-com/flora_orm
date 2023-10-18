@@ -116,7 +116,7 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
           ),
     );
     expect(json, isNotNull);
-    entity = TestEntity().load(json!);
+    entity = json!;
     expect(insertedEntity, entity);
   });
   test('getEntity() with columns should return expected entity values',
@@ -153,7 +153,7 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
           ),
     );
     expect(json, isNotNull);
-    entity = TestEntity().load(json!);
+    entity = json!;
     expect(entity.toString(), TestEntity(testInt: 11).toString());
   });
 
@@ -180,7 +180,7 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       ),
     );
     expect(json, isNotNull);
-    entity = TestEntity().load(json!);
+    entity = json!;
     expect(insertedEntity, entity);
   });
 
@@ -207,7 +207,7 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       ),
     );
     expect(json, isNotNull);
-    entity = TestEntity().load(json!);
+    entity = json!;
     expect(insertedEntity, entity);
   });
 
@@ -231,7 +231,7 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       ),
     );
     expect(json, isNotNull);
-    entity = TestEntity().load(json!);
+    entity = json!;
     expect(insertedEntity, entity);
   });
 
@@ -257,7 +257,7 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       ),
     );
     expect(json, isNotNull);
-    entity = TestEntity().load(json!);
+    entity = json!;
     expect(insertedEntity, entity);
   });
 
@@ -283,7 +283,7 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       ),
     );
     expect(json, isNotNull);
-    entity = TestEntity().load(json!);
+    entity = json!;
     expect(insertedEntity, entity);
   });
 
@@ -309,7 +309,7 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       ),
     );
     expect(json, isNotNull);
-    entity = TestEntity().load(json!);
+    entity = json!;
     expect(insertedEntity, entity);
   });
 
@@ -335,7 +335,7 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       ),
     );
     expect(json, isNotNull);
-    entity = TestEntity().load(json!);
+    entity = json!;
     expect(insertedEntity, entity);
   });
 
@@ -362,7 +362,7 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       ),
     );
     expect(json, isNotNull);
-    entity = TestEntity().load(json!);
+    entity = json!;
     expect(insertedEntity, entity);
   });
 
@@ -389,7 +389,7 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       ),
     );
     expect(json, isNotNull);
-    entity = TestEntity().load(json!);
+    entity = json!;
     expect(insertedEntity, entity);
   });
 
@@ -415,7 +415,7 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       ),
     );
     expect(json, isNotNull);
-    entity = TestEntity().load(json!);
+    entity = json!;
     expect(insertedEntity, entity);
   });
 
@@ -441,7 +441,7 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       ),
     );
     expect(json, isNotNull);
-    entity = TestEntity().load(json!);
+    entity = json!;
     expect(insertedEntity, entity);
   });
 
@@ -467,7 +467,7 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       ),
     );
     expect(json, isNotNull);
-    entity = TestEntity().load(json!);
+    entity = json!;
     expect(insertedEntity, entity);
   });
 
@@ -493,7 +493,7 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       ),
     );
     expect(json, isNotNull);
-    entity = TestEntity().load(json!);
+    entity = json!;
     expect(insertedEntity, entity);
   });
 
@@ -536,7 +536,7 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
           ),
     );
     expect(json, isNotNull);
-    entity = TestEntity().load(json!);
+    entity = json!;
     expect(insertedEntity, entity);
   });
 
@@ -568,7 +568,7 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       ),
     );
     expect(json, isNotNull);
-    var entities = json.map<TestEntity>((e) => TestEntity().load(e)).toList();
+    var entities = json.map<TestEntity>((e) => e).toList();
     expect(entities.length, 2);
     expect(entities, [
       insertedEntity,
@@ -601,7 +601,7 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
     );
     expect(json, isNotNull);
     expect(json.length, greaterThan(0));
-    var entities = json.map<TestEntity>((e) => TestEntity().load(e)).toList();
+    var entities = json.map<TestEntity>((e) => e).toList();
     expect(entities, contains(insertedEntity));
   });
 
@@ -640,7 +640,7 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       ),
     );
     expect(json, isNotNull);
-    var entities = json.map<TestEntity>((e) => TestEntity().load(e)).toList();
+    var entities = json.map<TestEntity>((e) => e).toList();
     expect(entities.length, 2);
     expect(entities, [
       insertedEntity1,
@@ -712,7 +712,7 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
     var json = await storage.getEntity(
         where: (t) => SqlWhere(entity.columnId, value: insertedEntity?.id));
     insertedEntity = insertedEntity?.copyWith(testString: 'Updated ax1');
-    entity = TestEntity().load(json!);
+    entity = json!;
     expect(entity, insertedEntity);
   });
 

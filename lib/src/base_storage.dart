@@ -61,13 +61,33 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   }
 
   @override
-  Future<Map<String, dynamic>?> getEntity({
+  Future<TEntity?> getEntity({
     Iterable<SqlColumn>? Function(TEntity t)? columns,
     List<SqlOrder>? Function(TEntity t)? orderBy,
     required SqlWhere Function(TEntity t) where,
     int? offset,
   }) async {
-    List<Map<String, dynamic>> maps = await query(
+    List<TEntity> maps = await query(
+      where: where,
+      columns: columns ?? (t) => t.allColumns,
+      limit: 1,
+      offset: offset,
+      orderBy: orderBy,
+    );
+    if (maps.length > 0) {
+      return maps.first;
+    }
+    return null;
+  }
+
+  @override
+  Future<Map<String, dynamic>?> getEntityMap({
+    Iterable<SqlColumn>? Function(TEntity t)? columns,
+    List<SqlOrder>? Function(TEntity t)? orderBy,
+    required SqlWhere Function(TEntity t) where,
+    int? offset,
+  }) async {
+    List<Map<String, dynamic>> maps = await queryMap(
       where: where,
       columns: columns ?? (t) => t.allColumns,
       limit: 1,
@@ -123,14 +143,35 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getEntities({
+  Future<List<TEntity>> getEntities({
     Iterable<SqlColumn>? Function(TEntity t)? columns,
     List<SqlOrder>? Function(TEntity t)? orderBy,
     SqlWhere Function(TEntity t)? where,
     int? limit,
     int? offset,
   }) async {
-    List<Map<String, Object?>> maps = await query(
+    List<TEntity> maps = await query(
+      where: where,
+      limit: limit,
+      offset: offset,
+      columns: columns ?? (t) => t.allColumns,
+      orderBy: orderBy,
+    );
+    if (maps.isNotEmpty) {
+      return maps;
+    }
+    return [];
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getEntityMaps({
+    Iterable<SqlColumn>? Function(TEntity t)? columns,
+    List<SqlOrder>? Function(TEntity t)? orderBy,
+    SqlWhere Function(TEntity t)? where,
+    int? limit,
+    int? offset,
+  }) async {
+    List<Map<String, Object?>> maps = await queryMap(
       where: where,
       limit: limit,
       offset: offset,
@@ -217,7 +258,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     var createdAt = entity?.createdAt;
     if (entity == null) {
       final res =
-          await getEntity(where: where, columns: (t) => [t.columnCreatedAt]);
+          await getEntityMap(where: where, columns: (t) => [t.columnCreatedAt]);
       if (res?.containsKey(t.columnCreatedAt.name) == true) {
         createdAt = DateTime.parse(res![t.columnCreatedAt.name]);
       }
@@ -236,7 +277,62 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
 
   @override
   @protected
-  Future<List<Map<String, dynamic>>> query({
+  Future<List<TEntity>> query({
+    SqlWhere Function(TEntity t)? where,
+    Iterable<SqlColumn>? Function(TEntity t)? columns,
+    List<SqlOrder>? Function(TEntity t)? orderBy,
+    int? limit,
+    int? offset,
+  }) async {
+    List<Map<String, dynamic>> maps;
+    final db = await dbContext.database;
+    final cols1 = columns?.call(t);
+    if (cols1 == null) {
+      throw ArgumentError('no columns supplied');
+    }
+    List<String> cols = [];
+    cols1.forEach((element) {
+      cols.add(element.name);
+    });
+    if (cols.isEmpty) {
+      throw ArgumentError('no columns supplied');
+    }
+    String? orderByFilter = orderBy
+        ?.call(t)
+        ?.map((e) =>
+            '${e.column.name} ${e.direction == OrderDirection.Desc ? ' DESC' : ''}')
+        .join(',');
+
+    if (where == null)
+      maps = await db.query(
+        t.tableName,
+        columns: cols,
+        orderBy: orderByFilter,
+        limit: limit,
+        offset: offset,
+      );
+    else {
+      final formattedQuery = whereString(where);
+      maps = await db.query(
+        t.tableName,
+        columns: cols,
+        where: formattedQuery.where,
+        whereArgs: formattedQuery.whereArgs,
+        orderBy: orderByFilter,
+        limit: limit,
+        offset: offset,
+      );
+    }
+    List<TEntity> entities = [];
+    for (final item in maps) {
+      entities.add(t.load(item) as TEntity);
+    }
+    return entities;
+  }
+
+  @override
+  @protected
+  Future<List<Map<String, dynamic>>> queryMap({
     SqlWhere Function(TEntity t)? where,
     Iterable<SqlColumn>? Function(TEntity t)? columns,
     List<SqlOrder>? Function(TEntity t)? orderBy,

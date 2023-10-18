@@ -44,7 +44,7 @@ class SharedPreferenceStorage<TEntity extends IEntity>
   }
 
   @override
-  Future<Map<String, dynamic>?> getEntity({
+  Future<TEntity?> getEntity({
     Iterable<SqlColumn>? Function(TEntity t)? columns,
     List<SqlOrder>? Function(TEntity t)? orderBy,
     required SqlWhere Function(TEntity t) where,
@@ -100,8 +100,8 @@ class SharedPreferenceStorage<TEntity extends IEntity>
     if (query.isNotEmpty == true) {
       var createdAt = entity?.createdAt;
       if (entity == null) {
-        final res =
-            await getEntity(where: where, columns: (t) => [t.columnCreatedAt]);
+        final res = await getEntityMap(
+            where: where, columns: (t) => [t.columnCreatedAt]);
         if (res?.containsKey(t.columnCreatedAt.name) == true) {
           createdAt = res![t.columnCreatedAt.name];
         }
@@ -118,7 +118,7 @@ class SharedPreferenceStorage<TEntity extends IEntity>
   }
 
   @override
-  Future<List<Map<String, dynamic>>> query({
+  Future<List<TEntity>> query({
     SqlWhere Function(TEntity t)? where,
     Iterable<SqlColumn>? Function(TEntity t)? columns,
     List<SqlOrder>? Function(TEntity t)? orderBy,

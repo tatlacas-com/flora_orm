@@ -21,7 +21,13 @@ abstract class SqlStorage<TEntity extends IEntity,
 
   Future<List<TEntity>?> insertOrUpdateList(Iterable<TEntity> items);
 
-  Future<Map<String, dynamic>?> getEntity({
+  Future<TEntity?> getEntity({
+    List<SqlColumn>? Function(TEntity t)? columns,
+    List<SqlOrder>? Function(TEntity t)? orderBy,
+    required SqlWhere Function(TEntity t) where,
+    int? offset,
+  });
+  Future<Map<String, dynamic>?> getEntityMap({
     List<SqlColumn>? Function(TEntity t)? columns,
     List<SqlOrder>? Function(TEntity t)? orderBy,
     required SqlWhere Function(TEntity t) where,
@@ -53,7 +59,15 @@ abstract class SqlStorage<TEntity extends IEntity,
   });
 
   @protected
-  Future<List<Map<String, dynamic>>> query({
+  Future<List<TEntity>> query({
+    SqlWhere Function(TEntity t)? where,
+    List<SqlColumn>? Function(TEntity t)? columns,
+    List<SqlOrder>? Function(TEntity t)? orderBy,
+    int? limit,
+    int? offset,
+  });
+  @protected
+  Future<List<Map<String, dynamic>>> queryMap({
     SqlWhere Function(TEntity t)? where,
     List<SqlColumn>? Function(TEntity t)? columns,
     List<SqlOrder>? Function(TEntity t)? orderBy,
@@ -61,7 +75,12 @@ abstract class SqlStorage<TEntity extends IEntity,
     int? offset,
   });
 
-  Future<List<Map<String, dynamic>>> getEntities({
+  Future<List<TEntity>> getEntities({
+    List<SqlColumn>? Function(TEntity t)? columns,
+    List<SqlOrder>? Function(TEntity t)? orderBy,
+    SqlWhere Function(TEntity t)? where,
+  });
+  Future<List<Map<String, dynamic>>> getEntityMaps({
     List<SqlColumn>? Function(TEntity t)? columns,
     List<SqlOrder>? Function(TEntity t)? orderBy,
     SqlWhere Function(TEntity t)? where,
