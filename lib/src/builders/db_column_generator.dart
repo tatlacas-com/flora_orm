@@ -43,6 +43,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     final generatedCode = StringBuffer();
     final columnsList = StringBuffer();
     final copyWithList = StringBuffer();
+    final getList = StringBuffer();
     final copyWithPropsList = StringBuffer();
     final propsList = StringBuffer();
     final extendedClassName =
@@ -63,6 +64,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
         columnsList.writeln('column$fieldNameCamel,');
         propsList.writeln('$fieldName,');
         copyWithPropsList.writeln('$fieldType? $fieldName,');
+        getList.writeln('$fieldType? get $fieldName;');
         copyWithList.writeln('$fieldName: $fieldName ?? this.$fieldName,');
         final fieldAnnotations = field.metadata.where((annotation) {
           final tp = annotation.computeConstantValue()?.type;
@@ -261,7 +263,9 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
         }
       }
     }
+    generatedCode.writeln(getList);
     generatedCode.writeln('''
+
       @override
       List<Object?> get props => [
         ...super.props,
