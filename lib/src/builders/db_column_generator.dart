@@ -284,20 +284,20 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
       ];''');
 
     generatedCode.writeln('''
-    @override
-  $className copyWith({
-    String? id,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-    $copyWithPropsList
-  }){
-    return $className(
-      id: id ?? this.id,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-      $copyWithList
-    );
-  }''');
+      @override
+      $className copyWith({
+        String? id,
+        DateTime? createdAt,
+        DateTime? updatedAt,
+        $copyWithPropsList
+      }){
+        return $className(
+          id: id ?? this.id,
+          createdAt: createdAt ?? this.createdAt,
+          updatedAt: updatedAt ?? this.updatedAt,
+          $copyWithList
+        );
+      }''');
     generatedCode.writeln('}');
 
     return generatedCode.toString();
