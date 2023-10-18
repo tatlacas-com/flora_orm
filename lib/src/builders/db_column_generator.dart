@@ -65,14 +65,14 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
 
         columnsList.writeln('column$fieldNameCamel,');
         propsList.writeln('$fieldName,');
-        copyWithPropsList.writeln('$fieldType? $fieldName,');
         getList.writeln('$fieldTypeFull get $fieldName;');
-        copyWithList.writeln('$fieldName: $fieldName ?? this.$fieldName,');
         final fieldAnnotations = field.metadata.where((annotation) {
           final tp = annotation.computeConstantValue()?.type;
           return tp != null &&
               TypeChecker.fromRuntime(DbColumn).isExactlyType(tp);
         });
+
+        var nullable = false;
 
         for (final annotation in fieldAnnotations) {
           final dbColumnAnnotation = annotation.computeConstantValue()!;
@@ -100,7 +100,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
               false;
           final bool notNull =
               dbColumnAnnotation.getField('notNull')?.toBoolValue() ?? false;
-          final bool nullable =
+          nullable =
               dbColumnAnnotation.getField('nullable')?.toBoolValue() ?? false;
           final bool unique =
               dbColumnAnnotation.getField('unique')?.toBoolValue() ?? false;
@@ -262,6 +262,14 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
         );
     ''');
           }
+        }
+        if (nullable) {
+          copyWithPropsList.writeln('CopyWith<$fieldType?>? $fieldName,');
+          copyWithList.writeln(
+              '$fieldName: $fieldName != null ? $fieldName.value : this.$fieldName,');
+        } else {
+          copyWithPropsList.writeln('$fieldType? $fieldName,');
+          copyWithList.writeln('$fieldName: $fieldName ?? this.$fieldName,');
         }
       }
     }
