@@ -18,6 +18,7 @@ dependencies:
   shared_preferences: ^2.0.15
   source_gen: ^1.4.0
   build: ^2.4.1
+  analyzer: ^6.2.0
 
 dev_dependencies:
   flutter_test:

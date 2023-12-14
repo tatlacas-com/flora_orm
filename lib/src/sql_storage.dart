@@ -21,20 +21,26 @@ abstract class SqlStorage<TEntity extends IEntity,
 
   Future<List<TEntity>?> insertOrUpdateList(Iterable<TEntity> items);
 
-  Future<Map<String, dynamic>?> getEntity({
-    List<SqlColumn>? columns,
-    List<SqlOrder>? orderBy,
+  Future<TEntity?> getEntity({
+    List<SqlColumn>? Function(TEntity t)? columns,
+    List<SqlOrder>? Function(TEntity t)? orderBy,
+    required SqlWhere Function(TEntity t) where,
+    int? offset,
+  });
+  Future<Map<String, dynamic>?> getEntityMap({
+    List<SqlColumn>? Function(TEntity t)? columns,
+    List<SqlOrder>? Function(TEntity t)? orderBy,
     required SqlWhere Function(TEntity t) where,
     int? offset,
   });
 
   Future<T> getSum<T>({
-    required SqlColumn column,
+    required SqlColumn Function(TEntity t) column,
     SqlWhere Function(TEntity t)? where,
   });
 
   Future<T> getSumProduct<T>({
-    required List<SqlColumn> columns,
+    required List<SqlColumn> Function(TEntity t) columns,
     SqlWhere Function(TEntity t)? where,
   });
 
@@ -53,17 +59,30 @@ abstract class SqlStorage<TEntity extends IEntity,
   });
 
   @protected
-  Future<List<Map<String, dynamic>>> query({
+  Future<List<TEntity>> query({
     SqlWhere Function(TEntity t)? where,
-    List<SqlColumn>? columns,
-    List<SqlOrder>? orderBy,
+    List<SqlColumn>? Function(TEntity t)? columns,
+    List<SqlOrder>? Function(TEntity t)? orderBy,
+    int? limit,
+    int? offset,
+  });
+  @protected
+  Future<List<Map<String, dynamic>>> queryMap({
+    SqlWhere Function(TEntity t)? where,
+    List<SqlColumn>? Function(TEntity t)? columns,
+    List<SqlOrder>? Function(TEntity t)? orderBy,
     int? limit,
     int? offset,
   });
 
-  Future<List<Map<String, dynamic>>> getEntities({
-    List<SqlColumn>? columns,
-    List<SqlOrder>? orderBy,
+  Future<List<TEntity>> getEntities({
+    List<SqlColumn>? Function(TEntity t)? columns,
+    List<SqlOrder>? Function(TEntity t)? orderBy,
+    SqlWhere Function(TEntity t)? where,
+  });
+  Future<List<Map<String, dynamic>>> getEntityMaps({
+    List<SqlColumn>? Function(TEntity t)? columns,
+    List<SqlOrder>? Function(TEntity t)? orderBy,
     SqlWhere Function(TEntity t)? where,
   });
 
