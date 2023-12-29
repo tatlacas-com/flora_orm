@@ -55,7 +55,7 @@ abstract class SqlStorage<TEntity extends IEntity,
   Future<int> update({
     required SqlWhere Function(TEntity t) where,
     TEntity entity,
-    Map<SqlColumn, dynamic>? columnValues,
+    Map<SqlColumn, dynamic> Function(TEntity t)? columnValues,
   });
 
   @protected

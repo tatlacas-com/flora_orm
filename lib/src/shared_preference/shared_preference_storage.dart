@@ -91,7 +91,7 @@ class SharedPreferenceStorage<TEntity extends IEntity>
   Future<int> update({
     required SqlWhere Function(TEntity t) where,
     TEntity? entity,
-    Map<SqlColumn, dynamic>? columnValues,
+    Map<SqlColumn, dynamic> Function(TEntity t)? columnValues,
   }) async {
     var query = where(t)
         .filters
@@ -108,7 +108,7 @@ class SharedPreferenceStorage<TEntity extends IEntity>
       }
       entity = (entity ?? t).updateDates(createdAt: createdAt) as TEntity;
       final update = columnValues != null
-          ? entity.toStorageJson(columnValues: columnValues)
+          ? entity.toStorageJson(columnValues: columnValues(t))
           : entity.toMap();
       final json = jsonEncode(update);
       await write(key: query[0].value, value: json);

@@ -707,7 +707,7 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
               entity.columnId,
               value: insertedEntity!.id,
             ),
-        columnValues: {entity.columnTestString: 'Updated ax1'});
+        columnValues: (t) => {t.columnTestString: 'Updated ax1'});
     expect(total, 1);
     var json = await storage.getEntity(
         where: (t) => SqlWhere(entity.columnId, value: insertedEntity?.id));

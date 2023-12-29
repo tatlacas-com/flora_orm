@@ -250,7 +250,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   Future<int> update({
     required SqlWhere Function(TEntity t) where,
     TEntity? entity,
-    Map<SqlColumn, dynamic>? columnValues,
+    Map<SqlColumn, dynamic> Function(TEntity t)? columnValues,
   }) async {
     assert(entity != null || columnValues != null);
     final db = await dbContext.database;
@@ -265,7 +265,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     }
     entity = (entity ?? t).updateDates(createdAt: createdAt) as TEntity;
     final update = columnValues != null
-        ? entity.toStorageJson(columnValues: columnValues)
+        ? entity.toStorageJson(columnValues: columnValues(t))
         : entity.toDb();
     return await db.update(
       entity.tableName,
