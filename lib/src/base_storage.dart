@@ -235,14 +235,14 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
 
   @override
   Future<int> delete({
-    required SqlWhere Function(TEntity t) where,
+    final SqlWhere Function(TEntity t)? where,
   }) async {
     final db = await dbContext.database;
-    final formattedQuery = whereString(where);
+    final formattedQuery = where != null ? whereString(where) : null;
     return await db.delete(
       t.tableName,
-      where: formattedQuery.where,
-      whereArgs: formattedQuery.whereArgs,
+      where: formattedQuery?.where,
+      whereArgs: formattedQuery?.whereArgs,
     );
   }
 

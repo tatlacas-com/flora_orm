@@ -49,7 +49,7 @@ abstract class SqlStorage<TEntity extends IEntity,
   });
 
   Future<int> delete({
-    required SqlWhere Function(TEntity t) where,
+    SqlWhere Function(TEntity t)? where,
   });
 
   Future<int> update({

@@ -74,14 +74,17 @@ class SharedPreferenceStorage<TEntity extends IEntity>
 
   @override
   Future<int> delete({
-    required SqlWhere Function(TEntity t) where,
+    final SqlWhere Function(TEntity t)? where,
   }) async {
-    var item = where(t)
-        .filters
-        .where((element) => element.column?.name == 'id')
-        .toList();
-    if (item.isNotEmpty == true) {
-      // await _delete(key: item[0].value); todo
+    var item = where == null
+        ? null
+        : where(t)
+            .filters
+            .where((element) => element.column?.name == 'id')
+            .toList();
+    if (item?.isNotEmpty == true) {
+      // TODO(tatenda): delete
+      // await _delete(key: item[0].value);
       return 1;
     }
     return 0;
