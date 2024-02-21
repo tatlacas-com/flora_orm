@@ -236,6 +236,17 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           }
           if (hasReadFromDb || jsonEncoded) {
             if (jsonEncoded) {
+              if (alias != null) {
+                if (nullable) {
+                  copyWithPropsList
+                      .writeln('CopyWith<$jsonEncodedType?>? $alias,');
+                  copyWithList.writeln(
+                      '$alias: $alias != null ? $alias.value : this.$alias,');
+                } else {
+                  copyWithPropsList.writeln('$jsonEncodedType? $alias,');
+                  copyWithList.writeln('$alias: $alias ?? this.$alias,');
+                }
+              }
               generatedCode.writeln('''
           readFromDb: (entity, value){
             if ('null' == value){
