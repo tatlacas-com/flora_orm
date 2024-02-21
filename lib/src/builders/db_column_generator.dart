@@ -133,6 +133,18 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
             }
           }
 
+          if (alias != null && (hasReadFromDb || jsonEncoded)) {
+            final finder = PropertyFinder(alias);
+            classElement.accept(finder);
+            final property = finder.foundProperty!;
+            if (property.type.isDartCoreList) {
+              jsonEncodedType =
+                  property.type.getDisplayString(withNullability: false);
+            }
+            generatedCode.writeln('''
+  final $jsonEncodedType? $alias;
+ ''');
+          }
           if (hasReadFromDb) {
             generatedCode.writeln('''
   $className read${fieldNameCamel}FromDb(value, $className entity);
