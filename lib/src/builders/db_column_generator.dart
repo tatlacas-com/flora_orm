@@ -217,7 +217,8 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
             classElement.accept(finder);
             final property = finder.foundProperty!;
             if (property.type.isDartCoreList) {
-              jsonEncodedType = annotationSource;
+              jsonEncodedType =
+                  property.type.getDisplayString(withNullability: false);
               generatedCode.writeln('''
             final map = entity.$alias?.map((p) => p.toMap()).toList();
     ''');
