@@ -142,7 +142,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
                   property.type.getDisplayString(withNullability: false);
             }
             generatedCode.writeln('''
-  final $jsonEncodedType? $alias;
+  $jsonEncodedType? get $alias;
  ''');
           }
           if (hasReadFromDb) {
