@@ -239,7 +239,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     ''');
             } else {
               generatedCode.writeln('''
-            final map = entity.${writeFn ?? alias}?.toMap();
+            final map = entity.$alias?.${writeFn ?? 'toMap'}();
     ''');
             }
             generatedCode.writeln('''
