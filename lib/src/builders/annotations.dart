@@ -4,6 +4,7 @@ class DbColumn<TColumnType> {
   const DbColumn({
     this.name,
     this.alias,
+    this.writeFn,
     this.encodedJson = false,
     this.primaryKey = false,
     this.unique = false,
@@ -16,6 +17,7 @@ class DbColumn<TColumnType> {
   });
   final String? name;
   final String? alias;
+  final String? writeFn;
   final bool encodedJson;
   final bool primaryKey;
   final bool autoIncrementPrimary;

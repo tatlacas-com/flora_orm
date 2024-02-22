@@ -86,6 +86,9 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
               dbColumnAnnotation.getField('alias')?.toStringValue() ??
                   (jsonEncoded ? fieldName.replaceAll('Json', '') : null);
 
+          final String? writeFn =
+              dbColumnAnnotation.getField('writeFn')?.toStringValue();
+
           final bool hasReadFromDb =
               dbColumnAnnotation.getField('hasReadFromDb')?.toBoolValue() ??
                   false;
@@ -236,7 +239,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     ''');
             } else {
               generatedCode.writeln('''
-            final map = entity.$alias?.toMap();
+            final map = entity.${writeFn ?? alias}?.toMap();
     ''');
             }
             generatedCode.writeln('''
