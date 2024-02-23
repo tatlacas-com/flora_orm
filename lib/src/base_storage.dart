@@ -15,6 +15,13 @@ List<TEntity> entitiesFromMap<TEntity extends IEntity>(
   return entities;
 }
 
+class InsertPrep<TEntity extends IEntity> {
+  final TEntity entity;
+  final Map<String, dynamic> map;
+
+  InsertPrep({required this.entity, required this.map});
+}
+
 class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     extends SqlStorage<TEntity, TDbContext> {
   /// Try to convert anything (int, String) to an int.
@@ -33,12 +40,18 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
       : super(t, dbContext: dbContext);
 
   Future<TEntity?> insert(TEntity item) async {
-    if (item.id == null) item = item.copyWith(id: Uuid().v4()) as TEntity;
-    item = item.updateDates() as TEntity;
     final db = await dbContext.database;
-    final updated = await db.insert(item.tableName, item.toDb(),
+    final response = await workerManager.execute(
+      () {
+        if (item.id == null) item = item.copyWith(id: Uuid().v4()) as TEntity;
+        item = item.updateDates() as TEntity;
+        return InsertPrep(entity: item, map: item.toDb());
+      },
+      priority: WorkPriority.immediately,
+    ).future;
+    final updated = await db.insert(response.entity.tableName, response.map,
         conflictAlgorithm: ConflictAlgorithm.abort);
-    return updated > 0 ? item : null;
+    return updated > 0 ? response.entity : null;
   }
 
   Future<List<TEntity>?> insertList(Iterable<TEntity> items) async {
@@ -63,11 +76,18 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   @override
   Future<TEntity?> insertOrUpdate(TEntity item) async {
     final db = await dbContext.database;
-    if (item.id == null) item = item.copyWith(id: Uuid().v4()) as TEntity;
-    item = item.updateDates() as TEntity;
-    final updated = await db.insert(item.tableName, item.toDb(),
+
+    final response = await workerManager.execute(
+      () {
+        if (item.id == null) item = item.copyWith(id: Uuid().v4()) as TEntity;
+        item = item.updateDates() as TEntity;
+        return InsertPrep(entity: item, map: item.toDb());
+      },
+      priority: WorkPriority.immediately,
+    ).future;
+    final updated = await db.insert(response.entity.tableName, response.map,
         conflictAlgorithm: ConflictAlgorithm.replace);
-    return updated > 0 ? item : null;
+    return updated > 0 ? response.entity : null;
   }
 
   @override

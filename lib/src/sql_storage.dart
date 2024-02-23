@@ -59,10 +59,10 @@ String getCondition(SqlCondition condition) {
 }
 
 FormattedQuery getWhereString<TEntity extends IEntity>(
-    WhereParams<TEntity> params) {
+    SqlWhere Function(TEntity t) where, TEntity t) {
   StringBuffer query = StringBuffer();
   final whereArgs = <dynamic>[];
-  params.where(params.t).filters.forEach((element) {
+  where(t).filters.forEach((element) {
     if (element.isBracketOnly) {
       if (element.leftBracket) query.write('(');
       if (element.rightBracket) query.write(')');
@@ -188,7 +188,7 @@ abstract class SqlStorage<TEntity extends IEntity,
   ) async {
     return await workerManager
         .execute(
-          () => getWhereString(WhereParams(where: where, t: t)),
+          () => getWhereString(where, t),
           priority: WorkPriority.immediately,
         )
         .future;
