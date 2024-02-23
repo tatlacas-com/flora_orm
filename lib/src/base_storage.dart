@@ -16,6 +16,12 @@ List<TEntity> entitiesFromMap<TEntity extends IEntity>(
   return entities;
 }
 
+InsertPrep<TEntity> wInsertOrUpdate<TEntity extends IEntity>(TEntity item) {
+  if (item.id == null) item = item.copyWith(id: Uuid().v4()) as TEntity;
+  item = item.updateDates() as TEntity;
+  return InsertPrep(entity: item, map: item.toDb());
+}
+
 class InsertPrep<TEntity extends IEntity> {
   final TEntity entity;
   final Map<String, dynamic> map;
@@ -46,15 +52,13 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     final WorkPriority priority = WorkPriority.immediately,
   }) async {
     final db = await dbContext.database;
-    final dfSpawn = useIsolateDefault;
+    final spawnIsolate = useIsolate ?? useIsolateDefault;
     final response = await worker(
       () {
-        if (item.id == null) item = item.copyWith(id: Uuid().v4()) as TEntity;
-        item = item.updateDates() as TEntity;
-        return InsertPrep(entity: item, map: item.toDb());
+        return wInsertOrUpdate(item);
       },
       priority: priority,
-      useIsolate: useIsolate ?? dfSpawn,
+      useIsolate: spawnIsolate,
     ).future;
     final updated = await db.insert(response.entity.tableName, response.map,
         conflictAlgorithm: ConflictAlgorithm.abort);
@@ -87,14 +91,12 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     final WorkPriority priority = WorkPriority.immediately,
   }) async {
     final db = await dbContext.database;
-    final dfSpawn = useIsolateDefault;
+    final spawnIsolate = useIsolate ?? useIsolateDefault;
     final response = await worker(
       () {
-        if (item.id == null) item = item.copyWith(id: Uuid().v4()) as TEntity;
-        item = item.updateDates() as TEntity;
-        return InsertPrep(entity: item, map: item.toDb());
+        return wInsertOrUpdate(item);
       },
-      useIsolate: useIsolate ?? dfSpawn,
+      useIsolate: spawnIsolate,
       priority: priority,
     ).future;
     final updated = await db.insert(response.entity.tableName, response.map,
@@ -411,7 +413,10 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
         offset: offset,
       );
     }
-    return worker(() => entitiesFromMap(t, maps)).future;
+    final spawnIsolate = useIsolate ?? useIsolateDefault;
+    return worker(() => entitiesFromMap(t, maps),
+            useIsolate: spawnIsolate, priority: priority)
+        .future;
   }
 
   @override
