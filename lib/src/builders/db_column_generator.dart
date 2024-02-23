@@ -89,12 +89,10 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           final String? writeFn =
               dbColumnAnnotation.getField('writeFn')?.toStringValue();
 
-          final bool hasReadFromDb =
-              dbColumnAnnotation.getField('hasReadFromDb')?.toBoolValue() ??
-                  false;
-          final bool hasSaveToDb =
-              dbColumnAnnotation.getField('hasSaveToDb')?.toBoolValue() ??
-                  false;
+          final bool hasRead =
+              dbColumnAnnotation.getField('hasRead')?.toBoolValue() ?? false;
+          final bool hasWrite =
+              dbColumnAnnotation.getField('hasWrite')?.toBoolValue() ?? false;
           final bool primaryKey =
               dbColumnAnnotation.getField('primaryKey')?.toBoolValue() ?? false;
           final bool autoIncrementPrimary = dbColumnAnnotation
@@ -136,7 +134,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
             }
           }
 
-          if (alias != null && (hasReadFromDb || jsonEncoded)) {
+          if (alias != null && (hasRead || jsonEncoded)) {
             final finder = PropertyFinder(alias);
             classElement.accept(finder);
             final property = finder.foundProperty!;
@@ -148,7 +146,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
   $jsonEncodedType? get $alias;
  ''');
           }
-          if (hasReadFromDb) {
+          if (hasRead) {
             generatedCode.writeln('''
   $className read${fieldNameCamel}FromDb(value, $className entity);
  ''');
@@ -168,9 +166,9 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
   }
  ''');
           }
-          if (hasSaveToDb) {
+          if (hasWrite) {
             generatedCode.writeln('''
-  $columnType? save${fieldNameCamel}ToDb($className entity);
+  $columnType? write${fieldNameCamel}($className entity);
  ''');
           }
 
@@ -220,13 +218,13 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     ''');
             }
           }
-          if (hasSaveToDb) {
+          if (hasWrite) {
             generatedCode.writeln('''
-          saveToDb: (entity) => save${fieldNameCamel}ToDb(entity),
+          write: (entity) => write${fieldNameCamel}(entity),
     ''');
           } else if (jsonEncoded) {
             generatedCode.writeln('''
-          saveToDb: (entity) {
+          write: (entity) {
     ''');
             final finder = PropertyFinder(alias!);
             classElement.accept(finder);
@@ -248,10 +246,10 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     ''');
           } else {
             generatedCode.writeln('''
-          saveToDb: (entity) => entity.$fieldName,
+          write: (entity) => entity.$fieldName,
     ''');
           }
-          if (hasReadFromDb || jsonEncoded) {
+          if (hasRead || jsonEncoded) {
             if (jsonEncoded) {
               if (alias != null) {
                 if (nullable) {
@@ -265,7 +263,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
                 }
               }
               generatedCode.writeln('''
-          readFromDb: (entity, value){
+          read: (json, entity, value){
             if ('null' == value){
               return read${fieldNameCamel}FromDb(null, entity);
             }
@@ -275,18 +273,18 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     ''');
             } else {
               generatedCode.writeln('''
-          readFromDb: (entity, value) => read${fieldNameCamel}FromDb(value, entity),
+          read: (json, entity, value) => read${fieldNameCamel}FromDb(value, entity),
         );
     ''');
             }
           } else if (nullable) {
             generatedCode.writeln('''
-          readFromDb: (entity, value) => entity.copyWith($fieldName: CopyWith(value)),
+          read: (json, entity, value) => entity.copyWith($fieldName: CopyWith(value)),
         );
     ''');
           } else {
             generatedCode.writeln('''
-          readFromDb: (entity, value) => entity.copyWith($fieldName: value),
+          read: (json, entity, value) => entity.copyWith($fieldName: value),
         );
     ''');
           }

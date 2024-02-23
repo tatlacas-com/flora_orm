@@ -9,8 +9,8 @@ class DbColumn<TColumnType> {
     this.primaryKey = false,
     this.unique = false,
     this.autoIncrementPrimary = false,
-    this.hasReadFromDb = false,
-    this.hasSaveToDb = false,
+    this.hasRead = false,
+    this.hasWrite = false,
     this.notNull = false,
     this.nullable = false,
     this.defaultValue,
@@ -21,9 +21,9 @@ class DbColumn<TColumnType> {
   final bool encodedJson;
   final bool primaryKey;
   final bool autoIncrementPrimary;
-  final bool hasReadFromDb;
+  final bool hasRead;
   final bool nullable;
-  final bool hasSaveToDb;
+  final bool hasWrite;
   final bool notNull;
   final bool unique;
   final dynamic defaultValue;
