@@ -419,9 +419,11 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     if (!spawnIsolate) {
       return entitiesFromMap(t, maps);
     }
-    return await workerManager
-        .execute(() => entitiesFromMap(t, maps), priority: priority)
+    final copy = t.copyWith() as TEntity;
+    final result = await workerManager
+        .execute(() => entitiesFromMap(copy, maps), priority: priority)
         .future;
+    return result;
   }
 
   @override
