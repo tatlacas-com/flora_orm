@@ -148,11 +148,11 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           }
           if (hasRead) {
             generatedCode.writeln('''
-  $className read$fieldNameCamel(value, $className entity);
+  $className read$fieldNameCamel(Map<String, dynamic> json, value, $className entity);
  ''');
           } else if (jsonEncoded) {
             generatedCode.writeln('''
-  $className read$fieldNameCamel(value, $className entity){
+  $className read$fieldNameCamel(Map<String, dynamic> json, value, $className entity){
     $jsonEncodedType? $alias;
     final val = value != null && value != 'null' ? value : null;
     if (val != null) {
@@ -265,15 +265,15 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
               generatedCode.writeln('''
           read: (json, entity, value){
             if ('null' == value){
-              return read$fieldNameCamel(null, entity);
+              return read$fieldNameCamel(json, null, entity);
             }
-            return read$fieldNameCamel(value, entity);
+            return read$fieldNameCamel(json, value, entity);
           },
         );
     ''');
             } else {
               generatedCode.writeln('''
-          read: (json, entity, value) => read$fieldNameCamel(value, entity),
+          read: (json, entity, value) => read$fieldNameCamel(json, value, entity),
         );
     ''');
             }
