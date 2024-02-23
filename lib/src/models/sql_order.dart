@@ -2,19 +2,18 @@ import 'package:equatable/equatable.dart';
 import 'package:tatlacas_sqflite_storage/sql.dart';
 
 class SqlOrder extends Equatable {
-  final OrderDirection direction;
-  final SqlColumn column;
-
   const SqlOrder({
-    this.direction = OrderDirection.Asc,
+    this.direction = OrderDirection.asc,
     required this.column,
   });
+  final OrderDirection direction;
+  final SqlColumn column;
 
   @override
   List<Object?> get props => [direction, column];
 }
 
 enum OrderDirection {
-  Asc,
-  Desc,
+  asc,
+  desc,
 }

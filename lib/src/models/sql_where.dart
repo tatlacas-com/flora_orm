@@ -5,12 +5,10 @@ import 'sql_condition.dart';
 import 'sql_where_condition.dart';
 
 class SqlWhere extends Equatable {
-  late final List<SqlWhereCondition> filters;
-
   /// [lb] adds left bracket, [rb] adds right bracket
   SqlWhere(
     SqlColumn? column, {
-    SqlCondition condition = SqlCondition.EqualTo,
+    SqlCondition condition = SqlCondition.equalTo,
     dynamic value,
     dynamic value2,
     bool lb = false,
@@ -20,7 +18,7 @@ class SqlWhere extends Equatable {
     if (column != null) {
       this.filters = [
         ...filters,
-        this._addFilter(
+        _addFilter(
           column,
           condition: condition,
           value: value,
@@ -34,17 +32,20 @@ class SqlWhere extends Equatable {
     }
   }
 
-  SqlWhere._({List<SqlWhereCondition> filters = const []})
-      : this.filters = filters;
+  // ignore: prefer_const_constructors_in_immutables
+  SqlWhere._({this.filters = const []});
 
   factory SqlWhere.lb() {
     return SqlWhere._(
-        filters: [SqlWhereCondition(leftBracket: true, isBracketOnly: true)]);
+        filters: [
+      const SqlWhereCondition(leftBracket: true, isBracketOnly: true)
+    ].toList());
   }
+  late final List<SqlWhereCondition> filters;
 
   SqlWhereCondition _addFilter(
     SqlColumn column, {
-    SqlCondition condition = SqlCondition.EqualTo,
+    SqlCondition condition = SqlCondition.equalTo,
     dynamic value,
     dynamic value2,
     bool lb = false,
@@ -69,25 +70,25 @@ class SqlWhere extends Equatable {
   SqlWhere lb() {
     return SqlWhere(null, filters: [
       ...filters,
-      SqlWhereCondition(leftBracket: true, isBracketOnly: true)
+      const SqlWhereCondition(leftBracket: true, isBracketOnly: true)
     ]);
   }
 
   SqlWhere rb() {
     return SqlWhere(null, filters: [
       ...filters,
-      SqlWhereCondition(rightBracket: true, isBracketOnly: true)
+      const SqlWhereCondition(rightBracket: true, isBracketOnly: true)
     ]);
   }
 
   SqlWhere and(SqlColumn column,
-      {SqlCondition condition = SqlCondition.EqualTo,
+      {SqlCondition condition = SqlCondition.equalTo,
       dynamic value,
       bool lb = false,
       bool rb = false}) {
     return SqlWhere(null, filters: [
       ...filters,
-      this._addFilter(
+      _addFilter(
         column,
         condition: condition,
         value: value,
@@ -99,13 +100,13 @@ class SqlWhere extends Equatable {
   }
 
   SqlWhere query(SqlColumn column,
-      {SqlCondition condition = SqlCondition.EqualTo,
+      {SqlCondition condition = SqlCondition.equalTo,
       dynamic value,
       bool lb = false,
       bool rb = false}) {
     return SqlWhere(null, filters: [
       ...filters,
-      this._addFilter(
+      _addFilter(
         column,
         condition: condition,
         value: value,
@@ -116,13 +117,13 @@ class SqlWhere extends Equatable {
   }
 
   SqlWhere or(SqlColumn column,
-      {SqlCondition condition = SqlCondition.EqualTo,
+      {SqlCondition condition = SqlCondition.equalTo,
       dynamic value,
       bool lb = false,
       bool rb = false}) {
     return SqlWhere(null, filters: [
       ...filters,
-      this._addFilter(
+      _addFilter(
         column,
         condition: condition,
         value: value,

@@ -1,0 +1,26 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    - flutter_style_todos
+    - prefer_single_quotes
+    - avoid_unused_constructor_parameters
+    - prefer_const_constructors
+    - sort_constructors_first
+    - sort_unnamed_constructors_first
+    - avoid_dynamic_calls
+    - avoid_print
+    - avoid_type_to_string
+    - avoid_types_as_parameter_names
+    - comment_references
+    - empty_statements
+    - unnecessary_statements
+    - valid_regexps
+    - avoid_escaping_inner_quotes
+    - sort_pub_dependencies
+    - use_super_parameters
+analyzer:
+  errors:
+    todo: ignore
+  exclude: 
+    - "lib/generated/**"

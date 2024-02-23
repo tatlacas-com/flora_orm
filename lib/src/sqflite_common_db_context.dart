@@ -8,14 +8,10 @@ import 'open_options.dart';
 
 class SqfliteCommonDbContext extends BaseContext {
   SqfliteCommonDbContext({
-    required String dbName,
-    required int dbVersion,
-    required List<IEntity> tables,
-  }) : super(
-          dbName: dbName,
-          dbVersion: dbVersion,
-          tables: tables,
-        );
+    required super.dbName,
+    required super.dbVersion,
+    required super.tables,
+  });
 
   SqfliteCommonDbContext copyWith({
     String? dbName,
@@ -29,10 +25,12 @@ class SqfliteCommonDbContext extends BaseContext {
     );
   }
 
+  @override
   Future<String> getDbPath() async {
     return (await getApplicationDocumentsDirectory()).path;
   }
 
+  @override
   Future<String> getDbFullName() async {
     return join(await getDbPath(), dbName);
   }

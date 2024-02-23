@@ -6,15 +6,14 @@ import 'package:tatlacas_sqflite_storage/sql.dart';
 import 'package:tatlacas_sqflite_storage/src/base_storage.dart';
 import 'package:tatlacas_sqflite_storage/src/shared_preference/shared_preference_context.dart';
 import 'package:uuid/uuid.dart';
-import 'package:worker_manager/worker_manager.dart';
 
 class SharedPreferenceStorage<TEntity extends IEntity>
     extends BaseStorage<TEntity, SharedPreferenceContext> {
-  @protected
-  final Future<SharedPreferences> prefs = SharedPreferences.getInstance();
 
   SharedPreferenceStorage(super.t,
       {required super.dbContext, super.useIsolateDefault = true});
+  @protected
+  final Future<SharedPreferences> prefs = SharedPreferences.getInstance();
 
   @protected
   Future<String?> read({required String key}) async {
@@ -38,9 +37,8 @@ class SharedPreferenceStorage<TEntity extends IEntity>
   Future<TEntity?> insert(
     TEntity item, {
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   }) async {
-    if (item.id == null) item = item.copyWith(id: Uuid().v4()) as TEntity;
+    if (item.id == null) item = item.copyWith(id: const Uuid().v4()) as TEntity;
     item = item.updateDates() as TEntity;
     final json = jsonEncode(item.toMap());
     await write(key: item.id!, value: json);
@@ -54,7 +52,6 @@ class SharedPreferenceStorage<TEntity extends IEntity>
     required SqlWhere Function(TEntity t) where,
     int? offset,
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     return null;
   }
@@ -68,9 +65,8 @@ class SharedPreferenceStorage<TEntity extends IEntity>
   Future<TEntity?> insertOrUpdate(
     TEntity item, {
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   }) async {
-    if (item.id == null) item = item.copyWith(id: Uuid().v4()) as TEntity;
+    if (item.id == null) item = item.copyWith(id: const Uuid().v4()) as TEntity;
     item = item.updateDates() as TEntity;
     final json = jsonEncode(item.toMap());
     await write(key: item.id!, value: json);
@@ -86,7 +82,6 @@ class SharedPreferenceStorage<TEntity extends IEntity>
   Future<int> delete({
     final SqlWhere Function(TEntity t)? where,
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     final item = where == null
         ? null
@@ -107,7 +102,6 @@ class SharedPreferenceStorage<TEntity extends IEntity>
     TEntity? entity,
     Map<SqlColumn, dynamic> Function(TEntity t)? columnValues,
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     var query = where(t)
         .filters
@@ -141,7 +135,6 @@ class SharedPreferenceStorage<TEntity extends IEntity>
     int? limit,
     int? offset,
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     return [];
   }
@@ -151,7 +144,6 @@ class SharedPreferenceStorage<TEntity extends IEntity>
     SqlWhere Function(TEntity t)? where,
     String query, {
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     return [];
   }

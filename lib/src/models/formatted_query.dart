@@ -1,9 +1,9 @@
 import 'package:equatable/equatable.dart';
 
 class FormattedQuery extends Equatable {
+  const FormattedQuery({required this.whereArgs,required this.where});
   final String where;
   final List<dynamic>? whereArgs;
-  const FormattedQuery({required this.whereArgs,required this.where});
 
   @override
   List<Object?> get props => [where,whereArgs];

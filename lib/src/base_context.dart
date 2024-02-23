@@ -6,20 +6,16 @@ import 'package:sqflite_common/sqlite_api.dart';
 import '../sql.dart';
 
 abstract class BaseContext extends DbContext<IEntity> {
-  Database? _database;
 
   BaseContext({
-    required String dbName,
-    required int dbVersion,
-    required List<IEntity> tables,
-  }) : super(
-          dbName: dbName,
-          dbVersion: dbVersion,
-          tables: tables,
-        );
+    required super.dbName,
+    required super.dbVersion,
+    required super.tables,
+  });
+  Database? _database;
 
   Future<Database> get database async {
-    if (_database == null) _database = await open();
+    _database ??= await open();
     return _database!;
   }
 
@@ -54,9 +50,9 @@ abstract class BaseContext extends DbContext<IEntity> {
         final queries = element.downgradeTable(oldVersion, newVersion);
         if (queries.isNotEmpty == true) {
           allQueries.addAll(queries);
-          queries.forEach((query) {
+          for (var query in queries) {
             batch.execute(query);
-          });
+          }
         }
       }
       await batch.commit(noResult: true);
@@ -70,9 +66,9 @@ abstract class BaseContext extends DbContext<IEntity> {
         final queries = element.onDowngradeComplete(oldVersion, newVersion);
         if (queries.isNotEmpty == true) {
           allQueries.addAll(queries);
-          queries.forEach((query) {
+          for (var query in queries) {
             batch.execute(query);
-          });
+          }
         }
       }
       await batch.commit(noResult: true);
@@ -92,9 +88,9 @@ abstract class BaseContext extends DbContext<IEntity> {
         if (queries.isNotEmpty == true) {
           allQueries.addAll(queries);
           upgradeQueriesFound = true;
-          queries.forEach((query) {
+          for (var query in queries) {
             batch.execute(query);
-          });
+          }
         }
       }
       if (!upgradeQueriesFound && kDebugMode) {
@@ -112,9 +108,9 @@ abstract class BaseContext extends DbContext<IEntity> {
         final queries = element.onUpgradeComplete(oldVersion, newVersion);
         if (queries.isNotEmpty == true) {
           allQueries.addAll(queries);
-          queries.forEach((query) {
+          for (var query in queries) {
             batch.execute(query);
-          });
+          }
         } else {}
       }
       await batch.commit(noResult: true);
@@ -179,9 +175,9 @@ abstract class BaseContext extends DbContext<IEntity> {
         final queries = element.onCreateComplete(version);
         if (queries.isNotEmpty == true) {
           allQueries.addAll(queries);
-          queries.forEach((query) {
+          for (var query in queries) {
             batch.execute(query);
-          });
+          }
         }
       }
       await batch.commit(noResult: true);

@@ -26,14 +26,14 @@ void main() {
     var dbContext = SqfliteCommonDbContext(
       dbVersion: 1,
       dbName: 'common_storage_db',
-      tables: [TestEntity()],
+      tables: [const TestEntity()],
     );
-    var storage = SqfliteCommonStorage(TestEntity(), dbContext: dbContext);
+    var storage = SqfliteCommonStorage(const TestEntity(), dbContext: dbContext);
     test('drop database', () async {
       var database = await dbContext.database;
       try {
         await database
-            .rawDelete('drop table if exists ${TestEntity().tableName}');
+            .rawDelete('drop table if exists ${const TestEntity().tableName}');
       } catch (e) {
         debugPrint(e.toString());
       }
@@ -41,7 +41,7 @@ void main() {
       dbContext = dbContext.copyWith(
         dbVersion: 2,
       );
-      storage = SqfliteCommonStorage(TestEntity(), dbContext: dbContext);
+      storage = SqfliteCommonStorage(const TestEntity(), dbContext: dbContext);
       await dbContext.open();
       final dbVersion = await (await dbContext.database).getVersion();
       expect(dbVersion, 2);
@@ -61,9 +61,9 @@ void main() {
         dbContext = dbContext.copyWith(
           dbVersion: 4,
         );
-        storage = SqfliteCommonStorage(TestEntity(), dbContext: dbContext);
+        storage = SqfliteCommonStorage(const TestEntity(), dbContext: dbContext);
         await dbContext.open();
-        storage.insert(TestEntity(testString: 'Okay'));
+        storage.insert(const TestEntity(testString: 'Okay'));
         final dbVersion = await (await dbContext.database).getVersion();
         expect(dbVersion, 4);
       });
@@ -75,9 +75,9 @@ void main() {
         dbContext = dbContext.copyWith(
           dbVersion: 3,
         );
-        storage = SqfliteCommonStorage(TestEntity(), dbContext: dbContext);
+        storage = SqfliteCommonStorage(const TestEntity(), dbContext: dbContext);
         await dbContext.open();
-        storage.insert(TestEntity(testString: 'Okay'));
+        storage.insert(const TestEntity(testString: 'Okay'));
         final dbVersion = await (await dbContext.database).getVersion();
         expect(dbVersion, 3);
       });

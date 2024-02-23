@@ -1,5 +1,1 @@
-enum DbInUse{
-  InMemory,
-  SqfliteCommon,
-  Sqflite
-}
+enum DbInUse { inMemory, sqfliteCommon, sqflite }

@@ -7,10 +7,10 @@ import 'package:tatlacas_sqflite_storage/src/models/entity.dart';
 
 // Define a visitor class to search for a property with a specific name.
 class PropertyFinder extends RecursiveElementVisitor<void> {
-  final String propertyName;
-  FieldElement? foundProperty;
 
   PropertyFinder(this.propertyName);
+  final String propertyName;
+  FieldElement? foundProperty;
 
   @override
   void visitFieldElement(FieldElement element) {
@@ -34,8 +34,8 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     final hasSuperColumns =
         annotation.read('hasSuperColumns').literalValue as bool? ?? false;
 
-    if (!TypeChecker.fromRuntime(Entity).isAssignableFrom(element)) {
-      throw new Exception('$className is not an Entity class');
+    if (!const TypeChecker.fromRuntime(Entity).isAssignableFrom(element)) {
+      throw Exception('$className is not an Entity class');
     }
 
     final fields = classElement.fields;
@@ -56,7 +56,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
   String get tableName => '${tableName ?? convertClassNameToSnakeCase(className)}';
     ''');
     for (final field in fields) {
-      if (TypeChecker.fromRuntime(DbColumn).hasAnnotationOfExact(field)) {
+      if (const TypeChecker.fromRuntime(DbColumn).hasAnnotationOfExact(field)) {
         final fieldName = field.name;
         final fieldNameCamel = _toUpperCamelCase(fieldName);
         final fieldType = field.type.getDisplayString(withNullability: false);
@@ -69,7 +69,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
         final fieldAnnotations = field.metadata.where((annotation) {
           final tp = annotation.computeConstantValue()?.type;
           return tp != null &&
-              TypeChecker.fromRuntime(DbColumn).isExactlyType(tp);
+              const TypeChecker.fromRuntime(DbColumn).isExactlyType(tp);
         });
 
         var nullable = false;
@@ -169,7 +169,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           }
           if (hasWrite) {
             generatedCode.writeln('''
-  $columnType? write${fieldNameCamel}($className entity);
+  $columnType? write$fieldNameCamel($className entity);
  ''');
           }
 
@@ -221,7 +221,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           }
           if (hasWrite) {
             generatedCode.writeln('''
-          write: (entity) => write${fieldNameCamel}(entity),
+          write: (entity) => write$fieldNameCamel(entity),
     ''');
           } else if (jsonEncoded) {
             generatedCode.writeln('''

@@ -7,14 +7,10 @@ import 'open_options.dart';
 class SqfliteInMemoryDbContext extends BaseContext {
 
   SqfliteInMemoryDbContext({
-    required String dbName,
-    required int dbVersion,
-    required List<IEntity> tables,
-  }) : super(
-          dbName: dbName,
-          dbVersion: dbVersion,
-          tables: tables,
-        );
+    required super.dbName,
+    required super.dbVersion,
+    required super.tables,
+  });
 
 
   SqfliteInMemoryDbContext copyWith({

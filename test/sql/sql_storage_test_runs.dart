@@ -57,7 +57,7 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
         testString: 'Testing 123456');
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
-    var fxn = () async => await storage.getEntity(
+    fxn() async => await storage.getEntity(
           columns: (t) => [],
           where: (t) => SqlWhere(
             t.columnId,
@@ -154,7 +154,7 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
     );
     expect(json, isNotNull);
     entity = json!;
-    expect(entity.toString(), TestEntity(testInt: 11).toString());
+    expect(entity.toString(), const TestEntity(testInt: 11).toString());
   });
 
   test('getEntity(NotEqualTo) should return expected entity', () async {
@@ -170,12 +170,12 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
-          direction: OrderDirection.Desc,
+          direction: OrderDirection.desc,
         )
       ],
       where: (t) => SqlWhere(
         entity.columnId,
-        condition: SqlCondition.NotEqualTo,
+        condition: SqlCondition.notEqualTo,
         value: '12',
       ),
     );
@@ -195,15 +195,15 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
-          direction: OrderDirection.Desc,
+          direction: OrderDirection.desc,
         )
       ],
       where: (t) => SqlWhere(
         entity.columnTestInt,
-        condition: SqlCondition.Null,
+        condition: SqlCondition.isNull,
       ).and(
         entity.columnTestDouble,
-        condition: SqlCondition.Null,
+        condition: SqlCondition.isNull,
       ),
     );
     expect(json, isNotNull);
@@ -222,12 +222,12 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
-          direction: OrderDirection.Desc,
+          direction: OrderDirection.desc,
         )
       ],
       where: (t) => SqlWhere(
         entity.columnTestString,
-        condition: SqlCondition.NotNull,
+        condition: SqlCondition.notNull,
       ),
     );
     expect(json, isNotNull);
@@ -247,12 +247,12 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
-          direction: OrderDirection.Desc,
+          direction: OrderDirection.desc,
         )
       ],
       where: (t) => SqlWhere(
         entity.columnTestInt,
-        condition: SqlCondition.LessThan,
+        condition: SqlCondition.lessThan,
         value: -14,
       ),
     );
@@ -273,12 +273,12 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
-          direction: OrderDirection.Desc,
+          direction: OrderDirection.desc,
         )
       ],
       where: (t) => SqlWhere(
         entity.columnTestInt,
-        condition: SqlCondition.GreaterThan,
+        condition: SqlCondition.greaterThan,
         value: 19999,
       ),
     );
@@ -299,12 +299,12 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
-          direction: OrderDirection.Desc,
+          direction: OrderDirection.desc,
         )
       ],
       where: (t) => SqlWhere(
         entity.columnTestInt,
-        condition: SqlCondition.GreaterThanOrEqual,
+        condition: SqlCondition.greaterThanOrEqual,
         value: 100,
       ),
     );
@@ -325,12 +325,12 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
-          direction: OrderDirection.Desc,
+          direction: OrderDirection.desc,
         )
       ],
       where: (t) => SqlWhere(
         entity.columnTestInt,
-        condition: SqlCondition.GreaterThanOrEqual,
+        condition: SqlCondition.greaterThanOrEqual,
         value: -10,
       ),
     );
@@ -351,12 +351,12 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
-          direction: OrderDirection.Desc,
+          direction: OrderDirection.desc,
         )
       ],
       where: (t) => SqlWhere(
         entity.columnTestInt,
-        condition: SqlCondition.Between,
+        condition: SqlCondition.between,
         value: 1000,
         value2: 1002,
       ),
@@ -378,12 +378,12 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
-          direction: OrderDirection.Desc,
+          direction: OrderDirection.desc,
         )
       ],
       where: (t) => SqlWhere(
         entity.columnTestInt,
-        condition: SqlCondition.NotBetween,
+        condition: SqlCondition.notBetween,
         value: -500,
         value2: 2019,
       ),
@@ -405,13 +405,13 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
-          direction: OrderDirection.Desc,
+          direction: OrderDirection.desc,
         )
       ],
       where: (t) => SqlWhere(
         entity.columnTestInt,
-        condition: SqlCondition.In,
-        value: [11001],
+        condition: SqlCondition.isIn,
+        value: const [11001],
       ),
     );
     expect(json, isNotNull);
@@ -431,13 +431,13 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
-          direction: OrderDirection.Desc,
+          direction: OrderDirection.desc,
         )
       ],
       where: (t) => SqlWhere(
         entity.columnTestInt,
-        condition: SqlCondition.NotIn,
-        value: [11001, 11005],
+        condition: SqlCondition.notIn,
+        value: const [11001, 11005],
       ),
     );
     expect(json, isNotNull);
@@ -457,12 +457,12 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
-          direction: OrderDirection.Desc,
+          direction: OrderDirection.desc,
         )
       ],
       where: (t) => SqlWhere(
         entity.columnTestString,
-        condition: SqlCondition.Like,
+        condition: SqlCondition.like,
         value: '%Like%',
       ),
     );
@@ -483,12 +483,12 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
-          direction: OrderDirection.Desc,
+          direction: OrderDirection.desc,
         )
       ],
       where: (t) => SqlWhere(
         entity.columnTestString,
-        condition: SqlCondition.NotLike,
+        condition: SqlCondition.notLike,
         value: '%Dummy%',
       ),
     );
@@ -510,13 +510,13 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       orderBy: (t) => [
         SqlOrder(
           column: entity.columnCreatedAt,
-          direction: OrderDirection.Desc,
+          direction: OrderDirection.desc,
         )
       ],
       where: (t) => SqlWhere.lb()
           .query(
             entity.columnTestString,
-            condition: SqlCondition.Like,
+            condition: SqlCondition.like,
             value: '%Dummy%',
           )
           .and(
@@ -577,7 +577,7 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
   });
 
   test('getEntities() should return empty array', () async {
-    final entity = TestEntity();
+    const entity = TestEntity();
     var json = await storage.getEntities(
       orderBy: (t) => [SqlOrder(column: entity.columnTestInt)],
       where: (t) => SqlWhere(
@@ -628,7 +628,7 @@ void run(BaseStorage<TestEntity, BaseContext> storage) {
       orderBy: (t) => [
         SqlOrder(
           column: entity.columnTestInt,
-          direction: OrderDirection.Desc,
+          direction: OrderDirection.desc,
         )
       ],
       where: (t) => SqlWhere(

@@ -1,7 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:equatable/equatable.dart';
-import 'package:meta/meta.dart';
-import 'package:worker_manager/worker_manager.dart';
+import 'package:flutter/foundation.dart';
 
 import 'db_context.dart';
 import 'models/entity.dart';
@@ -19,41 +18,43 @@ class WhereParams<TEntity extends IEntity> {
 
 dynamic dbValue(dynamic value) {
   var result = value;
-  if (value is bool)
+  if (value is bool) {
     result = value ? 1 : 0;
-  else if (value is DateTime) result = value.toIso8601String();
+  } else if (value is DateTime) {
+    result = value.toIso8601String();
+  }
   return result;
 }
 
 String getCondition(SqlCondition condition) {
   switch (condition) {
-    case SqlCondition.EqualTo:
+    case SqlCondition.equalTo:
       return ' = ? ';
-    case SqlCondition.NotEqualTo:
+    case SqlCondition.notEqualTo:
       return ' <> ? ';
-    case SqlCondition.Null:
+    case SqlCondition.isNull:
       return ' IS NULL ';
-    case SqlCondition.NotNull:
+    case SqlCondition.notNull:
       return ' IS NOT NULL ';
-    case SqlCondition.LessThan:
+    case SqlCondition.lessThan:
       return ' < ? ';
-    case SqlCondition.GreaterThan:
+    case SqlCondition.greaterThan:
       return ' > ? ';
-    case SqlCondition.GreaterThanOrEqual:
+    case SqlCondition.greaterThanOrEqual:
       return ' >= ? ';
-    case SqlCondition.LessThanOrEqual:
+    case SqlCondition.lessThanOrEqual:
       return ' <= ? ';
-    case SqlCondition.Between:
+    case SqlCondition.between:
       return ' BETWEEN ? AND ? ';
-    case SqlCondition.NotBetween:
+    case SqlCondition.notBetween:
       return ' NOT BETWEEN ? AND ? ';
-    case SqlCondition.In:
+    case SqlCondition.isIn:
       return ' IN ';
-    case SqlCondition.NotIn:
+    case SqlCondition.notIn:
       return ' NOT IN ';
-    case SqlCondition.Like:
+    case SqlCondition.like:
       return ' LIKE ? ';
-    case SqlCondition.NotLike:
+    case SqlCondition.notLike:
       return ' NOT LIKE ? ';
   }
 }
@@ -61,37 +62,41 @@ String getCondition(SqlCondition condition) {
 FormattedQuery getWhereString<TEntity extends IEntity>(SqlWhere where) {
   StringBuffer stringBuffer = StringBuffer();
   final whereArgs = <dynamic>[];
-  where.filters.forEach((element) {
+  for (var element in where.filters) {
     if (element.isBracketOnly) {
       if (element.leftBracket) stringBuffer.write('(');
       if (element.rightBracket) stringBuffer.write(')');
-      return;
+      continue;
     }
-    if (element.and)
+    if (element.and) {
       stringBuffer.write(' AND ');
-    else if (element.or) stringBuffer.write(' OR ');
+    } else if (element.or) {
+      stringBuffer.write(' OR ');
+    }
     if (element.leftBracket) stringBuffer.write('(');
 
     stringBuffer.write(element.column!.name);
     stringBuffer.write(getCondition(element.condition));
-    if (element.condition != SqlCondition.Null &&
-        element.condition != SqlCondition.NotNull) {
-      if ((element.condition == SqlCondition.In ||
-              element.condition == SqlCondition.NotIn) &&
+    if (element.condition != SqlCondition.isNull &&
+        element.condition != SqlCondition.notNull) {
+      if ((element.condition == SqlCondition.isIn ||
+              element.condition == SqlCondition.notIn) &&
           element.value is List) {
         final args = element.value as List;
         final argsQ = args.map((e) => '?').toList();
         final q = argsQ.join(', ');
         stringBuffer.write('($q)');
         whereArgs.addAll(args);
-      } else
+      } else {
         whereArgs.add(dbValue(element.value));
+      }
     }
-    if (element.condition == SqlCondition.Between ||
-        element.condition == SqlCondition.NotBetween)
+    if (element.condition == SqlCondition.between ||
+        element.condition == SqlCondition.notBetween) {
       whereArgs.add(element.value2);
+    }
     if (element.rightBracket) stringBuffer.write(')');
-  });
+  }
   return FormattedQuery(where: stringBuffer.toString(), whereArgs: whereArgs);
 }
 
@@ -107,7 +112,6 @@ abstract class SqlStorage<TEntity extends IEntity,
   Future<TEntity?> insert(
     TEntity item, {
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   });
 
   Future<List<TEntity>?> insertList(Iterable<TEntity> items);
@@ -115,7 +119,6 @@ abstract class SqlStorage<TEntity extends IEntity,
   Future<TEntity?> insertOrUpdate(
     TEntity item, {
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   });
 
   Future<List<TEntity>?> insertOrUpdateList(Iterable<TEntity> items);
@@ -126,7 +129,6 @@ abstract class SqlStorage<TEntity extends IEntity,
     required SqlWhere Function(TEntity t) where,
     int? offset,
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   });
   Future<Map<String, dynamic>?> getEntityMap({
     List<SqlColumn>? Function(TEntity t)? columns,
@@ -134,33 +136,28 @@ abstract class SqlStorage<TEntity extends IEntity,
     required SqlWhere Function(TEntity t) where,
     int? offset,
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   });
 
   Future<T> getSum<T>({
     required SqlColumn Function(TEntity t) column,
     SqlWhere Function(TEntity t)? where,
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   });
 
   Future<T> getSumProduct<T>({
     required List<SqlColumn> Function(TEntity t) columns,
     SqlWhere Function(TEntity t)? where,
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   });
 
   Future<int> getCount({
     SqlWhere Function(TEntity t)? where,
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   });
 
   Future<int> delete({
     SqlWhere Function(TEntity t)? where,
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   });
 
   Future<int> update({
@@ -168,7 +165,6 @@ abstract class SqlStorage<TEntity extends IEntity,
     TEntity entity,
     Map<SqlColumn, dynamic> Function(TEntity t)? columnValues,
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   });
 
   @protected
@@ -179,7 +175,6 @@ abstract class SqlStorage<TEntity extends IEntity,
     int? limit,
     int? offset,
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   });
   @protected
   Future<List<Map<String, dynamic>>> queryMap({
@@ -189,7 +184,6 @@ abstract class SqlStorage<TEntity extends IEntity,
     int? limit,
     int? offset,
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   });
 
   Future<List<TEntity>> getEntities({
@@ -197,14 +191,12 @@ abstract class SqlStorage<TEntity extends IEntity,
     List<SqlOrder>? Function(TEntity t)? orderBy,
     SqlWhere Function(TEntity t)? where,
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   });
   Future<List<Map<String, dynamic>>> getEntityMaps({
     List<SqlColumn>? Function(TEntity t)? columns,
     List<SqlOrder>? Function(TEntity t)? orderBy,
     SqlWhere Function(TEntity t)? where,
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   });
 
   @protected
@@ -212,25 +204,19 @@ abstract class SqlStorage<TEntity extends IEntity,
     SqlWhere Function(TEntity t)? where,
     String query, {
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   });
 
   @protected
   Future<FormattedQuery> whereString(
     SqlWhere Function(TEntity t) where,
     bool? useIsolate,
-    WorkPriority priority,
   ) async {
     final sqlWhere = where(t);
     final spawnIsolate = useIsolate ?? useIsolateDefault;
     if (!spawnIsolate) {
       return getWhereString(sqlWhere);
     }
-    return await workerManager.execute(
-      () async {
-        return getWhereString(sqlWhere);
-      },
-      priority: priority,
-    ).future;
+
+    return await compute(getWhereString, sqlWhere);
   }
 }

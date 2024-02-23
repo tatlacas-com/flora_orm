@@ -12,9 +12,9 @@ void main() {
     var dbContext = SqfliteInMemoryDbContext(
       dbVersion: 1,
       dbName: 'common_storage_db',
-      tables: <IEntity>[TestEntity()],
+      tables: <IEntity>[const TestEntity()],
     );
-    var storage = SqfliteInMemoryStorage(TestEntity(), dbContext: dbContext);
+    var storage = SqfliteInMemoryStorage(const TestEntity(), dbContext: dbContext);
 
     group('Test Db upgrade', () {
       late Database database;
@@ -23,7 +23,7 @@ void main() {
         dbContext = dbContext.copyWith(
           dbVersion: 2,
         );
-        storage = SqfliteInMemoryStorage(TestEntity(), dbContext: dbContext);
+        storage = SqfliteInMemoryStorage(const TestEntity(), dbContext: dbContext);
         database = await dbContext.database;
       });
 
@@ -41,7 +41,7 @@ void main() {
         dbContext = dbContext.copyWith(
           dbVersion: 3,
         );
-        storage = SqfliteInMemoryStorage(TestEntity(), dbContext: dbContext);
+        storage = SqfliteInMemoryStorage(const TestEntity(), dbContext: dbContext);
         database = await dbContext.database;
       });
 

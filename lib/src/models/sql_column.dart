@@ -6,6 +6,18 @@ import 'entity.dart';
 import 'sql_column_extension.dart';
 
 class SqlColumn<TEntity extends IEntity, TType> extends Equatable {
+  SqlColumn(
+    this.name, {
+    this.alias,
+    this.jsonEncodeAlias = false,
+    this.primaryKey = false,
+    this.unique = false,
+    this.autoIncrementPrimary = false,
+    this.notNull = false,
+    this.defaultValue,
+    required this.write,
+    required this.read,
+  }) : _columnType = computeColumnType<TType>();
   final String name;
   final String? alias;
   final bool jsonEncodeAlias;
@@ -34,37 +46,21 @@ class SqlColumn<TEntity extends IEntity, TType> extends Equatable {
         defaultValue
       ];
 
+  @override
   String toString() =>
       'StorageColumn<$TEntity, $TType> {name:$name, primaryKey:$primaryKey, autoIncrementPrimary:$autoIncrementPrimary, notNull:$notNull, unique:$unique, _columnType:$_columnType}';
 
-  SqlColumn(
-    this.name, {
-    this.alias,
-    this.jsonEncodeAlias = false,
-    this.primaryKey = false,
-    this.unique = false,
-    this.autoIncrementPrimary = false,
-    this.notNull = false,
-    this.defaultValue,
-    required TType? Function(TEntity entity) write,
-    required TEntity Function(
-            Map<String, dynamic> json, TEntity entity, dynamic value)
-        read,
-  })  : _columnType = computeColumnType<TType>(),
-        write = write,
-        read = read;
-
   static ColumnType computeColumnType<TType>() {
     if (TType == String) {
-      return ColumnType.Text;
+      return ColumnType.text;
     } else if (TType == DateTime) {
-      return ColumnType.DateTime;
+      return ColumnType.dateTime;
     } else if (TType == int) {
-      return ColumnType.Integer;
+      return ColumnType.integer;
     } else if (TType == bool) {
-      return ColumnType.Boolean;
+      return ColumnType.boolean;
     } else if (TType == double) {
-      return ColumnType.Real;
+      return ColumnType.real;
     } else {
       throw Exception('Column type not supported $TType');
     }
@@ -90,10 +86,10 @@ class SqlColumn<TEntity extends IEntity, TType> extends Equatable {
 }
 
 enum ColumnType {
-  Text,
-  Integer,
-  Real,
-  Blob,
-  Boolean,
-  DateTime,
+  text,
+  integer,
+  real,
+  blob,
+  boolean,
+  dateTime,
 }

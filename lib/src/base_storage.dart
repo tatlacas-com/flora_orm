@@ -2,34 +2,41 @@ import 'package:flutter/foundation.dart';
 import 'package:sqflite_common/sqlite_api.dart';
 import 'package:tatlacas_sqflite_storage/src/base_context.dart';
 import 'package:uuid/uuid.dart';
-import 'package:worker_manager/worker_manager.dart';
 
 import '../sql.dart';
 
-List<TEntity> entitiesFromMap<TEntity extends IEntity>(
-    IEntity t, List<Map<String, dynamic>> maps) {
+class Args<TEntity extends IEntity> {
+  Args({required this.t, required this.maps});
+
+  final IEntity t;
+  final List<Map<String, dynamic>> maps;
+}
+
+List<IEntity> entitiesFromMap<TEntity extends IEntity>(Args args) {
   List<TEntity> entities = [];
-  for (final item in maps) {
-    entities.add(t.load(item) as TEntity);
+  for (final item in args.maps) {
+    entities.add(args.t.load(item) as TEntity);
   }
   return entities;
 }
 
-InsertPrep<TEntity> wInsertOrUpdate<TEntity extends IEntity>(TEntity item) {
-  if (item.id == null) item = item.copyWith(id: Uuid().v4()) as TEntity;
-  item = item.updateDates() as TEntity;
+InsertPrep<IEntity> wInsertOrUpdate(IEntity item) {
+  if (item.id == null) item = item.copyWith(id: const Uuid().v4());
+  item = item.updateDates();
   return InsertPrep(entity: item, map: item.toDb());
 }
 
 class InsertPrep<TEntity extends IEntity> {
+  InsertPrep({required this.entity, required this.map});
   final TEntity entity;
   final Map<String, dynamic> map;
-
-  InsertPrep({required this.entity, required this.map});
 }
 
 class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     extends SqlStorage<TEntity, TDbContext> {
+  const BaseStorage(super.t,
+      {required super.dbContext, required super.useIsolateDefault});
+
   /// Try to convert anything (int, String) to an int.
   int? parseInt(Object? object) {
     if (object is int) {
@@ -42,43 +49,37 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     return null;
   }
 
-  const BaseStorage(super.t,
-      {required super.dbContext, required super.useIsolateDefault});
-
+  @override
   Future<TEntity?> insert(
     TEntity item, {
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     final db = await dbContext.database;
     final spawnIsolate = useIsolate ?? useIsolateDefault;
     final response = !spawnIsolate
         ? wInsertOrUpdate(item)
-        : await workerManager.execute(
-            () async {
-              return wInsertOrUpdate(item);
-            },
-            priority: priority,
-          ).future;
+        : await compute(wInsertOrUpdate, item);
     final updated = await db.insert(response.entity.tableName, response.map,
         conflictAlgorithm: ConflictAlgorithm.abort);
-    return updated > 0 ? response.entity : null;
+    return updated > 0 ? response.entity as TEntity? : null;
   }
 
+  @override
   Future<List<TEntity>?> insertList(Iterable<TEntity> items) async {
     final db = await dbContext.database;
     List<TEntity>? result;
     List<TEntity> updatedItems = <TEntity>[];
     await db.transaction((txn) async {
       var batch = txn.batch();
-      items.forEach((element) {
-        if (element.id == null)
-          element = element.copyWith(id: Uuid().v4()) as TEntity;
+      for (var element in items) {
+        if (element.id == null) {
+          element = element.copyWith(id: const Uuid().v4()) as TEntity;
+        }
         element = element.updateDates() as TEntity;
         batch.insert(element.tableName, element.toMap(),
             conflictAlgorithm: ConflictAlgorithm.abort);
         updatedItems.add(element);
-      });
+      }
       result = await _finishBatch(batch, updatedItems);
     });
     return result;
@@ -88,22 +89,16 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   Future<TEntity?> insertOrUpdate(
     TEntity item, {
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     final db = await dbContext.database;
     final spawnIsolate = useIsolate ?? useIsolateDefault;
 
     final response = !spawnIsolate
         ? wInsertOrUpdate(item)
-        : await workerManager.execute(
-            () async {
-              return wInsertOrUpdate(item);
-            },
-            priority: priority,
-          ).future;
+        : await compute(wInsertOrUpdate, item);
     final updated = await db.insert(response.entity.tableName, response.map,
         conflictAlgorithm: ConflictAlgorithm.replace);
-    return updated > 0 ? response.entity : null;
+    return updated > 0 ? response.entity as TEntity? : null;
   }
 
   @override
@@ -113,7 +108,6 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     required SqlWhere Function(TEntity t) where,
     int? offset,
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     List<TEntity> maps = await query(
       where: where,
@@ -122,9 +116,8 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
       offset: offset,
       orderBy: orderBy,
       useIsolate: useIsolate,
-      priority: priority,
     );
-    if (maps.length > 0) {
+    if (maps.isNotEmpty) {
       return maps.first;
     }
     return null;
@@ -137,7 +130,6 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     required SqlWhere Function(TEntity t) where,
     int? offset,
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     List<Map<String, dynamic>> maps = await queryMap(
       where: where,
@@ -146,9 +138,8 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
       offset: offset,
       orderBy: orderBy,
       useIsolate: useIsolate,
-      priority: priority,
     );
-    if (maps.length > 0) {
+    if (maps.isNotEmpty) {
       return maps.first;
     }
     return null;
@@ -159,13 +150,11 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     required SqlColumn Function(TEntity t) column,
     SqlWhere Function(TEntity t)? where,
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     List<Map> result = await rawQuery(
       where,
       'SELECT SUM (${column(t).name}) FROM ${t.tableName}',
       useIsolate: useIsolate,
-      priority: priority,
     );
     if (result.isNotEmpty) {
       final firstRow = result.first;
@@ -181,14 +170,12 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     required Iterable<SqlColumn> Function(TEntity t) columns,
     SqlWhere Function(TEntity t)? where,
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     final cols = columns(t).map((e) => e.name).join(' * ');
     List<Map> result = await rawQuery(
       where,
       'SELECT SUM ($cols) FROM ${t.tableName}',
       useIsolate: useIsolate,
-      priority: priority,
     );
     if (result.isNotEmpty) {
       final firstRow = result.first;
@@ -216,7 +203,6 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     int? limit,
     int? offset,
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     List<TEntity> maps = await query(
       where: where,
@@ -225,7 +211,6 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
       columns: columns ?? (t) => t.allColumns,
       orderBy: orderBy,
       useIsolate: useIsolate,
-      priority: priority,
     );
     if (maps.isNotEmpty) {
       return maps;
@@ -241,7 +226,6 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     int? limit,
     int? offset,
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     List<Map<String, Object?>> maps = await queryMap(
       where: where,
@@ -250,7 +234,6 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
       columns: columns ?? (t) => t.allColumns,
       orderBy: orderBy,
       useIsolate: useIsolate,
-      priority: priority,
     );
     if (maps.isNotEmpty) {
       return maps;
@@ -265,14 +248,15 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     List<TEntity> updatedItems = <TEntity>[];
     await db.transaction((txn) async {
       var batch = txn.batch();
-      items.forEach((element) {
-        if (element.id == null)
-          element = element.copyWith(id: Uuid().v4()) as TEntity;
+      for (var element in items) {
+        if (element.id == null) {
+          element = element.copyWith(id: const Uuid().v4()) as TEntity;
+        }
         element = element.updateDates() as TEntity;
         updatedItems.add(element);
         batch.insert(element.tableName, element.toMap(),
             conflictAlgorithm: ConflictAlgorithm.replace);
-      });
+      }
       result = await _finishBatch(batch, updatedItems);
     });
     return result;
@@ -283,12 +267,12 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     var result = await batch.commit(noResult: false, continueOnError: true);
     List<TEntity> inserted = <TEntity>[];
     var indx = 0;
-    result.forEach((element) {
+    for (var element in result) {
       if (element is int && element > 0) {
         inserted.add(items.elementAt(indx));
       }
       indx++;
-    });
+    }
     return inserted;
   }
 
@@ -296,13 +280,11 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   Future<int> getCount({
     SqlWhere Function(TEntity t)? where,
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     List<Map<String, Object?>> result = await rawQuery(
       where,
       'SELECT COUNT (*) FROM ${t.tableName}',
       useIsolate: useIsolate,
-      priority: priority,
     );
     if (result.isNotEmpty) {
       final firstRow = result.first;
@@ -317,14 +299,12 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   Future<int> delete({
     final SqlWhere Function(TEntity t)? where,
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     final db = await dbContext.database;
     final formattedQuery = where != null
         ? await whereString(
             where,
             useIsolate,
-            priority,
           )
         : null;
     return await db.delete(
@@ -340,11 +320,10 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     TEntity? entity,
     Map<SqlColumn, dynamic> Function(TEntity t)? columnValues,
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     assert(entity != null || columnValues != null);
     final db = await dbContext.database;
-    final formattedQuery = await whereString(where, useIsolate, priority);
+    final formattedQuery = await whereString(where, useIsolate);
     var createdAt = entity?.createdAt;
     if (entity == null) {
       final res =
@@ -374,7 +353,6 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     int? limit,
     int? offset,
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     List<Map<String, dynamic>> maps;
     final db = await dbContext.database;
@@ -383,19 +361,19 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
       throw ArgumentError('no columns supplied');
     }
     List<String> cols = [];
-    cols1.forEach((element) {
+    for (var element in cols1) {
       cols.add(element.name);
-    });
+    }
     if (cols.isEmpty) {
       throw ArgumentError('no columns supplied');
     }
     String? orderByFilter = orderBy
         ?.call(t)
         ?.map((e) =>
-            '${e.column.name} ${e.direction == OrderDirection.Desc ? ' DESC' : ''}')
+            '${e.column.name} ${e.direction == OrderDirection.desc ? ' DESC' : ''}')
         .join(',');
 
-    if (where == null)
+    if (where == null) {
       maps = await db.query(
         t.tableName,
         columns: cols,
@@ -403,8 +381,8 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
         limit: limit,
         offset: offset,
       );
-    else {
-      final formattedQuery = await whereString(where, useIsolate, priority);
+    } else {
+      final formattedQuery = await whereString(where, useIsolate);
       maps = await db.query(
         t.tableName,
         columns: cols,
@@ -416,14 +394,12 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
       );
     }
     final spawnIsolate = useIsolate ?? useIsolateDefault;
+    final args = Args<TEntity>(t: t.copyWith(), maps: maps);
     if (!spawnIsolate) {
-      return entitiesFromMap(t, maps);
+      return entitiesFromMap(args).map<TEntity>((e) => e as TEntity).toList();
     }
-    final copy = t.copyWith();
-    final result = await workerManager.execute(() async {
-      return entitiesFromMap<TEntity>(copy, maps);
-    }, priority: priority).future;
-    return result;
+    final result = await compute(entitiesFromMap, args);
+    return result.map<TEntity>((e) => e as TEntity).toList();
   }
 
   @override
@@ -435,7 +411,6 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     int? limit,
     int? offset,
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     List<Map<String, dynamic>> maps;
     final db = await dbContext.database;
@@ -444,19 +419,19 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
       throw ArgumentError('no columns supplied');
     }
     List<String> cols = [];
-    cols1.forEach((element) {
+    for (var element in cols1) {
       cols.add(element.name);
-    });
+    }
     if (cols.isEmpty) {
       throw ArgumentError('no columns supplied');
     }
     String? orderByFilter = orderBy
         ?.call(t)
         ?.map((e) =>
-            '${e.column.name} ${e.direction == OrderDirection.Desc ? ' DESC' : ''}')
+            '${e.column.name} ${e.direction == OrderDirection.desc ? ' DESC' : ''}')
         .join(',');
 
-    if (where == null)
+    if (where == null) {
       maps = await db.query(
         t.tableName,
         columns: cols,
@@ -464,8 +439,8 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
         limit: limit,
         offset: offset,
       );
-    else {
-      final formattedQuery = await whereString(where, useIsolate, priority);
+    } else {
+      final formattedQuery = await whereString(where, useIsolate);
       maps = await db.query(
         t.tableName,
         columns: cols,
@@ -479,18 +454,18 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     return maps;
   }
 
+  @override
   @protected
   Future<List<Map<String, Object?>>> rawQuery(
     SqlWhere Function(TEntity t)? where,
     String query, {
     final bool? useIsolate,
-    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     final db = await dbContext.database;
-    if (where == null)
+    if (where == null) {
       return await db.rawQuery(query);
-    else {
-      final formattedQuery = await whereString(where, useIsolate, priority);
+    } else {
+      final formattedQuery = await whereString(where, useIsolate);
       return await db.rawQuery(
           '$query WHERE ${formattedQuery.where}', formattedQuery.whereArgs);
     }

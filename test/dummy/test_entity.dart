@@ -1,6 +1,19 @@
 import 'package:tatlacas_sqflite_storage/sql.dart';
 
 class TestEntity extends Entity<TestEntity> {
+
+  const TestEntity({
+    super.id,
+    super.createdAt,
+    super.updatedAt,
+    this.testString,
+    this.testUpgrade,
+    this.testDateTime,
+    this.testInt,
+    this.testIntWithDefault,
+    this.testBool,
+    this.testDouble,
+  });
   final String? testString;
   final String? testUpgrade;
   final DateTime? testDateTime;
@@ -52,19 +65,6 @@ class TestEntity extends Entity<TestEntity> {
         write: (entity) => entity.testDouble,
         read: (json, entity, value) => entity.copyWith(testDouble: value),
       );
-
-  const TestEntity({
-    String? id,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-    this.testString,
-    this.testUpgrade,
-    this.testDateTime,
-    this.testInt,
-    this.testIntWithDefault,
-    this.testBool,
-    this.testDouble,
-  }) : super(id: id, createdAt: createdAt, updatedAt: updatedAt);
 
   @override
   TestEntity copyWith({

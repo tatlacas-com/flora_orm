@@ -7,15 +7,14 @@ import 'sql.dart';
 import 'sql_column_extension.dart';
 
 abstract class IEntity {
-  final String? id;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
-
   const IEntity({
     this.id,
     this.createdAt,
     this.updatedAt,
   });
+  final String? id;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   IEntity updateDates({DateTime? createdAt});
 
@@ -62,15 +61,17 @@ abstract class IEntity {
 
 abstract class Entity<TEntity extends IEntity> extends Equatable
     implements IEntity {
-  final String? id;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
-
   const Entity({
     this.id,
     this.createdAt,
     this.updatedAt,
   });
+  @override
+  final String? id;
+  @override
+  final DateTime? createdAt;
+  @override
+  final DateTime? updatedAt;
 
   @override
   List<Object?> get props => [
@@ -81,12 +82,14 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
   String toString() => indentedString({runtimeType.toString(): toMap()});
 
   String indentedString(json) {
-    var encoder = new JsonEncoder.withIndent("     ");
+    var encoder = const JsonEncoder.withIndent('     ');
     return encoder.convert(json);
   }
 
+  @override
   Iterable<SqlColumn<TEntity, dynamic>> get columns;
 
+  @override
   Iterable<SqlColumn<TEntity, dynamic>> get allColumns =>
       <SqlColumn<TEntity, dynamic>>[columnId, columnCreatedAt, columnUpdatedAt]
           .followedBy(columns);
@@ -99,6 +102,7 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
     Map<String, dynamic>? json,
   });
 
+  @override
   SqlColumn<TEntity, String> get columnId => SqlColumn<TEntity, String>(
         'id',
         primaryKey: true,
@@ -107,6 +111,7 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
             entity.copyWith(id: value, json: json) as TEntity,
       );
 
+  @override
   SqlColumn<TEntity, DateTime> get columnCreatedAt =>
       SqlColumn<TEntity, DateTime>(
         'createdAt',
@@ -115,6 +120,7 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
             entity.copyWith(createdAt: value, json: json) as TEntity,
       );
 
+  @override
   SqlColumn<TEntity, DateTime> get columnUpdatedAt =>
       SqlColumn<TEntity, DateTime>(
         'updatedAt',
@@ -136,26 +142,29 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
     );
   }
 
+  @override
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {};
-    allColumns.forEach((column) {
+    for (var column in allColumns) {
       column.commitValue(this as TEntity, map);
-    });
+    }
     return map;
   }
 
+  @override
   Map<String, dynamic> toDb() {
     Map<String, dynamic> map = {};
-    allColumns.forEach((column) {
+    for (var column in allColumns) {
       column.commitValue(this as TEntity, map);
-    });
+    }
     return map;
   }
 
   ///Reads the values from database and set the corresponding values
+  @override
   TEntity load(Map<String, dynamic> json) {
     TEntity entity = this as TEntity;
-    allColumns.forEach((column) {
+    for (var column in allColumns) {
       try {
         final value = column.getValueFrom(json);
         if (column is SqlColumn<TEntity, double> && value is int) {
@@ -164,10 +173,9 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
           entity = column.read(json, entity, value);
         }
       } catch (e) {
-        throw ArgumentError(
-            'Error on ${this.runtimeType} loading ${column.name}: $e');
+        throw ArgumentError('Error on $runtimeType loading ${column.name}: $e');
       }
-    });
+    }
     return entity;
   }
 
@@ -178,18 +186,19 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
     ];
   }
 
+  @override
   String createTable(int version) {
     int indx = 1;
     StringBuffer stringBuffer = StringBuffer();
-    allColumns.forEach((element) {
+    for (var element in allColumns) {
       stringBuffer
           .write('${element.name} ${getColumnType(element.columnType)}');
       columnDefinition(element, stringBuffer);
       if (indx++ != allColumns.length) stringBuffer.write(',');
-    });
+    }
 
     var composite = '';
-    if (compositePrimaryKey.length > 0) {
+    if (compositePrimaryKey.isNotEmpty) {
       bool firstItem = true;
       var keys = compositePrimaryKey.fold('', (prev, element) {
         var cm = ', ';
@@ -211,6 +220,7 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
     return 'DROP TABLE IF EXISTS $tableName';
   }
 
+  @override
   Map<String, dynamic> toStorageJson(
       {required Map<SqlColumn, dynamic> columnValues}) {
     Map<String, dynamic> map = {};
@@ -230,15 +240,15 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
   @protected
   String getColumnType(ColumnType columnType) {
     switch (columnType) {
-      case ColumnType.Text:
-      case ColumnType.DateTime:
+      case ColumnType.text:
+      case ColumnType.dateTime:
         return 'TEXT';
-      case ColumnType.Boolean:
-      case ColumnType.Integer:
+      case ColumnType.boolean:
+      case ColumnType.integer:
         return 'INTEGER';
-      case ColumnType.Real:
+      case ColumnType.real:
         return 'REAL';
-      case ColumnType.Blob:
+      case ColumnType.blob:
         return 'BLOB';
       default:
         return 'TEXT';
@@ -251,17 +261,18 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
     if (element.autoIncrementPrimary) stringBuffer.write(' AUTOINCREMENT');
     if (element.unique) stringBuffer.write(' UNIQUE');
     if (element.notNull) stringBuffer.write(' NOT NULL');
-    if (element.defaultValue != null)
+    if (element.defaultValue != null) {
       stringBuffer.write(
           ' DEFAULT ${generateDefaultValue(colType: element.columnType, defaultValue: element.defaultValue)}');
+    }
   }
 
   dynamic generateDefaultValue(
       {required ColumnType colType, required dynamic defaultValue}) {
     switch (colType) {
-      case ColumnType.Text:
+      case ColumnType.text:
         return "'$defaultValue'";
-      case ColumnType.Boolean:
+      case ColumnType.boolean:
         if (defaultValue is bool) {
           return defaultValue ? 1 : 0;
         }
@@ -272,22 +283,27 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
     return defaultValue;
   }
 
+  @override
   List<String> upgradeTable(int oldVersion, int newVersion) {
     return [];
   }
 
+  @override
   List<String> downgradeTable(int oldVersion, int newVersion) {
     return [];
   }
 
+  @override
   List<String> onUpgradeComplete(int oldVersion, int newVersion) {
     return [];
   }
 
+  @override
   List<String> onCreateComplete(int newVersion) {
     return [];
   }
 
+  @override
   List<String> onDowngradeComplete(int oldVersion, int newVersion) {
     return [];
   }

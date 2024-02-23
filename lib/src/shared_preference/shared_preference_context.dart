@@ -4,14 +4,10 @@ import 'package:tatlacas_sqflite_storage/src/base_context.dart';
 
 class SharedPreferenceContext extends BaseContext {
   SharedPreferenceContext({
-    required String dbName,
-    required int dbVersion,
-    required List<IEntity> tables,
-  }) : super(
-    dbName: dbName,
-    dbVersion: dbVersion,
-    tables: tables,
-  );
+    required super.dbName,
+    required super.dbVersion,
+    required super.tables,
+  });
 
   SharedPreferenceContext copyWith({
     String? dbName,
@@ -25,10 +21,12 @@ class SharedPreferenceContext extends BaseContext {
     );
   }
 
+  @override
   Future<String> getDbPath() async {
     return '';
   }
 
+  @override
   Future<String> getDbFullName() async {
     return dbName;
   }
