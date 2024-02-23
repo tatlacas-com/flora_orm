@@ -11,46 +11,46 @@ class TestEntity extends Entity<TestEntity> {
 
   get columnTestString => SqlColumn<TestEntity, String>(
         'testString',
-        saveToDb: (entity) => entity.testString,
-        readFromDb: (entity, value) => entity.copyWith(testString: value),
+        write: (entity) => entity.testString,
+        read: (json, entity, value) => entity.copyWith(testString: value),
       );
 
   get columnTestUpgrade => SqlColumn<TestEntity, String>(
         'testUpgrade',
-        saveToDb: (entity) => entity.testUpgrade,
-        readFromDb: (entity, value) => entity.copyWith(testUpgrade: value),
+        write: (entity) => entity.testUpgrade,
+        read: (json, entity, value) => entity.copyWith(testUpgrade: value),
       );
 
   get columTestDateTime => SqlColumn<TestEntity, DateTime>(
         'testDateTime',
-        saveToDb: (entity) => entity.testDateTime,
-        readFromDb: (entity, value) => entity.copyWith(testDateTime: value),
+        write: (entity) => entity.testDateTime,
+        read: (json, entity, value) => entity.copyWith(testDateTime: value),
       );
 
   get columnTestInt => SqlColumn<TestEntity, int>(
         'testInt',
-        saveToDb: (entity) => entity.testInt,
-        readFromDb: (entity, value) => entity.copyWith(testInt: value),
+        write: (entity) => entity.testInt,
+        read: (json, entity, value) => entity.copyWith(testInt: value),
       );
 
   get columnTestIntWithDefault => SqlColumn<TestEntity, int>(
         'testIntWithDefault',
-        saveToDb: (entity) => entity.testIntWithDefault,
+        write: (entity) => entity.testIntWithDefault,
         defaultValue: 100,
-        readFromDb: (entity, value) =>
+        read: (json, entity, value) =>
             entity.copyWith(testIntWithDefault: value),
       );
 
   get columnTestBool => SqlColumn<TestEntity, bool>(
         'testBool',
-        saveToDb: (entity) => entity.testBool,
-        readFromDb: (entity, value) => entity.copyWith(testBool: value),
+        write: (entity) => entity.testBool,
+        read: (json, entity, value) => entity.copyWith(testBool: value),
       );
 
   get columnTestDouble => SqlColumn<TestEntity, double>(
         'testDouble',
-        saveToDb: (entity) => entity.testDouble,
-        readFromDb: (entity, value) => entity.copyWith(testDouble: value),
+        write: (entity) => entity.testDouble,
+        read: (json, entity, value) => entity.copyWith(testDouble: value),
       );
 
   const TestEntity({
@@ -78,6 +78,7 @@ class TestEntity extends Entity<TestEntity> {
     int? testIntWithDefault,
     bool? testBool,
     double? testDouble,
+    Map<String, dynamic>? json,
   }) {
     return TestEntity(
       id: id ?? this.id,

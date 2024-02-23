@@ -23,6 +23,7 @@ abstract class IEntity {
     String? id,
     DateTime? createdAt,
     DateTime? updatedAt,
+    Map<String, dynamic>? json,
   });
 
   String get tableName;
@@ -95,29 +96,31 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
     String? id,
     DateTime? createdAt,
     DateTime? updatedAt,
+    Map<String, dynamic>? json,
   });
 
   SqlColumn<TEntity, String> get columnId => SqlColumn<TEntity, String>(
         'id',
         primaryKey: true,
-        saveToDb: (entity) => entity.id,
-        readFromDb: (entity, value) => entity.copyWith(id: value) as TEntity,
+        write: (entity) => entity.id,
+        read: (json, entity, value) =>
+            entity.copyWith(id: value, json: json) as TEntity,
       );
 
   SqlColumn<TEntity, DateTime> get columnCreatedAt =>
       SqlColumn<TEntity, DateTime>(
         'createdAt',
-        saveToDb: (entity) => entity.createdAt,
-        readFromDb: (entity, value) =>
-            entity.copyWith(createdAt: value) as TEntity,
+        write: (entity) => entity.createdAt,
+        read: (json, entity, value) =>
+            entity.copyWith(createdAt: value, json: json) as TEntity,
       );
 
   SqlColumn<TEntity, DateTime> get columnUpdatedAt =>
       SqlColumn<TEntity, DateTime>(
         'updatedAt',
-        saveToDb: (entity) => entity.updatedAt,
-        readFromDb: (entity, value) =>
-            entity.copyWith(updatedAt: value) as TEntity,
+        write: (entity) => entity.updatedAt,
+        read: (json, entity, value) =>
+            entity.copyWith(updatedAt: value, json: json) as TEntity,
       );
 
   List<SqlColumn<TEntity, dynamic>> get compositePrimaryKey =>
@@ -156,9 +159,9 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
       try {
         final value = column.getValueFrom(json);
         if (column is SqlColumn<TEntity, double> && value is int) {
-          entity = column.readFromDb(entity, value.toDouble());
+          entity = column.read(json, entity, value.toDouble());
         } else {
-          entity = column.readFromDb(entity, value);
+          entity = column.read(json, entity, value);
         }
       } catch (e) {
         throw ArgumentError(
