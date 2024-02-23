@@ -59,21 +59,21 @@ String getCondition(SqlCondition condition) {
 }
 
 FormattedQuery getWhereString<TEntity extends IEntity>(SqlWhere where) {
-  StringBuffer query = StringBuffer();
+  StringBuffer stringBuffer = StringBuffer();
   final whereArgs = <dynamic>[];
   where.filters.forEach((element) {
     if (element.isBracketOnly) {
-      if (element.leftBracket) query.write('(');
-      if (element.rightBracket) query.write(')');
+      if (element.leftBracket) stringBuffer.write('(');
+      if (element.rightBracket) stringBuffer.write(')');
       return;
     }
     if (element.and)
-      query.write(' AND ');
-    else if (element.or) query.write(' OR ');
-    if (element.leftBracket) query.write('(');
+      stringBuffer.write(' AND ');
+    else if (element.or) stringBuffer.write(' OR ');
+    if (element.leftBracket) stringBuffer.write('(');
 
-    query.write(element.column!.name);
-    query.write(getCondition(element.condition));
+    stringBuffer.write(element.column!.name);
+    stringBuffer.write(getCondition(element.condition));
     if (element.condition != SqlCondition.Null &&
         element.condition != SqlCondition.NotNull) {
       if ((element.condition == SqlCondition.In ||
@@ -82,7 +82,7 @@ FormattedQuery getWhereString<TEntity extends IEntity>(SqlWhere where) {
         final args = element.value as List;
         final argsQ = args.map((e) => '?').toList();
         final q = argsQ.join(', ');
-        query.write('($q)');
+        stringBuffer.write('($q)');
         whereArgs.addAll(args);
       } else
         whereArgs.add(dbValue(element.value));
@@ -90,9 +90,9 @@ FormattedQuery getWhereString<TEntity extends IEntity>(SqlWhere where) {
     if (element.condition == SqlCondition.Between ||
         element.condition == SqlCondition.NotBetween)
       whereArgs.add(element.value2);
-    if (element.rightBracket) query.write(')');
+    if (element.rightBracket) stringBuffer.write(')');
   });
-  return FormattedQuery(where: query.toString(), whereArgs: whereArgs);
+  return FormattedQuery(where: stringBuffer.toString(), whereArgs: whereArgs);
 }
 
 abstract class SqlStorage<TEntity extends IEntity,
