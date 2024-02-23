@@ -1,7 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
-import 'package:tatlacas_sqflite_storage/src/worker.dart';
 import 'package:worker_manager/worker_manager.dart';
 
 import 'db_context.dart';
@@ -223,11 +222,15 @@ abstract class SqlStorage<TEntity extends IEntity,
     WorkPriority priority,
   ) async {
     final sqlWhere = where(t);
-    final dfSpawn = useIsolateDefault;
-    return await worker(
-      () => getWhereString(sqlWhere),
-      useIsolate: useIsolate ?? dfSpawn,
-      priority: priority,
-    ).future;
+    final spawnIsolate = useIsolate ?? useIsolateDefault;
+    if (!spawnIsolate) {
+      return getWhereString(sqlWhere);
+    }
+    return await workerManager
+        .execute(
+          () => getWhereString(sqlWhere),
+          priority: priority,
+        )
+        .future;
   }
 }

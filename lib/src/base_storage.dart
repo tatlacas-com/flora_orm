@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:sqflite_common/sqlite_api.dart';
 import 'package:tatlacas_sqflite_storage/src/base_context.dart';
-import 'package:tatlacas_sqflite_storage/src/worker.dart';
 import 'package:uuid/uuid.dart';
 import 'package:worker_manager/worker_manager.dart';
 
@@ -53,13 +52,14 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   }) async {
     final db = await dbContext.database;
     final spawnIsolate = useIsolate ?? useIsolateDefault;
-    final response = await worker(
-      () {
-        return wInsertOrUpdate(item);
-      },
-      priority: priority,
-      useIsolate: spawnIsolate,
-    ).future;
+    final response = !spawnIsolate
+        ? wInsertOrUpdate(item)
+        : await workerManager.execute(
+            () {
+              return wInsertOrUpdate(item);
+            },
+            priority: priority,
+          ).future;
     final updated = await db.insert(response.entity.tableName, response.map,
         conflictAlgorithm: ConflictAlgorithm.abort);
     return updated > 0 ? response.entity : null;
@@ -92,13 +92,15 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   }) async {
     final db = await dbContext.database;
     final spawnIsolate = useIsolate ?? useIsolateDefault;
-    final response = await worker(
-      () {
-        return wInsertOrUpdate(item);
-      },
-      useIsolate: spawnIsolate,
-      priority: priority,
-    ).future;
+
+    final response = !spawnIsolate
+        ? wInsertOrUpdate(item)
+        : await workerManager.execute(
+            () {
+              return wInsertOrUpdate(item);
+            },
+            priority: priority,
+          ).future;
     final updated = await db.insert(response.entity.tableName, response.map,
         conflictAlgorithm: ConflictAlgorithm.replace);
     return updated > 0 ? response.entity : null;
@@ -414,8 +416,11 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
       );
     }
     final spawnIsolate = useIsolate ?? useIsolateDefault;
-    return worker(() => entitiesFromMap(t, maps),
-            useIsolate: spawnIsolate, priority: priority)
+    if (!spawnIsolate) {
+      return entitiesFromMap(t, maps);
+    }
+    return await workerManager
+        .execute(() => entitiesFromMap(t, maps), priority: priority)
         .future;
   }
 
