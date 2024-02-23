@@ -162,6 +162,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     return entity.copyWith(
       $fieldName: val,
       $alias: $alias,
+      json: json,
     );
   }
  ''');
@@ -279,12 +280,12 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
             }
           } else if (nullable) {
             generatedCode.writeln('''
-          read: (json, entity, value) => entity.copyWith($fieldName: CopyWith(value)),
+          read: (json, entity, value) => entity.copyWith($fieldName: CopyWith(value), json: json),
         );
     ''');
           } else {
             generatedCode.writeln('''
-          read: (json, entity, value) => entity.copyWith($fieldName: value),
+          read: (json, entity, value) => entity.copyWith($fieldName: value, json: json),
         );
     ''');
           }
