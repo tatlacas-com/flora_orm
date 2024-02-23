@@ -43,7 +43,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   }
 
   const BaseStorage(super.t,
-      {required super.dbContext, super.useIsolateDefault = true});
+      {required super.dbContext, required super.useIsolateDefault});
 
   Future<TEntity?> insert(
     TEntity item, {

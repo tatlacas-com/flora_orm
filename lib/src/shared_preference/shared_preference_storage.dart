@@ -13,9 +13,8 @@ class SharedPreferenceStorage<TEntity extends IEntity>
   @protected
   final Future<SharedPreferences> prefs = SharedPreferences.getInstance();
 
-  SharedPreferenceStorage(TEntity t,
-      {required SharedPreferenceContext dbContext})
-      : super(t, dbContext: dbContext);
+  SharedPreferenceStorage(super.t,
+      {required super.dbContext, super.useIsolateDefault = true});
 
   @protected
   Future<String?> read({required String key}) async {
