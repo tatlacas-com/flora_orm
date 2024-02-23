@@ -2,8 +2,18 @@ import 'package:flutter/foundation.dart';
 import 'package:sqflite_common/sqlite_api.dart';
 import 'package:tatlacas_sqflite_storage/src/base_context.dart';
 import 'package:uuid/uuid.dart';
+import 'package:worker_manager/worker_manager.dart';
 
 import '../sql.dart';
+
+List<TEntity> entitiesFromMap<TEntity extends IEntity>(
+    TEntity t, List<Map<String, dynamic>> maps) {
+  List<TEntity> entities = [];
+  for (final item in maps) {
+    entities.add(t.load(item) as TEntity);
+  }
+  return entities;
+}
 
 class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     extends SqlStorage<TEntity, TDbContext> {
@@ -238,7 +248,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     final SqlWhere Function(TEntity t)? where,
   }) async {
     final db = await dbContext.database;
-    final formattedQuery = where != null ? whereString(where) : null;
+    final formattedQuery = where != null ? (await whereString(where)) : null;
     return await db.delete(
       t.tableName,
       where: formattedQuery?.where,
@@ -254,7 +264,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   }) async {
     assert(entity != null || columnValues != null);
     final db = await dbContext.database;
-    final formattedQuery = whereString(where);
+    final formattedQuery = await whereString(where);
     var createdAt = entity?.createdAt;
     if (entity == null) {
       final res =
@@ -312,7 +322,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
         offset: offset,
       );
     else {
-      final formattedQuery = whereString(where);
+      final formattedQuery = await whereString(where);
       maps = await db.query(
         t.tableName,
         columns: cols,
@@ -323,11 +333,12 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
         offset: offset,
       );
     }
-    List<TEntity> entities = [];
-    for (final item in maps) {
-      entities.add(t.load(item) as TEntity);
-    }
-    return entities;
+    return workerManager
+        .execute(
+          () => entitiesFromMap(t, maps),
+          priority: WorkPriority.immediately,
+        )
+        .future;
   }
 
   @override
@@ -367,7 +378,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
         offset: offset,
       );
     else {
-      final formattedQuery = whereString(where);
+      final formattedQuery = await whereString(where);
       maps = await db.query(
         t.tableName,
         columns: cols,
@@ -390,7 +401,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     if (where == null)
       return await db.rawQuery(query);
     else {
-      final formattedQuery = whereString(where);
+      final formattedQuery = await whereString(where);
       return await db.rawQuery(
           '$query WHERE ${formattedQuery.where}', formattedQuery.whereArgs);
     }

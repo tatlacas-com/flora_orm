@@ -19,6 +19,7 @@ dependencies:
   source_gen: ^1.4.0
   build: ^2.4.1
   analyzer: ^6.2.0
+  worker_manager: ^6.3.2
 
 dev_dependencies:
   flutter_test:
