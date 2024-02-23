@@ -7,7 +7,7 @@ import 'package:worker_manager/worker_manager.dart';
 import '../sql.dart';
 
 List<TEntity> entitiesFromMap<TEntity extends IEntity>(
-    TEntity t, List<Map<String, dynamic>> maps) {
+    IEntity t, List<Map<String, dynamic>> maps) {
   List<TEntity> entities = [];
   for (final item in maps) {
     entities.add(t.load(item) as TEntity);
@@ -419,9 +419,9 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     if (!spawnIsolate) {
       return entitiesFromMap(t, maps);
     }
-    final copy = t.copyWith() as TEntity;
+    final copy = t.copyWith();
     final result = await workerManager.execute(() async {
-      return entitiesFromMap(copy, maps);
+      return entitiesFromMap<TEntity>(copy, maps);
     }, priority: priority).future;
     return result;
   }
