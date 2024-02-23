@@ -226,11 +226,11 @@ abstract class SqlStorage<TEntity extends IEntity,
     if (!spawnIsolate) {
       return getWhereString(sqlWhere);
     }
-    return await workerManager
-        .execute(
-          () => getWhereString(sqlWhere),
-          priority: priority,
-        )
-        .future;
+    return await workerManager.execute(
+      () async {
+        return getWhereString(sqlWhere);
+      },
+      priority: priority,
+    ).future;
   }
 }

@@ -55,7 +55,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     final response = !spawnIsolate
         ? wInsertOrUpdate(item)
         : await workerManager.execute(
-            () {
+            () async {
               return wInsertOrUpdate(item);
             },
             priority: priority,
@@ -96,7 +96,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     final response = !spawnIsolate
         ? wInsertOrUpdate(item)
         : await workerManager.execute(
-            () {
+            () async {
               return wInsertOrUpdate(item);
             },
             priority: priority,
@@ -420,9 +420,9 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
       return entitiesFromMap(t, maps);
     }
     final copy = t.copyWith() as TEntity;
-    final result = await workerManager
-        .execute(() => entitiesFromMap(copy, maps), priority: priority)
-        .future;
+    final result = await workerManager.execute(() async {
+      return entitiesFromMap(copy, maps);
+    }, priority: priority).future;
     return result;
   }
 
