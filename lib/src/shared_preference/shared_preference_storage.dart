@@ -6,6 +6,7 @@ import 'package:tatlacas_sqflite_storage/sql.dart';
 import 'package:tatlacas_sqflite_storage/src/base_storage.dart';
 import 'package:tatlacas_sqflite_storage/src/shared_preference/shared_preference_context.dart';
 import 'package:uuid/uuid.dart';
+import 'package:worker_manager/worker_manager.dart';
 
 class SharedPreferenceStorage<TEntity extends IEntity>
     extends BaseStorage<TEntity, SharedPreferenceContext> {
@@ -35,7 +36,11 @@ class SharedPreferenceStorage<TEntity extends IEntity>
   }
 
   @override
-  Future<TEntity?> insert(TEntity item) async {
+  Future<TEntity?> insert(
+    TEntity item, {
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
+  }) async {
     if (item.id == null) item = item.copyWith(id: Uuid().v4()) as TEntity;
     item = item.updateDates() as TEntity;
     final json = jsonEncode(item.toMap());
@@ -49,6 +54,8 @@ class SharedPreferenceStorage<TEntity extends IEntity>
     List<SqlOrder>? Function(TEntity t)? orderBy,
     required SqlWhere Function(TEntity t) where,
     int? offset,
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     return null;
   }
@@ -59,7 +66,11 @@ class SharedPreferenceStorage<TEntity extends IEntity>
   }
 
   @override
-  Future<TEntity?> insertOrUpdate(TEntity item) async {
+  Future<TEntity?> insertOrUpdate(
+    TEntity item, {
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
+  }) async {
     if (item.id == null) item = item.copyWith(id: Uuid().v4()) as TEntity;
     item = item.updateDates() as TEntity;
     final json = jsonEncode(item.toMap());
@@ -75,6 +86,8 @@ class SharedPreferenceStorage<TEntity extends IEntity>
   @override
   Future<int> delete({
     final SqlWhere Function(TEntity t)? where,
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     final item = where == null
         ? null
@@ -94,6 +107,8 @@ class SharedPreferenceStorage<TEntity extends IEntity>
     required SqlWhere Function(TEntity t) where,
     TEntity? entity,
     Map<SqlColumn, dynamic> Function(TEntity t)? columnValues,
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     var query = where(t)
         .filters
@@ -126,6 +141,8 @@ class SharedPreferenceStorage<TEntity extends IEntity>
     List<SqlOrder>? Function(TEntity t)? orderBy,
     int? limit,
     int? offset,
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     return [];
   }
@@ -133,8 +150,10 @@ class SharedPreferenceStorage<TEntity extends IEntity>
   @override
   Future<List<Map<String, Object?>>> rawQuery(
     SqlWhere Function(TEntity t)? where,
-    String query,
-  ) async {
+    String query, {
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
+  }) async {
     return [];
   }
 }

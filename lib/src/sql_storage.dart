@@ -2,6 +2,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:tatlacas_sqflite_storage/src/worker.dart';
+import 'package:worker_manager/worker_manager.dart';
 
 import 'db_context.dart';
 import 'models/entity.dart';
@@ -58,11 +59,10 @@ String getCondition(SqlCondition condition) {
   }
 }
 
-FormattedQuery getWhereString<TEntity extends IEntity>(
-    SqlWhere Function(TEntity t) where, TEntity t) {
+FormattedQuery getWhereString<TEntity extends IEntity>(SqlWhere where) {
   StringBuffer query = StringBuffer();
   final whereArgs = <dynamic>[];
-  where(t).filters.forEach((element) {
+  where.filters.forEach((element) {
     if (element.isBracketOnly) {
       if (element.leftBracket) query.write('(');
       if (element.rightBracket) query.write(')');
@@ -100,14 +100,24 @@ abstract class SqlStorage<TEntity extends IEntity,
     TDbContext extends DbContext<IEntity>> extends Equatable {
   final TDbContext dbContext;
   final TEntity t;
+  final bool useIsolateDefault;
 
-  const SqlStorage(this.t, {required this.dbContext});
+  const SqlStorage(this.t,
+      {required this.dbContext, this.useIsolateDefault = true});
 
-  Future<TEntity?> insert(TEntity item);
+  Future<TEntity?> insert(
+    TEntity item, {
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
+  });
 
   Future<List<TEntity>?> insertList(Iterable<TEntity> items);
 
-  Future<TEntity?> insertOrUpdate(TEntity item);
+  Future<TEntity?> insertOrUpdate(
+    TEntity item, {
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
+  });
 
   Future<List<TEntity>?> insertOrUpdateList(Iterable<TEntity> items);
 
@@ -116,36 +126,50 @@ abstract class SqlStorage<TEntity extends IEntity,
     List<SqlOrder>? Function(TEntity t)? orderBy,
     required SqlWhere Function(TEntity t) where,
     int? offset,
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
   });
   Future<Map<String, dynamic>?> getEntityMap({
     List<SqlColumn>? Function(TEntity t)? columns,
     List<SqlOrder>? Function(TEntity t)? orderBy,
     required SqlWhere Function(TEntity t) where,
     int? offset,
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
   });
 
   Future<T> getSum<T>({
     required SqlColumn Function(TEntity t) column,
     SqlWhere Function(TEntity t)? where,
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
   });
 
   Future<T> getSumProduct<T>({
     required List<SqlColumn> Function(TEntity t) columns,
     SqlWhere Function(TEntity t)? where,
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
   });
 
   Future<int> getCount({
     SqlWhere Function(TEntity t)? where,
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
   });
 
   Future<int> delete({
     SqlWhere Function(TEntity t)? where,
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
   });
 
   Future<int> update({
     required SqlWhere Function(TEntity t) where,
     TEntity entity,
     Map<SqlColumn, dynamic> Function(TEntity t)? columnValues,
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
   });
 
   @protected
@@ -155,6 +179,8 @@ abstract class SqlStorage<TEntity extends IEntity,
     List<SqlOrder>? Function(TEntity t)? orderBy,
     int? limit,
     int? offset,
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
   });
   @protected
   Future<List<Map<String, dynamic>>> queryMap({
@@ -163,29 +189,45 @@ abstract class SqlStorage<TEntity extends IEntity,
     List<SqlOrder>? Function(TEntity t)? orderBy,
     int? limit,
     int? offset,
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
   });
 
   Future<List<TEntity>> getEntities({
     List<SqlColumn>? Function(TEntity t)? columns,
     List<SqlOrder>? Function(TEntity t)? orderBy,
     SqlWhere Function(TEntity t)? where,
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
   });
   Future<List<Map<String, dynamic>>> getEntityMaps({
     List<SqlColumn>? Function(TEntity t)? columns,
     List<SqlOrder>? Function(TEntity t)? orderBy,
     SqlWhere Function(TEntity t)? where,
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
   });
 
   @protected
   Future<List<Map<String, Object?>>> rawQuery(
     SqlWhere Function(TEntity t)? where,
-    String query,
-  );
+    String query, {
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
+  });
 
   @protected
   Future<FormattedQuery> whereString(
     SqlWhere Function(TEntity t) where,
+    bool? useIsolate,
+    WorkPriority priority,
   ) async {
-    return await worker(() => getWhereString(where, t)).future;
+    final sqlWhere = where(t);
+    final dfSpawn = useIsolateDefault;
+    return await worker(
+      () => getWhereString(sqlWhere),
+      useIsolate: useIsolate ?? dfSpawn,
+      priority: priority,
+    ).future;
   }
 }

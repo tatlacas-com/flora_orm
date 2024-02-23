@@ -37,18 +37,24 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     return null;
   }
 
-  const BaseStorage(TEntity t, {required TDbContext dbContext})
-      : super(t, dbContext: dbContext);
+  const BaseStorage(super.t,
+      {required super.dbContext, super.useIsolateDefault = true});
 
-  Future<TEntity?> insert(TEntity item) async {
+  Future<TEntity?> insert(
+    TEntity item, {
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
+  }) async {
     final db = await dbContext.database;
-    final response = await workerManager.execute(
+    final dfSpawn = useIsolateDefault;
+    final response = await worker(
       () {
         if (item.id == null) item = item.copyWith(id: Uuid().v4()) as TEntity;
         item = item.updateDates() as TEntity;
         return InsertPrep(entity: item, map: item.toDb());
       },
-      priority: WorkPriority.immediately,
+      priority: priority,
+      useIsolate: useIsolate ?? dfSpawn,
     ).future;
     final updated = await db.insert(response.entity.tableName, response.map,
         conflictAlgorithm: ConflictAlgorithm.abort);
@@ -75,16 +81,21 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   }
 
   @override
-  Future<TEntity?> insertOrUpdate(TEntity item) async {
+  Future<TEntity?> insertOrUpdate(
+    TEntity item, {
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
+  }) async {
     final db = await dbContext.database;
-
-    final response = await workerManager.execute(
+    final dfSpawn = useIsolateDefault;
+    final response = await worker(
       () {
         if (item.id == null) item = item.copyWith(id: Uuid().v4()) as TEntity;
         item = item.updateDates() as TEntity;
         return InsertPrep(entity: item, map: item.toDb());
       },
-      priority: WorkPriority.immediately,
+      useIsolate: useIsolate ?? dfSpawn,
+      priority: priority,
     ).future;
     final updated = await db.insert(response.entity.tableName, response.map,
         conflictAlgorithm: ConflictAlgorithm.replace);
@@ -97,6 +108,8 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     List<SqlOrder>? Function(TEntity t)? orderBy,
     required SqlWhere Function(TEntity t) where,
     int? offset,
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     List<TEntity> maps = await query(
       where: where,
@@ -104,6 +117,8 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
       limit: 1,
       offset: offset,
       orderBy: orderBy,
+      useIsolate: useIsolate,
+      priority: priority,
     );
     if (maps.length > 0) {
       return maps.first;
@@ -117,6 +132,8 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     List<SqlOrder>? Function(TEntity t)? orderBy,
     required SqlWhere Function(TEntity t) where,
     int? offset,
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     List<Map<String, dynamic>> maps = await queryMap(
       where: where,
@@ -124,6 +141,8 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
       limit: 1,
       offset: offset,
       orderBy: orderBy,
+      useIsolate: useIsolate,
+      priority: priority,
     );
     if (maps.length > 0) {
       return maps.first;
@@ -135,9 +154,15 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   Future<T> getSum<T>({
     required SqlColumn Function(TEntity t) column,
     SqlWhere Function(TEntity t)? where,
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     List<Map> result = await rawQuery(
-        where, 'SELECT SUM (${column(t).name}) FROM ${t.tableName}');
+      where,
+      'SELECT SUM (${column(t).name}) FROM ${t.tableName}',
+      useIsolate: useIsolate,
+      priority: priority,
+    );
     if (result.isNotEmpty) {
       final firstRow = result.first;
       if (firstRow.isNotEmpty && firstRow.values.first != null) {
@@ -151,10 +176,16 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   Future<T> getSumProduct<T>({
     required Iterable<SqlColumn> Function(TEntity t) columns,
     SqlWhere Function(TEntity t)? where,
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     final cols = columns(t).map((e) => e.name).join(' * ');
-    List<Map> result =
-        await rawQuery(where, 'SELECT SUM ($cols) FROM ${t.tableName}');
+    List<Map> result = await rawQuery(
+      where,
+      'SELECT SUM ($cols) FROM ${t.tableName}',
+      useIsolate: useIsolate,
+      priority: priority,
+    );
     if (result.isNotEmpty) {
       final firstRow = result.first;
       if (firstRow.isNotEmpty && firstRow.values.first != null) {
@@ -180,6 +211,8 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     SqlWhere Function(TEntity t)? where,
     int? limit,
     int? offset,
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     List<TEntity> maps = await query(
       where: where,
@@ -187,6 +220,8 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
       offset: offset,
       columns: columns ?? (t) => t.allColumns,
       orderBy: orderBy,
+      useIsolate: useIsolate,
+      priority: priority,
     );
     if (maps.isNotEmpty) {
       return maps;
@@ -201,6 +236,8 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     SqlWhere Function(TEntity t)? where,
     int? limit,
     int? offset,
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     List<Map<String, Object?>> maps = await queryMap(
       where: where,
@@ -208,6 +245,8 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
       offset: offset,
       columns: columns ?? (t) => t.allColumns,
       orderBy: orderBy,
+      useIsolate: useIsolate,
+      priority: priority,
     );
     if (maps.isNotEmpty) {
       return maps;
@@ -252,9 +291,15 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   @override
   Future<int> getCount({
     SqlWhere Function(TEntity t)? where,
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
   }) async {
-    List<Map<String, Object?>> result =
-        await rawQuery(where, 'SELECT COUNT (*) FROM ${t.tableName}');
+    List<Map<String, Object?>> result = await rawQuery(
+      where,
+      'SELECT COUNT (*) FROM ${t.tableName}',
+      useIsolate: useIsolate,
+      priority: priority,
+    );
     if (result.isNotEmpty) {
       final firstRow = result.first;
       if (firstRow.isNotEmpty) {
@@ -267,9 +312,17 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   @override
   Future<int> delete({
     final SqlWhere Function(TEntity t)? where,
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     final db = await dbContext.database;
-    final formattedQuery = where != null ? (await whereString(where)) : null;
+    final formattedQuery = where != null
+        ? await whereString(
+            where,
+            useIsolate,
+            priority,
+          )
+        : null;
     return await db.delete(
       t.tableName,
       where: formattedQuery?.where,
@@ -282,10 +335,12 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     required SqlWhere Function(TEntity t) where,
     TEntity? entity,
     Map<SqlColumn, dynamic> Function(TEntity t)? columnValues,
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     assert(entity != null || columnValues != null);
     final db = await dbContext.database;
-    final formattedQuery = await whereString(where);
+    final formattedQuery = await whereString(where, useIsolate, priority);
     var createdAt = entity?.createdAt;
     if (entity == null) {
       final res =
@@ -314,6 +369,8 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     List<SqlOrder>? Function(TEntity t)? orderBy,
     int? limit,
     int? offset,
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     List<Map<String, dynamic>> maps;
     final db = await dbContext.database;
@@ -343,7 +400,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
         offset: offset,
       );
     else {
-      final formattedQuery = await whereString(where);
+      final formattedQuery = await whereString(where, useIsolate, priority);
       maps = await db.query(
         t.tableName,
         columns: cols,
@@ -365,6 +422,8 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     List<SqlOrder>? Function(TEntity t)? orderBy,
     int? limit,
     int? offset,
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
   }) async {
     List<Map<String, dynamic>> maps;
     final db = await dbContext.database;
@@ -394,7 +453,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
         offset: offset,
       );
     else {
-      final formattedQuery = await whereString(where);
+      final formattedQuery = await whereString(where, useIsolate, priority);
       maps = await db.query(
         t.tableName,
         columns: cols,
@@ -411,13 +470,15 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   @protected
   Future<List<Map<String, Object?>>> rawQuery(
     SqlWhere Function(TEntity t)? where,
-    String query,
-  ) async {
+    String query, {
+    final bool? useIsolate,
+    final WorkPriority priority = WorkPriority.immediately,
+  }) async {
     final db = await dbContext.database;
     if (where == null)
       return await db.rawQuery(query);
     else {
-      final formattedQuery = await whereString(where);
+      final formattedQuery = await whereString(where, useIsolate, priority);
       return await db.rawQuery(
           '$query WHERE ${formattedQuery.where}', formattedQuery.whereArgs);
     }
