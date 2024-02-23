@@ -329,7 +329,8 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
         String? id,
         DateTime? createdAt,
         DateTime? updatedAt,
-        $copyWithPropsList
+        $copyWithPropsList,
+        Map<String, dynamic>? json,
       }){
         return $className(
           id: id ?? this.id,
