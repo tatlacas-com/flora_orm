@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
-import 'package:worker_manager/worker_manager.dart';
+import 'package:tatlacas_sqflite_storage/src/worker.dart';
 
 import 'db_context.dart';
 import 'models/entity.dart';
@@ -186,11 +186,6 @@ abstract class SqlStorage<TEntity extends IEntity,
   Future<FormattedQuery> whereString(
     SqlWhere Function(TEntity t) where,
   ) async {
-    return await workerManager
-        .execute(
-          () => getWhereString(where, t),
-          priority: WorkPriority.immediately,
-        )
-        .future;
+    return await worker(() => getWhereString(where, t)).future;
   }
 }

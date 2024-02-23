@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:sqflite_common/sqlite_api.dart';
 import 'package:tatlacas_sqflite_storage/src/base_context.dart';
+import 'package:tatlacas_sqflite_storage/src/worker.dart';
 import 'package:uuid/uuid.dart';
 import 'package:worker_manager/worker_manager.dart';
 
@@ -353,12 +354,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
         offset: offset,
       );
     }
-    return workerManager
-        .execute(
-          () => entitiesFromMap(t, maps),
-          priority: WorkPriority.immediately,
-        )
-        .future;
+    return worker(() => entitiesFromMap(t, maps)).future;
   }
 
   @override
