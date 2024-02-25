@@ -71,7 +71,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     final Map<String, _ExtraField> extraFields = {};
     extraFields.addEntries(
       fields
-          .where((element) => element.metadata.isEmpty)
+          .where((element) => element.metadata.isEmpty && element.isFinal)
           .map(
             (e) => MapEntry(
               e.name,
@@ -351,13 +351,24 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           notNull: false,
           typeFull: fieldTypeFull,
         );
+      } else if (const TypeChecker.fromRuntime(CopyableProp)
+          .hasAnnotationOfExact(field)) {
+        final fieldName = field.name;
+        final fieldType = field.type.getDisplayString(withNullability: false);
+        final fieldTypeFull =
+            field.type.getDisplayString(withNullability: true);
+        extraFields[fieldName] = _ExtraField(
+          type: fieldType,
+          notNull: field.type.nullabilitySuffix == NullabilitySuffix.none,
+          typeFull: fieldTypeFull,
+        );
       }
     }
     for (final fieldName in extraFields.keys) {
       final extraField = extraFields[fieldName]!;
 
       propsList.writeln('$fieldName,');
-      getList.writeln('${extraField.type} get $fieldName;');
+      getList.writeln('${extraField.typeFull} get $fieldName;');
       if (extraField.notNull) {
         copyWithPropsList.writeln('${extraField.type}? $fieldName,');
         copyWithList.writeln('$fieldName: $fieldName ?? this.$fieldName,');

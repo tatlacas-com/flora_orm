@@ -39,3 +39,7 @@ class DbEntity {
 class NullableProp {
   const NullableProp();
 }
+
+class CopyableProp {
+  const CopyableProp();
+}
