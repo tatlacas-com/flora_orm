@@ -131,10 +131,13 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
             }
           }
           FieldElement? aliasProperty;
+          bool aliasNotNull = false;
           if (alias != null && (hasRead || jsonEncoded)) {
             final finder = PropertyFinder(alias);
             classElement.accept(finder);
             aliasProperty = finder.foundProperty!;
+            aliasNotNull =
+                aliasProperty.type.nullabilitySuffix == NullabilitySuffix.none;
             if (aliasProperty.type.isDartCoreList) {
               jsonEncodedType =
                   aliasProperty.type.getDisplayString(withNullability: false);
@@ -158,7 +161,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     }
     return entity.copyWith(
       $fieldName: val,
-      $alias: $alias,
+      $alias: ${aliasNotNull ? alias : 'CopyWith($alias)'},
       json: json,
     );
   }
@@ -250,8 +253,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           if (hasRead || jsonEncoded) {
             if (jsonEncoded) {
               if (alias != null) {
-                if (aliasProperty?.type.nullabilitySuffix ==
-                    NullabilitySuffix.none) {
+                if (aliasNotNull) {
                   copyWithPropsList.writeln('$jsonEncodedType? $alias,');
                   copyWithList.writeln('$alias: $alias ?? this.$alias,');
                 } else {
