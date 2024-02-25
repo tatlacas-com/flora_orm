@@ -33,6 +33,14 @@ class PropertyFinder extends RecursiveElementVisitor<void> {
 }
 
 class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
+  bool _hasDbAnnotation(FieldElement field) {
+    return const TypeChecker.fromRuntime(DbColumn)
+            .hasAnnotationOfExact(field) ||
+        const TypeChecker.fromRuntime(CopyableProp)
+            .hasAnnotationOfExact(field) ||
+        const TypeChecker.fromRuntime(NullableProp).hasAnnotationOfExact(field);
+  }
+
   @override
   String generateForAnnotatedElement(
     Element element,
@@ -71,7 +79,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     final Map<String, _ExtraField> extraFields = {};
     extraFields.addEntries(
       fields
-          .where((element) => element.metadata.isEmpty && element.isFinal)
+          .where((field) => field.isFinal && !_hasDbAnnotation(field))
           .map(
             (e) => MapEntry(
               e.name,
