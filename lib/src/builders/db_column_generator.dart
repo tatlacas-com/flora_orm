@@ -1,4 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/visitor.dart';
 import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
@@ -97,7 +98,8 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
                   ?.toBoolValue() ??
               false;
           final bool notNull =
-              dbColumnAnnotation.getField('notNull')?.toBoolValue() ?? false;
+              dbColumnAnnotation.getField('notNull')?.toBoolValue() ??
+                  (field.type.nullabilitySuffix != NullabilitySuffix.none);
           final bool unique =
               dbColumnAnnotation.getField('unique')?.toBoolValue() ?? false;
           dynamic defaultValue = dbColumnAnnotation.getField('defaultValue');
