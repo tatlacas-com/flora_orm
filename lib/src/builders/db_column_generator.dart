@@ -75,7 +75,13 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
         propsList.writeln('$fieldName,');
         getList.writeln('$fieldTypeFull get $fieldName;');
         final fieldMetadata = field.metadata;
-
+        if (fieldMetadata.isEmpty) {
+          extraFields[fieldName] = _ExtraField(
+            type: fieldType,
+            notNull: field.type.nullabilitySuffix == NullabilitySuffix.none,
+          );
+          continue;
+        }
         final List<ElementAnnotation> fieldAnnotations = [];
         final List<ElementAnnotation> nullableProps = [];
         for (final annotation in fieldMetadata) {
@@ -328,6 +334,10 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
             copyWithPropsList.writeln('CopyWith<$fieldType?>? $fieldName,');
             copyWithList.writeln(
                 '$fieldName: $fieldName != null ? $fieldName.value : this.$fieldName,');
+          }
+
+          if (extraFields.containsKey(fieldName)) {
+            extraFields.remove(fieldName);
           }
         }
         for (final _ in nullableProps) {
