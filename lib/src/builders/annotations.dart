@@ -35,3 +35,7 @@ class DbEntity {
   final String? tableName;
   final bool hasSuperColumns;
 }
+
+class NullableProp {
+  const NullableProp();
+}

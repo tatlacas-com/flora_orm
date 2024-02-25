@@ -6,6 +6,13 @@ import 'package:source_gen/source_gen.dart';
 import 'package:tatlacas_sqflite_storage/src/builders/annotations.dart';
 import 'package:tatlacas_sqflite_storage/src/models/entity.dart';
 
+class _ExtraField {
+  _ExtraField({required this.notNull, required this.type});
+
+  final bool notNull;
+  final String type;
+}
+
 // Define a visitor class to search for a property with a specific name.
 class PropertyFinder extends RecursiveElementVisitor<void> {
   PropertyFinder(this.propertyName);
@@ -46,6 +53,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     final getList = StringBuffer();
     final copyWithPropsList = StringBuffer();
     final propsList = StringBuffer();
+    final Map<String, _ExtraField> extraFields = {};
     final extendedClassName =
         element.supertype?.getDisplayString(withNullability: false);
 
@@ -66,11 +74,30 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
         columnsList.writeln('column$fieldNameCamel,');
         propsList.writeln('$fieldName,');
         getList.writeln('$fieldTypeFull get $fieldName;');
-        final fieldAnnotations = field.metadata.where((annotation) {
+        final fieldMetadata = field.metadata;
+        if (fieldMetadata.isEmpty) {
+          extraFields[fieldName] = _ExtraField(
+            type: fieldType,
+            notNull: field.type.nullabilitySuffix == NullabilitySuffix.none,
+          );
+          continue;
+        }
+        final List<ElementAnnotation> fieldAnnotations = [];
+        final List<ElementAnnotation> nullableProps = [];
+        for (final annotation in fieldMetadata) {
           final tp = annotation.computeConstantValue()?.type;
-          return tp != null &&
-              const TypeChecker.fromRuntime(DbColumn).isExactlyType(tp);
-        });
+          if (tp == null) {
+            continue;
+          }
+          if (const TypeChecker.fromRuntime(DbColumn).isExactlyType(tp)) {
+            fieldAnnotations.add(annotation);
+            continue;
+          }
+          if (const TypeChecker.fromRuntime(NullableProp).isExactlyType(tp)) {
+            nullableProps.add(annotation);
+            continue;
+          }
+        }
 
         for (final annotation in fieldAnnotations) {
           final dbColumnAnnotation = annotation.computeConstantValue()!;
@@ -262,6 +289,9 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
                   copyWithList.writeln(
                       '$alias: $alias != null ? $alias.value : this.$alias,');
                 }
+                if (extraFields.containsKey(alias)) {
+                  extraFields.remove(alias);
+                }
               }
               generatedCode.writeln('''
           read: (json, entity, value){
@@ -297,6 +327,23 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
             copyWithList.writeln(
                 '$fieldName: $fieldName != null ? $fieldName.value : this.$fieldName,');
           }
+        }
+        for (final _ in nullableProps) {
+          copyWithPropsList.writeln('CopyWith<$fieldType?>? $fieldName,');
+          copyWithList.writeln(
+              '$fieldName: $fieldName != null ? $fieldName.value : this.$fieldName,');
+        }
+      }
+      for (final fieldName in extraFields.keys) {
+        final extraField = extraFields[fieldName]!;
+        if (extraField.notNull) {
+          copyWithPropsList.writeln('${extraField.type}? $fieldName,');
+          copyWithList.writeln('$fieldName: $fieldName ?? this.$fieldName,');
+        } else {
+          copyWithPropsList
+              .writeln('CopyWith<${extraField.type}?>? $fieldName,');
+          copyWithList.writeln(
+              '$fieldName: $fieldName != null ? $fieldName.value : this.$fieldName,');
         }
       }
     }
