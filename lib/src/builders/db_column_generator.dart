@@ -75,18 +75,16 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
         propsList.writeln('$fieldName,');
         getList.writeln('$fieldTypeFull get $fieldName;');
         final fieldMetadata = field.metadata;
-        if (fieldMetadata.isEmpty) {
-          extraFields[fieldName] = _ExtraField(
-            type: fieldType,
-            notNull: field.type.nullabilitySuffix == NullabilitySuffix.none,
-          );
-          continue;
-        }
+
         final List<ElementAnnotation> fieldAnnotations = [];
         final List<ElementAnnotation> nullableProps = [];
         for (final annotation in fieldMetadata) {
           final tp = annotation.computeConstantValue()?.type;
           if (tp == null) {
+            extraFields[fieldName] = _ExtraField(
+              type: fieldType,
+              notNull: field.type.nullabilitySuffix == NullabilitySuffix.none,
+            );
             continue;
           }
           if (const TypeChecker.fromRuntime(DbColumn).isExactlyType(tp)) {
@@ -97,6 +95,10 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
             nullableProps.add(annotation);
             continue;
           }
+          extraFields[fieldName] = _ExtraField(
+            type: fieldType,
+            notNull: field.type.nullabilitySuffix == NullabilitySuffix.none,
+          );
         }
 
         for (final annotation in fieldAnnotations) {
@@ -334,17 +336,16 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
               '$fieldName: $fieldName != null ? $fieldName.value : this.$fieldName,');
         }
       }
-      for (final fieldName in extraFields.keys) {
-        final extraField = extraFields[fieldName]!;
-        if (extraField.notNull) {
-          copyWithPropsList.writeln('${extraField.type}? $fieldName,');
-          copyWithList.writeln('$fieldName: $fieldName ?? this.$fieldName,');
-        } else {
-          copyWithPropsList
-              .writeln('CopyWith<${extraField.type}?>? $fieldName,');
-          copyWithList.writeln(
-              '$fieldName: $fieldName != null ? $fieldName.value : this.$fieldName,');
-        }
+    }
+    for (final fieldName in extraFields.keys) {
+      final extraField = extraFields[fieldName]!;
+      if (extraField.notNull) {
+        copyWithPropsList.writeln('${extraField.type}? $fieldName,');
+        copyWithList.writeln('$fieldName: $fieldName ?? this.$fieldName,');
+      } else {
+        copyWithPropsList.writeln('CopyWith<${extraField.type}?>? $fieldName,');
+        copyWithList.writeln(
+            '$fieldName: $fieldName != null ? $fieldName.value : this.$fieldName,');
       }
     }
     generatedCode.writeln(getList);
