@@ -53,7 +53,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     final getList = StringBuffer();
     final copyWithPropsList = StringBuffer();
     final propsList = StringBuffer();
-    final Map<String, _ExtraField> extraFields = {};
+
     final extendedClassName =
         element.supertype?.getDisplayString(withNullability: false);
 
@@ -63,6 +63,21 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
   @override
   String get tableName => '${tableName ?? convertClassNameToSnakeCase(className)}';
     ''');
+    final Map<String, _ExtraField> extraFields = {};
+    extraFields.addEntries(
+      fields
+          .where((element) => element.metadata.isEmpty)
+          .map(
+            (e) => MapEntry(
+              e.name,
+              _ExtraField(
+                type: e.type.getDisplayString(withNullability: false),
+                notNull: e.type.nullabilitySuffix == NullabilitySuffix.none,
+              ),
+            ),
+          )
+          .toList(),
+    );
     for (final field in fields) {
       // if (const TypeChecker.fromRuntime(DbColumn).hasAnnotationOfExact(field)) {
 
@@ -70,13 +85,6 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
       final fieldType = field.type.getDisplayString(withNullability: false);
       final fieldNameCamel = _toUpperCamelCase(fieldName);
       final fieldMetadata = field.metadata;
-      if (fieldMetadata.isEmpty) {
-        extraFields[fieldName] = _ExtraField(
-          type: fieldType,
-          notNull: field.type.nullabilitySuffix == NullabilitySuffix.none,
-        );
-        continue;
-      }
       final List<ElementAnnotation> fieldAnnotations = [];
       var isDbColumn = false;
       for (final annotation in fieldMetadata) {
