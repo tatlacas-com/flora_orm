@@ -130,14 +130,14 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
               columnType = t;
             }
           }
-
+          FieldElement? aliasProperty;
           if (alias != null && (hasRead || jsonEncoded)) {
             final finder = PropertyFinder(alias);
             classElement.accept(finder);
-            final property = finder.foundProperty!;
-            if (property.type.isDartCoreList) {
+            aliasProperty = finder.foundProperty!;
+            if (aliasProperty.type.isDartCoreList) {
               jsonEncodedType =
-                  property.type.getDisplayString(withNullability: false);
+                  aliasProperty.type.getDisplayString(withNullability: false);
             }
             generatedCode.writeln('''
   $jsonEncodedType? get $alias;
@@ -250,14 +250,15 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           if (hasRead || jsonEncoded) {
             if (jsonEncoded) {
               if (alias != null) {
-                if (notNull) {
+                if (aliasProperty?.type.nullabilitySuffix ==
+                    NullabilitySuffix.none) {
+                  copyWithPropsList.writeln('$jsonEncodedType? $alias,');
+                  copyWithList.writeln('$alias: $alias ?? this.$alias,');
+                } else {
                   copyWithPropsList
                       .writeln('CopyWith<$jsonEncodedType?>? $alias,');
                   copyWithList.writeln(
                       '$alias: $alias != null ? $alias.value : this.$alias,');
-                } else {
-                  copyWithPropsList.writeln('$jsonEncodedType? $alias,');
-                  copyWithList.writeln('$alias: $alias ?? this.$alias,');
                 }
               }
               generatedCode.writeln('''
@@ -275,24 +276,24 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
         );
     ''');
             }
-          } else if (!notNull) {
-            generatedCode.writeln('''
-          read: (json, entity, value) => entity.copyWith($fieldName: CopyWith(value), json: json),
-        );
-    ''');
-          } else {
+          } else if (notNull) {
             generatedCode.writeln('''
           read: (json, entity, value) => entity.copyWith($fieldName: value, json: json),
         );
     ''');
+          } else {
+            generatedCode.writeln('''
+          read: (json, entity, value) => entity.copyWith($fieldName: CopyWith(value), json: json),
+        );
+    ''');
           }
-          if (!notNull) {
+          if (notNull) {
+            copyWithPropsList.writeln('$fieldType? $fieldName,');
+            copyWithList.writeln('$fieldName: $fieldName ?? this.$fieldName,');
+          } else {
             copyWithPropsList.writeln('CopyWith<$fieldType?>? $fieldName,');
             copyWithList.writeln(
                 '$fieldName: $fieldName != null ? $fieldName.value : this.$fieldName,');
-          } else {
-            copyWithPropsList.writeln('$fieldType? $fieldName,');
-            copyWithList.writeln('$fieldName: $fieldName ?? this.$fieldName,');
           }
         }
       }
