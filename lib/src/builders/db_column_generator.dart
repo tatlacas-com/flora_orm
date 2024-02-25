@@ -70,7 +70,6 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
       final fieldType = field.type.getDisplayString(withNullability: false);
       final fieldTypeFull = field.type.getDisplayString(withNullability: true);
 
-      columnsList.writeln('column$fieldNameCamel,');
       propsList.writeln('$fieldName,');
       getList.writeln('$fieldTypeFull get $fieldName;');
       final fieldMetadata = field.metadata;
@@ -93,6 +92,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           continue;
         }
         if (const TypeChecker.fromRuntime(DbColumn).isExactlyType(tp)) {
+          columnsList.writeln('column$fieldNameCamel,');
           fieldAnnotations.add(annotation);
           continue;
         }
