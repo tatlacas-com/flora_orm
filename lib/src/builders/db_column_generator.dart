@@ -160,7 +160,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
       $alias = $jsonEncodedType.fromMap(map);
     }
     return entity.copyWith(
-      $fieldName: val,
+      $fieldName: ${notNull ? 'val' : 'CopyWith(val)'},
       $alias: ${aliasNotNull ? alias : 'CopyWith($alias)'},
       json: json,
     );
