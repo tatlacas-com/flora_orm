@@ -11,7 +11,7 @@ class DbColumn<TColumnType> {
     this.autoIncrementPrimary = false,
     this.hasRead = false,
     this.hasWrite = false,
-    this.notNull = false,
+    this.notNull,
     this.defaultValue,
   });
   final String? name;
@@ -22,7 +22,7 @@ class DbColumn<TColumnType> {
   final bool autoIncrementPrimary;
   final bool hasRead;
   final bool hasWrite;
-  final bool notNull;
+  final bool? notNull;
   final bool unique;
   final dynamic defaultValue;
 }
