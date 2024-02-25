@@ -7,7 +7,6 @@ import 'package:tatlacas_sqflite_storage/src/models/entity.dart';
 
 // Define a visitor class to search for a property with a specific name.
 class PropertyFinder extends RecursiveElementVisitor<void> {
-
   PropertyFinder(this.propertyName);
   final String propertyName;
   FieldElement? foundProperty;
@@ -72,8 +71,6 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
               const TypeChecker.fromRuntime(DbColumn).isExactlyType(tp);
         });
 
-        var nullable = false;
-
         for (final annotation in fieldAnnotations) {
           final dbColumnAnnotation = annotation.computeConstantValue()!;
 
@@ -101,8 +98,6 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
               false;
           final bool notNull =
               dbColumnAnnotation.getField('notNull')?.toBoolValue() ?? false;
-          nullable =
-              dbColumnAnnotation.getField('nullable')?.toBoolValue() ?? false;
           final bool unique =
               dbColumnAnnotation.getField('unique')?.toBoolValue() ?? false;
           dynamic defaultValue = dbColumnAnnotation.getField('defaultValue');
@@ -253,7 +248,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           if (hasRead || jsonEncoded) {
             if (jsonEncoded) {
               if (alias != null) {
-                if (nullable) {
+                if (notNull) {
                   copyWithPropsList
                       .writeln('CopyWith<$jsonEncodedType?>? $alias,');
                   copyWithList.writeln(
@@ -278,7 +273,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
         );
     ''');
             }
-          } else if (nullable) {
+          } else if (!notNull) {
             generatedCode.writeln('''
           read: (json, entity, value) => entity.copyWith($fieldName: CopyWith(value), json: json),
         );
@@ -289,14 +284,14 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
         );
     ''');
           }
-        }
-        if (nullable) {
-          copyWithPropsList.writeln('CopyWith<$fieldType?>? $fieldName,');
-          copyWithList.writeln(
-              '$fieldName: $fieldName != null ? $fieldName.value : this.$fieldName,');
-        } else {
-          copyWithPropsList.writeln('$fieldType? $fieldName,');
-          copyWithList.writeln('$fieldName: $fieldName ?? this.$fieldName,');
+          if (!notNull) {
+            copyWithPropsList.writeln('CopyWith<$fieldType?>? $fieldName,');
+            copyWithList.writeln(
+                '$fieldName: $fieldName != null ? $fieldName.value : this.$fieldName,');
+          } else {
+            copyWithPropsList.writeln('$fieldType? $fieldName,');
+            copyWithList.writeln('$fieldName: $fieldName ?? this.$fieldName,');
+          }
         }
       }
     }
