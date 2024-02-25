@@ -65,13 +65,10 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     ''');
     for (final field in fields) {
       // if (const TypeChecker.fromRuntime(DbColumn).hasAnnotationOfExact(field)) {
-      final fieldName = field.name;
-      final fieldNameCamel = _toUpperCamelCase(fieldName);
-      final fieldType = field.type.getDisplayString(withNullability: false);
-      final fieldTypeFull = field.type.getDisplayString(withNullability: true);
 
-      propsList.writeln('$fieldName,');
-      getList.writeln('$fieldTypeFull get $fieldName;');
+      final fieldName = field.name;
+      final fieldType = field.type.getDisplayString(withNullability: false);
+      final fieldNameCamel = _toUpperCamelCase(fieldName);
       final fieldMetadata = field.metadata;
       if (fieldMetadata.isEmpty) {
         extraFields[fieldName] = _ExtraField(
@@ -81,7 +78,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
         continue;
       }
       final List<ElementAnnotation> fieldAnnotations = [];
-      final List<ElementAnnotation> nullableProps = [];
+      var isDbColumn = false;
       for (final annotation in fieldMetadata) {
         final tp = annotation.computeConstantValue()?.type;
         if (tp == null) {
@@ -94,10 +91,14 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
         if (const TypeChecker.fromRuntime(DbColumn).isExactlyType(tp)) {
           columnsList.writeln('column$fieldNameCamel,');
           fieldAnnotations.add(annotation);
+          isDbColumn = true;
           continue;
         }
         if (const TypeChecker.fromRuntime(NullableProp).isExactlyType(tp)) {
-          nullableProps.add(annotation);
+          extraFields[fieldName] = _ExtraField(
+            type: fieldType,
+            notNull: false,
+          );
           continue;
         }
         extraFields[fieldName] = _ExtraField(
@@ -105,6 +106,13 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           notNull: field.type.nullabilitySuffix == NullabilitySuffix.none,
         );
       }
+      if (!isDbColumn) {
+        continue;
+      }
+      final fieldTypeFull = field.type.getDisplayString(withNullability: true);
+
+      propsList.writeln('$fieldName,');
+      getList.writeln('$fieldTypeFull get $fieldName;');
 
       for (final annotation in fieldAnnotations) {
         final dbColumnAnnotation = annotation.computeConstantValue()!;
@@ -337,11 +345,6 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
         if (extraFields.containsKey(fieldName)) {
           extraFields.remove(fieldName);
         }
-      }
-      for (final _ in nullableProps) {
-        copyWithPropsList.writeln('CopyWith<$fieldType?>? $fieldName,');
-        copyWithList.writeln(
-            '$fieldName: $fieldName != null ? $fieldName.value : this.$fieldName,');
       }
       // }
     }
