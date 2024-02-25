@@ -99,7 +99,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
               false;
           final bool notNull =
               dbColumnAnnotation.getField('notNull')?.toBoolValue() ??
-                  (field.type.nullabilitySuffix != NullabilitySuffix.none);
+                  (field.type.nullabilitySuffix == NullabilitySuffix.none);
           final bool unique =
               dbColumnAnnotation.getField('unique')?.toBoolValue() ?? false;
           dynamic defaultValue = dbColumnAnnotation.getField('defaultValue');
