@@ -277,7 +277,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
               jsonEncodedType =
                   property.type.getDisplayString(withNullability: false);
               generatedCode.writeln('''
-            final map = entity.$alias?.map((p) => p.toMap()).toList();
+            final map = entity.$alias${aliasNotNull ? '' : '?'}.map((p) => p.toMap()).toList();
     ''');
             } else {
               generatedCode.writeln('''
