@@ -186,7 +186,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
                   aliasProperty.type.getDisplayString(withNullability: false);
             }
             generatedCode.writeln('''
-  $jsonEncodedType? get $alias;
+  $jsonEncodedType${aliasNotNull ? '' : '?'} get $alias;
  ''');
           }
           if (hasRead) {
