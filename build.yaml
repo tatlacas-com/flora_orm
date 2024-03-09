@@ -2,7 +2,7 @@
 builders:
   # name of the builder
   db_columns:
-    import: "package:tatlacas_sqflite_storage/builder.dart"
+    import: "package:tatlacas_orm/builder.dart"
     builder_factories: ["dbColumnsBuilder"]
     build_extensions: {".dart": [".g.part"]}
     auto_apply: dependents

@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:sqflite_common/sqlite_api.dart';
-import 'package:tatlacas_sqflite_storage/src/base_context.dart';
+import 'package:tatlacas_orm/src/base_context.dart';
 import 'package:uuid/uuid.dart';
 
-import '../sql.dart';
+import '../tatlacas_orm.dart';
 
 class Args<TEntity extends IEntity> {
   Args({required this.t, required this.maps});

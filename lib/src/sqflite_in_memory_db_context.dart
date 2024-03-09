@@ -1,22 +1,20 @@
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import '../sql.dart';
+import '../tatlacas_orm.dart';
 
 import 'base_context.dart';
 import 'open_options.dart';
 
 class SqfliteInMemoryDbContext extends BaseContext {
-
   SqfliteInMemoryDbContext({
     required super.dbName,
     required super.dbVersion,
     required super.tables,
   });
 
-
   SqfliteInMemoryDbContext copyWith({
-     String? dbName,
-     int? dbVersion,
-     List<IEntity>? tables,
+    String? dbName,
+    int? dbVersion,
+    List<IEntity>? tables,
   }) {
     return SqfliteInMemoryDbContext(
       dbName: dbName ?? this.dbName,
@@ -24,8 +22,6 @@ class SqfliteInMemoryDbContext extends BaseContext {
       tables: tables ?? this.tables,
     );
   }
-
-
 
   @override
   Future<Database> open() async {
@@ -54,6 +50,4 @@ class SqfliteInMemoryDbContext extends BaseContext {
   Future<String> getDbPath() {
     throw UnimplementedError();
   }
-
-
 }

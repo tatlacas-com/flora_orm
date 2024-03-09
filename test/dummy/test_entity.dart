@@ -1,7 +1,6 @@
-import 'package:tatlacas_sqflite_storage/sql.dart';
+import 'package:tatlacas_orm/tatlacas_orm.dart';
 
 class TestEntity extends Entity<TestEntity> {
-
   const TestEntity({
     super.id,
     super.createdAt,

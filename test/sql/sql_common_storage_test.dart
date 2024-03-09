@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sqlite_api.dart';
-import 'package:tatlacas_sqflite_storage/sqflite_common_storage.dart';
-import 'package:tatlacas_sqflite_storage/src/open_options.dart';
+import 'package:tatlacas_orm/sqflite_common_storage.dart';
+import 'package:tatlacas_orm/src/open_options.dart';
 
 import '../dummy/test_entity.dart';
 import 'sql_storage_test_runs.dart';
@@ -28,7 +28,8 @@ void main() {
       dbName: 'common_storage_db',
       tables: [const TestEntity()],
     );
-    var storage = SqfliteCommonStorage(const TestEntity(), dbContext: dbContext);
+    var storage =
+        SqfliteCommonStorage(const TestEntity(), dbContext: dbContext);
     test('drop database', () async {
       var database = await dbContext.database;
       try {
@@ -61,7 +62,8 @@ void main() {
         dbContext = dbContext.copyWith(
           dbVersion: 4,
         );
-        storage = SqfliteCommonStorage(const TestEntity(), dbContext: dbContext);
+        storage =
+            SqfliteCommonStorage(const TestEntity(), dbContext: dbContext);
         await dbContext.open();
         storage.insert(const TestEntity(testString: 'Okay'));
         final dbVersion = await (await dbContext.database).getVersion();
@@ -75,7 +77,8 @@ void main() {
         dbContext = dbContext.copyWith(
           dbVersion: 3,
         );
-        storage = SqfliteCommonStorage(const TestEntity(), dbContext: dbContext);
+        storage =
+            SqfliteCommonStorage(const TestEntity(), dbContext: dbContext);
         await dbContext.open();
         storage.insert(const TestEntity(testString: 'Okay'));
         final dbVersion = await (await dbContext.database).getVersion();

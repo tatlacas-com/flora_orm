@@ -2,14 +2,13 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tatlacas_sqflite_storage/sql.dart';
-import 'package:tatlacas_sqflite_storage/src/base_storage.dart';
-import 'package:tatlacas_sqflite_storage/src/shared_preference/shared_preference_context.dart';
+import 'package:tatlacas_orm/tatlacas_orm.dart';
+import 'package:tatlacas_orm/src/base_storage.dart';
+import 'package:tatlacas_orm/src/shared_preference/shared_preference_context.dart';
 import 'package:uuid/uuid.dart';
 
 class SharedPreferenceStorage<TEntity extends IEntity>
     extends BaseStorage<TEntity, SharedPreferenceContext> {
-
   SharedPreferenceStorage(super.t,
       {required super.dbContext, super.useIsolateDefault = true});
   @protected

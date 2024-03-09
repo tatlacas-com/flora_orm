@@ -3,8 +3,8 @@ import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/visitor.dart';
 import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
-import 'package:tatlacas_sqflite_storage/src/builders/annotations.dart';
-import 'package:tatlacas_sqflite_storage/src/models/entity.dart';
+import 'package:tatlacas_orm/src/builders/annotations.dart';
+import 'package:tatlacas_orm/src/models/entity.dart';
 
 class _ExtraField {
   _ExtraField({

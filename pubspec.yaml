@@ -1,4 +1,4 @@
-name: tatlacas_sqflite_storage
+name: tatlacas_orm
 version: 1.0.1
 publish_to: none
 description: sqflite storage

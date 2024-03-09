@@ -1,6 +1,5 @@
-import 'package:tatlacas_sqflite_storage/sql.dart';
-import 'package:tatlacas_sqflite_storage/src/base_context.dart';
-
+import 'package:tatlacas_orm/tatlacas_orm.dart';
+import 'package:tatlacas_orm/src/base_context.dart';
 
 class SharedPreferenceContext extends BaseContext {
   SharedPreferenceContext({
@@ -30,5 +29,4 @@ class SharedPreferenceContext extends BaseContext {
   Future<String> getDbFullName() async {
     return dbName;
   }
-
 }

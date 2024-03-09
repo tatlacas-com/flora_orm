@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:tatlacas_sqflite_storage/sql.dart';
+import 'package:tatlacas_orm/tatlacas_orm.dart';
 
 class SqlOrder extends Equatable {
   const SqlOrder({

@@ -1,4 +1,4 @@
-library tatlacas_sqflite_storage;
+library tatlacas_orm;
 
 export 'src/db_context.dart';
 export 'src/sql_storage.dart';
