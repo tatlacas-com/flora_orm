@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:meta/meta.dart';
 
 import 'sql.dart';
@@ -173,7 +174,8 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
           entity = column.read(json, entity, value);
         }
       } catch (e) {
-        throw ArgumentError('Error on $runtimeType loading ${column.name}: $e');
+        debugPrint('Error on $runtimeType loading ${column.name}: $e');
+        rethrow;
       }
     }
     return entity;
