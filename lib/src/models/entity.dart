@@ -1,9 +1,7 @@
 import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
 import 'package:meta/meta.dart';
-
 import 'sql.dart';
 import 'sql_column_extension.dart';
 
@@ -166,16 +164,11 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
   TEntity load(Map<String, dynamic> json) {
     TEntity entity = this as TEntity;
     for (var column in allColumns) {
-      try {
-        final value = column.getValueFrom(json);
-        if (column is SqlColumn<TEntity, double> && value is int) {
-          entity = column.read(json, entity, value.toDouble());
-        } else {
-          entity = column.read(json, entity, value);
-        }
-      } catch (e) {
-        debugPrint('Error on $runtimeType loading ${column.name}: $e');
-        rethrow;
+      final value = column.getValueFrom(json);
+      if (column is SqlColumn<TEntity, double> && value is int) {
+        entity = column.read(json, entity, value.toDouble());
+      } else {
+        entity = column.read(json, entity, value);
       }
     }
     return entity;
