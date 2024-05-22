@@ -3,8 +3,8 @@ import 'package:equatable/equatable.dart';
 import 'orm_column.dart';
 import 'orm_condition.dart';
 
-class OrmFilterCondition extends Equatable {
-  const OrmFilterCondition({
+class FilterCondition extends Equatable {
+  const FilterCondition({
     this.column,
     this.condition = OrmCondition.equalTo,
     this.value,

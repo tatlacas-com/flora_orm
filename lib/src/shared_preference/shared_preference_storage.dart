@@ -9,7 +9,7 @@ import 'package:uuid/uuid.dart';
 
 class SharedPreferenceStorage<TEntity extends IEntity,
         TMeta extends EntityMeta<TEntity>>
-    extends BaseEngine<TEntity, TMeta, SharedPreferenceContext> {
+    extends BaseOrmEngine<TEntity, TMeta, SharedPreferenceContext> {
   SharedPreferenceStorage(super.t,
       {required super.dbContext, super.useIsolateDefault = true});
   @protected
@@ -49,7 +49,7 @@ class SharedPreferenceStorage<TEntity extends IEntity,
   Future<TEntity?> getEntity({
     Iterable<OrmColumn>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
-    required OrmFilter Function(TMeta t) filter,
+    required Filter Function(TMeta t) filter,
     int? offset,
     final bool? useIsolate,
   }) async {
@@ -80,7 +80,7 @@ class SharedPreferenceStorage<TEntity extends IEntity,
 
   @override
   Future<int> delete({
-    final OrmFilter Function(TMeta t)? filter,
+    final Filter Function(TMeta t)? filter,
     final bool? useIsolate,
   }) async {
     final item = filter == null
@@ -98,7 +98,7 @@ class SharedPreferenceStorage<TEntity extends IEntity,
 
   @override
   Future<int> update({
-    required OrmFilter Function(TMeta t) filter,
+    required Filter Function(TMeta t) filter,
     TEntity? entity,
     Map<OrmColumn, dynamic> Function(TMeta t)? columnValues,
     final bool? useIsolate,
@@ -129,7 +129,7 @@ class SharedPreferenceStorage<TEntity extends IEntity,
 
   @override
   Future<List<TEntity>> query({
-    OrmFilter Function(TMeta t)? filter,
+    Filter Function(TMeta t)? filter,
     Iterable<OrmColumn>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? limit,
@@ -141,7 +141,7 @@ class SharedPreferenceStorage<TEntity extends IEntity,
 
   @override
   Future<List<Map<String, Object?>>> rawQuery(
-    OrmFilter Function(TMeta t)? filter,
+    Filter Function(TMeta t)? filter,
     String query, {
     final bool? useIsolate,
   }) async {

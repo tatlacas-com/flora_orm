@@ -5,7 +5,7 @@ import 'package:tatlacas_orm/src/engines/orm_engine.dart';
 import 'package:tatlacas_orm/src/models/entity.dart';
 import 'package:tatlacas_orm/src/models/orm_column.dart';
 import 'package:tatlacas_orm/src/models/orm_order.dart';
-import 'package:tatlacas_orm/src/models/orm_filter.dart';
+import 'package:tatlacas_orm/src/models/filter.dart';
 import 'package:uuid/uuid.dart';
 
 class Args<TEntity extends IEntity> {
@@ -35,10 +35,10 @@ class InsertPrep<TEntity extends IEntity> {
   final Map<String, dynamic> map;
 }
 
-class BaseEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
+class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
         TDbContext extends BaseContext>
-    extends SqlEngine<TEntity, TMeta, TDbContext> {
-  const BaseEngine(super.t,
+    extends OrmEngine<TEntity, TMeta, TDbContext> {
+  const BaseOrmEngine(super.t,
       {required super.dbContext, required super.useIsolateDefault});
 
   /// Try to convert anything (int, String) to an int.
@@ -111,7 +111,7 @@ class BaseEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
   Future<TEntity?> getEntity({
     Iterable<OrmColumn>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
-    required OrmFilter Function(TMeta t) filter,
+    required Filter Function(TMeta t) filter,
     int? offset,
     final bool? useIsolate,
   }) async {
@@ -133,7 +133,7 @@ class BaseEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
   Future<Map<String, dynamic>?> getEntityMap({
     Iterable<OrmColumn>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
-    required OrmFilter Function(TMeta t) filter,
+    required Filter Function(TMeta t) filter,
     int? offset,
     final bool? useIsolate,
   }) async {
@@ -154,7 +154,7 @@ class BaseEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
   @override
   Future<T> getSum<T>({
     required OrmColumn Function(TMeta t) column,
-    OrmFilter Function(TMeta t)? filter,
+    Filter Function(TMeta t)? filter,
     final bool? useIsolate,
   }) async {
     List<Map> result = await rawQuery(
@@ -174,7 +174,7 @@ class BaseEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
   @override
   Future<T> getSumProduct<T>({
     required Iterable<OrmColumn> Function(TMeta t) columns,
-    OrmFilter Function(TMeta t)? filter,
+    Filter Function(TMeta t)? filter,
     final bool? useIsolate,
   }) async {
     final cols = columns(t).map((e) => e.name).join(' * ');
@@ -205,7 +205,7 @@ class BaseEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
   Future<List<TEntity>> getEntities({
     Iterable<OrmColumn>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
-    OrmFilter Function(TMeta t)? filter,
+    Filter Function(TMeta t)? filter,
     int? limit,
     int? offset,
     final bool? useIsolate,
@@ -228,7 +228,7 @@ class BaseEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
   Future<List<Map<String, dynamic>>> getEntityMaps({
     Iterable<OrmColumn>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
-    OrmFilter Function(TMeta t)? filter,
+    Filter Function(TMeta t)? filter,
     int? limit,
     int? offset,
     final bool? useIsolate,
@@ -284,7 +284,7 @@ class BaseEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
 
   @override
   Future<int> getCount({
-    OrmFilter Function(TMeta t)? filter,
+    Filter Function(TMeta t)? filter,
     final bool? useIsolate,
   }) async {
     List<Map<String, Object?>> result = await rawQuery(
@@ -303,7 +303,7 @@ class BaseEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
 
   @override
   Future<int> delete({
-    final OrmFilter Function(TMeta t)? filter,
+    final Filter Function(TMeta t)? filter,
     final bool? useIsolate,
   }) async {
     final db = await dbContext.database;
@@ -322,7 +322,7 @@ class BaseEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
 
   @override
   Future<int> update({
-    required OrmFilter Function(TMeta t) filter,
+    required Filter Function(TMeta t) filter,
     TEntity? entity,
     Map<OrmColumn, dynamic> Function(TMeta t)? columnValues,
     final bool? useIsolate,
@@ -353,7 +353,7 @@ class BaseEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
   @override
   @protected
   Future<List<TEntity>> query({
-    OrmFilter Function(TMeta t)? filter,
+    Filter Function(TMeta t)? filter,
     Iterable<OrmColumn>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? limit,
@@ -411,7 +411,7 @@ class BaseEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
   @override
   @protected
   Future<List<Map<String, dynamic>>> queryMap({
-    OrmFilter Function(TMeta t)? filter,
+    Filter Function(TMeta t)? filter,
     Iterable<OrmColumn>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? limit,
@@ -463,7 +463,7 @@ class BaseEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
   @override
   @protected
   Future<List<Map<String, Object?>>> rawQuery(
-    OrmFilter Function(TMeta t)? filter,
+    Filter Function(TMeta t)? filter,
     String query, {
     final bool? useIsolate,
   }) async {

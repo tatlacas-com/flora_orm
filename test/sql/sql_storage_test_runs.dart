@@ -7,7 +7,7 @@ import 'package:tatlacas_orm/src/engines/base_orm_engine.dart';
 import '../dummy/test_entity.dart';
 
 @isTest
-void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
+void run(BaseOrmEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
   test('insert(entity) should insert entity', () async {
     final entity = TestEntity(
         testBool: true,
@@ -59,7 +59,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     fxn() async => await storage.getEntity(
           columns: (t) => [],
-          filter: (t) => OrmFilter(
+          filter: (t) => Filter(
             t.id,
             value: insertedEntity!.id,
           )
@@ -94,7 +94,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
-      filter: (t) => OrmFilter(
+      filter: (t) => Filter(
         entity.meta.id,
         value: insertedEntity!.id,
       )
@@ -131,7 +131,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
       columns: (t) => [t.testInt],
-      filter: (t) => OrmFilter(
+      filter: (t) => Filter(
         entity.meta.id,
         value: insertedEntity!.id,
       )
@@ -173,7 +173,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => OrmFilter(
+      filter: (t) => Filter(
         entity.meta.id,
         condition: OrmCondition.notEqualTo,
         value: '12',
@@ -198,7 +198,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => OrmFilter(
+      filter: (t) => Filter(
         t.testInt,
         condition: OrmCondition.isNull,
       ).and(
@@ -225,7 +225,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => OrmFilter(
+      filter: (t) => Filter(
         t.testString,
         condition: OrmCondition.notNull,
       ),
@@ -250,7 +250,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => OrmFilter(
+      filter: (t) => Filter(
         t.testInt,
         condition: OrmCondition.lessThan,
         value: -14,
@@ -276,7 +276,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => OrmFilter(
+      filter: (t) => Filter(
         t.testInt,
         condition: OrmCondition.greaterThan,
         value: 19999,
@@ -302,7 +302,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => OrmFilter(
+      filter: (t) => Filter(
         t.testInt,
         condition: OrmCondition.greaterThanOrEqual,
         value: 100,
@@ -328,7 +328,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => OrmFilter(
+      filter: (t) => Filter(
         t.testInt,
         condition: OrmCondition.greaterThanOrEqual,
         value: -10,
@@ -354,7 +354,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => OrmFilter(
+      filter: (t) => Filter(
         t.testInt,
         condition: OrmCondition.between,
         value: 1000,
@@ -381,7 +381,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => OrmFilter(
+      filter: (t) => Filter(
         t.testInt,
         condition: OrmCondition.notBetween,
         value: -500,
@@ -408,7 +408,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => OrmFilter(
+      filter: (t) => Filter(
         t.testInt,
         condition: OrmCondition.isIn,
         value: const [11001],
@@ -434,7 +434,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => OrmFilter(
+      filter: (t) => Filter(
         t.testInt,
         condition: OrmCondition.notIn,
         value: const [11001, 11005],
@@ -460,7 +460,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => OrmFilter(
+      filter: (t) => Filter(
         t.testString,
         condition: OrmCondition.like,
         value: '%Like%',
@@ -486,7 +486,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => OrmFilter(
+      filter: (t) => Filter(
         t.testString,
         condition: OrmCondition.notLike,
         value: '%Dummy%',
@@ -513,7 +513,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => OrmFilter.lb()
+      filter: (t) => Filter.lb()
           .filter(
             t.testString,
             condition: OrmCondition.like,
@@ -559,7 +559,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity1, isNotNull);
     var json = await storage.getEntities(
       orderBy: (t) => [OrmOrder(column: t.testInt)],
-      filter: (t) => OrmFilter(
+      filter: (t) => Filter(
         entity.meta.id,
         value: insertedEntity!.id,
       ).or(
@@ -580,7 +580,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     const entity = TestEntity();
     var json = await storage.getEntities(
       orderBy: (t) => [OrmOrder(column: t.testInt)],
-      filter: (t) => OrmFilter(
+      filter: (t) => Filter(
         entity.meta.id,
         value: 'xyzNotFound',
       ),
@@ -631,7 +631,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => OrmFilter(
+      filter: (t) => Filter(
         entity.meta.id,
         value: insertedEntity!.id,
       ).or(
@@ -685,7 +685,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     entity = (insertedEntity as TestEntity).copyWith(testString: 'Updated a');
     var total = await storage.update(
       entity: entity,
-      filter: (t) => OrmFilter(
+      filter: (t) => Filter(
         entity.meta.id,
         value: entity.id,
       ),
@@ -703,14 +703,14 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var total = await storage.update(
-        filter: (t) => OrmFilter(
+        filter: (t) => Filter(
               entity.meta.id,
               value: insertedEntity!.id,
             ),
         columnValues: (t) => {t.testString: 'Updated ax1'});
     expect(total, 1);
     var json = await storage.getEntity(
-        filter: (t) => OrmFilter(entity.meta.id, value: insertedEntity?.id));
+        filter: (t) => Filter(entity.meta.id, value: insertedEntity?.id));
     insertedEntity = insertedEntity?.copyWith(testString: 'Updated ax1');
     entity = json!;
     expect(entity, insertedEntity);
@@ -790,7 +790,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     expect(insertedEntity!.length, 2);
     var total = await storage.getCount(
-      filter: (t) => OrmFilter(
+      filter: (t) => Filter(
         entity.meta.id,
         value: insertedEntity[0].id,
       ).or(
@@ -819,7 +819,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     expect(insertedEntity!.length, 2);
     var total = await storage.delete(
-      filter: (t) => OrmFilter(
+      filter: (t) => Filter(
         entity.meta.id,
         value: insertedEntity[0].id,
       ).or(
@@ -849,7 +849,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity1, isNotNull);
     var sum = await storage.getSum<int>(
       column: (t) => t.testInt,
-      filter: (t) => OrmFilter(
+      filter: (t) => Filter(
         entity.meta.id,
         value: insertedEntity!.id,
       ).or(
@@ -886,7 +886,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
         t.testInt,
         t.testDouble,
       ],
-      filter: (t) => OrmFilter(
+      filter: (t) => Filter(
         entity.meta.id,
         value: insertedEntity!.id,
       ).or(
@@ -916,7 +916,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity1, isNotNull);
     var json = await storage.getSum<double>(
       column: (t) => t.testDouble,
-      filter: (t) => OrmFilter(
+      filter: (t) => Filter(
         entity.meta.id,
         value: insertedEntity!.id,
       ).or(

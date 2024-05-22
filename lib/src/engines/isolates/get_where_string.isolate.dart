@@ -3,9 +3,9 @@ import 'package:tatlacas_orm/src/engines/isolates/get_condition.isolate.dart';
 import 'package:tatlacas_orm/src/models/entity.dart';
 import 'package:tatlacas_orm/src/models/formatted_query.dart';
 import 'package:tatlacas_orm/src/models/orm_condition.dart';
-import 'package:tatlacas_orm/src/models/orm_filter.dart';
+import 'package:tatlacas_orm/src/models/filter.dart';
 
-FormattedQuery getWhereString<TEntity extends IEntity>(OrmFilter filter) {
+FormattedQuery getWhereString<TEntity extends IEntity>(Filter filter) {
   StringBuffer stringBuffer = StringBuffer();
   final whereArgs = <dynamic>[];
   for (var element in filter.filters) {

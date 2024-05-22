@@ -2,18 +2,18 @@ import 'package:equatable/equatable.dart';
 
 import 'orm_column.dart';
 import 'orm_condition.dart';
-import 'orm_filter_condition.dart';
+import 'filter_condition.dart';
 
-class OrmFilter extends Equatable {
+class Filter extends Equatable {
   /// [lb] adds left bracket, [rb] adds right bracket
-  OrmFilter(
+  Filter(
     OrmColumn? column, {
     OrmCondition condition = OrmCondition.equalTo,
     dynamic value,
     dynamic value2,
     bool lb = false,
     bool rb = false,
-    List<OrmFilterCondition> filters = const [],
+    List<FilterCondition> filters = const [],
   }) {
     if (column != null) {
       this.filters = [
@@ -33,17 +33,16 @@ class OrmFilter extends Equatable {
   }
 
   // ignore: prefer_const_constructors_in_immutables
-  OrmFilter._({this.filters = const []});
+  Filter._({this.filters = const []});
 
-  factory OrmFilter.lb() {
-    return OrmFilter._(
-        filters: [
-      const OrmFilterCondition(leftBracket: true, isBracketOnly: true)
-    ].toList());
+  factory Filter.lb() {
+    return Filter._(
+        filters: [const FilterCondition(leftBracket: true, isBracketOnly: true)]
+            .toList());
   }
-  late final List<OrmFilterCondition> filters;
+  late final List<FilterCondition> filters;
 
-  OrmFilterCondition _addFilter(
+  FilterCondition _addFilter(
     OrmColumn column, {
     OrmCondition condition = OrmCondition.equalTo,
     dynamic value,
@@ -54,7 +53,7 @@ class OrmFilter extends Equatable {
     bool and = false,
     bool or = false,
   }) {
-    return OrmFilterCondition(
+    return FilterCondition(
       column: column,
       condition: condition,
       value: value,
@@ -67,26 +66,26 @@ class OrmFilter extends Equatable {
     );
   }
 
-  OrmFilter lb() {
-    return OrmFilter(null, filters: [
+  Filter lb() {
+    return Filter(null, filters: [
       ...filters,
-      const OrmFilterCondition(leftBracket: true, isBracketOnly: true)
+      const FilterCondition(leftBracket: true, isBracketOnly: true)
     ]);
   }
 
-  OrmFilter rb() {
-    return OrmFilter(null, filters: [
+  Filter rb() {
+    return Filter(null, filters: [
       ...filters,
-      const OrmFilterCondition(rightBracket: true, isBracketOnly: true)
+      const FilterCondition(rightBracket: true, isBracketOnly: true)
     ]);
   }
 
-  OrmFilter and(OrmColumn column,
+  Filter and(OrmColumn column,
       {OrmCondition condition = OrmCondition.equalTo,
       dynamic value,
       bool lb = false,
       bool rb = false}) {
-    return OrmFilter(null, filters: [
+    return Filter(null, filters: [
       ...filters,
       _addFilter(
         column,
@@ -99,14 +98,14 @@ class OrmFilter extends Equatable {
     ]);
   }
 
-  OrmFilter filter(
+  Filter filter(
     OrmColumn column, {
     OrmCondition condition = OrmCondition.equalTo,
     dynamic value,
     bool lb = false,
     bool rb = false,
   }) {
-    return OrmFilter(null, filters: [
+    return Filter(null, filters: [
       ...filters,
       _addFilter(
         column,
@@ -118,12 +117,12 @@ class OrmFilter extends Equatable {
     ]);
   }
 
-  OrmFilter or(OrmColumn column,
+  Filter or(OrmColumn column,
       {OrmCondition condition = OrmCondition.equalTo,
       dynamic value,
       bool lb = false,
       bool rb = false}) {
-    return OrmFilter(null, filters: [
+    return Filter(null, filters: [
       ...filters,
       _addFilter(
         column,
