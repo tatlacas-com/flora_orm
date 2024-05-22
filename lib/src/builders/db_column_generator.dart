@@ -195,11 +195,11 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           }
           if (hasRead) {
             mixinCode.writeln('''
-  $className read$fieldNameCamel(Map<String, dynamic> json, value, $className entity);
+  $className read$fieldNameCamel(Map<String, dynamic> json, value);
  ''');
           } else if (jsonEncoded) {
             mixinCode.writeln('''
-  $className read$fieldNameCamel(Map<String, dynamic> json, value, $className entity){
+  $className read$fieldNameCamel(Map<String, dynamic> json, value){
     $jsonEncodedType? $alias;
     final val = value != null && value != 'null' ? value : null;
     if (val != null) {
@@ -216,11 +216,11 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           }
           if (hasWrite) {
             mixinCode.writeln('''
-  $columnType? write$fieldNameCamel($className entity);
+  $columnType? write$fieldNameCamel();
  ''');
           }
 
-          metaCode.writeln('''
+          /*  metaCode.writeln('''
   @override
   SqlColumn<$className, String> get id => 
   SqlColumn<$className, String>(
@@ -248,7 +248,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
         read: (json, entity, value) =>
             entity.copyWith(updatedAt: value, json: json),
       );
-    ''');
+    '''); */
 
           metaCode.writeln('''
       SqlColumn<$className, $columnType> get $fieldName =>
@@ -298,7 +298,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           }
           if (hasWrite) {
             metaCode.writeln('''
-          write: (entity) => write$fieldNameCamel(entity),
+          write: (entity) => entity.write$fieldNameCamel(),
     ''');
           } else if (jsonEncoded) {
             metaCode.writeln('''
@@ -349,15 +349,15 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
               metaCode.writeln('''
           read: (json, entity, value){
             if ('null' == value){
-              return read$fieldNameCamel(json, null, entity);
+              return entity.read$fieldNameCamel(json, null);
             }
-            return read$fieldNameCamel(json, value, entity);
+            return entity.read$fieldNameCamel(json, value);
           },
         );
     ''');
             } else {
               metaCode.writeln('''
-          read: (json, entity, value) => read$fieldNameCamel(json, value, entity),
+          read: (json, entity, value) => entity.read$fieldNameCamel(json, value),
         );
     ''');
             }
