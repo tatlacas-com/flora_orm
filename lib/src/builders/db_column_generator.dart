@@ -66,12 +66,12 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     final copyWithPropsList = StringBuffer();
     final propsList = StringBuffer();
 
-    final extendedClassName =
-        element.supertype?.getDisplayString(withNullability: false);
-
-    mixinCode.writeln('mixin _${className}Mixin on $extendedClassName {');
-    metaCode
-        .writeln('class ${className}Meta extends  EntityMeta<$className> {');
+    mixinCode.writeln(
+        'mixin _${className}Mixin on Entity<$className, ${className}Meta> {');
+    metaCode.writeln('''class ${className}Meta extends  EntityMeta<$className> {
+          
+          const ${className}Meta();
+          ''');
 
     mixinCode.writeln('''
   @override
