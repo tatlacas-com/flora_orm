@@ -59,7 +59,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     fxn() async => await storage.getEntity(
           columns: (t) => [],
-          filter: (t) => Filter.Filter(
+          filter: (t) => Filter(
             t.columnId,
             value: insertedEntity!.id,
           )
@@ -94,7 +94,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
-      filter: (t) => Filter.Filter(
+      filter: (t) => Filter(
         entity.columnId,
         value: insertedEntity!.id,
       )
@@ -131,7 +131,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
       columns: (t) => [entity.columnTestInt],
-      filter: (t) => Filter.Filter(
+      filter: (t) => Filter(
         entity.columnId,
         value: insertedEntity!.id,
       )
@@ -173,7 +173,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter.Filter(
+      filter: (t) => Filter(
         entity.columnId,
         condition: SqlCondition.notEqualTo,
         value: '12',
@@ -198,7 +198,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter.Filter(
+      filter: (t) => Filter(
         entity.columnTestInt,
         condition: SqlCondition.isNull,
       ).and(
@@ -225,7 +225,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter.Filter(
+      filter: (t) => Filter(
         entity.columnTestString,
         condition: SqlCondition.notNull,
       ),
@@ -250,7 +250,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter.Filter(
+      filter: (t) => Filter(
         entity.columnTestInt,
         condition: SqlCondition.lessThan,
         value: -14,
@@ -276,7 +276,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter.Filter(
+      filter: (t) => Filter(
         entity.columnTestInt,
         condition: SqlCondition.greaterThan,
         value: 19999,
@@ -302,7 +302,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter.Filter(
+      filter: (t) => Filter(
         entity.columnTestInt,
         condition: SqlCondition.greaterThanOrEqual,
         value: 100,
@@ -328,7 +328,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter.Filter(
+      filter: (t) => Filter(
         entity.columnTestInt,
         condition: SqlCondition.greaterThanOrEqual,
         value: -10,
@@ -354,7 +354,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter.Filter(
+      filter: (t) => Filter(
         entity.columnTestInt,
         condition: SqlCondition.between,
         value: 1000,
@@ -381,7 +381,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter.Filter(
+      filter: (t) => Filter(
         entity.columnTestInt,
         condition: SqlCondition.notBetween,
         value: -500,
@@ -408,7 +408,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter.Filter(
+      filter: (t) => Filter(
         entity.columnTestInt,
         condition: SqlCondition.isIn,
         value: const [11001],
@@ -434,7 +434,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter.Filter(
+      filter: (t) => Filter(
         entity.columnTestInt,
         condition: SqlCondition.notIn,
         value: const [11001, 11005],
@@ -460,7 +460,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter.Filter(
+      filter: (t) => Filter(
         entity.columnTestString,
         condition: SqlCondition.like,
         value: '%Like%',
@@ -486,7 +486,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter.Filter(
+      filter: (t) => Filter(
         entity.columnTestString,
         condition: SqlCondition.notLike,
         value: '%Dummy%',
@@ -559,7 +559,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     expect(insertedEntity1, isNotNull);
     var json = await storage.getEntities(
       orderBy: (t) => [SqlOrder(column: entity.columnTestInt)],
-      filter: (t) => Filter.Filter(
+      filter: (t) => Filter(
         entity.columnId,
         value: insertedEntity!.id,
       ).or(
@@ -580,7 +580,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     const entity = TestEntity();
     var json = await storage.getEntities(
       orderBy: (t) => [SqlOrder(column: entity.columnTestInt)],
-      filter: (t) => Filter.Filter(
+      filter: (t) => Filter(
         entity.columnId,
         value: 'xyzNotFound',
       ),
@@ -631,7 +631,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter.Filter(
+      filter: (t) => Filter(
         entity.columnId,
         value: insertedEntity!.id,
       ).or(
@@ -685,7 +685,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     entity = (insertedEntity as TestEntity).copyWith(testString: 'Updated a');
     var total = await storage.update(
       entity: entity,
-      filter: (t) => Filter.Filter(
+      filter: (t) => Filter(
         entity.columnId,
         value: entity.id,
       ),
@@ -703,15 +703,14 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var total = await storage.update(
-        filter: (t) => Filter.Filter(
+        filter: (t) => Filter(
               entity.columnId,
               value: insertedEntity!.id,
             ),
         columnValues: (t) => {t.columnTestString: 'Updated ax1'});
     expect(total, 1);
     var json = await storage.getEntity(
-        filter: (t) =>
-            Filter.Filter(entity.columnId, value: insertedEntity?.id));
+        filter: (t) => Filter(entity.columnId, value: insertedEntity?.id));
     insertedEntity = insertedEntity?.copyWith(testString: 'Updated ax1');
     entity = json!;
     expect(entity, insertedEntity);
@@ -791,7 +790,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     expect(insertedEntity!.length, 2);
     var total = await storage.getCount(
-      filter: (t) => Filter.Filter(
+      filter: (t) => Filter(
         entity.columnId,
         value: insertedEntity[0].id,
       ).or(
@@ -820,7 +819,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     expect(insertedEntity!.length, 2);
     var total = await storage.delete(
-      filter: (t) => Filter.Filter(
+      filter: (t) => Filter(
         entity.columnId,
         value: insertedEntity[0].id,
       ).or(
@@ -850,7 +849,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     expect(insertedEntity1, isNotNull);
     var sum = await storage.getSum<int>(
       column: (t) => t.columnTestInt,
-      filter: (t) => Filter.Filter(
+      filter: (t) => Filter(
         entity.columnId,
         value: insertedEntity!.id,
       ).or(
@@ -887,7 +886,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
         entity.columnTestInt,
         entity.columnTestDouble,
       ],
-      filter: (t) => Filter.Filter(
+      filter: (t) => Filter(
         entity.columnId,
         value: insertedEntity!.id,
       ).or(
@@ -917,7 +916,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     expect(insertedEntity1, isNotNull);
     var json = await storage.getSum<double>(
       column: (t) => t.columnTestDouble,
-      filter: (t) => Filter.Filter(
+      filter: (t) => Filter(
         entity.columnId,
         value: insertedEntity!.id,
       ).or(
