@@ -40,6 +40,8 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
     extends OrmEngine<TEntity, TMeta, TDbContext> {
   const BaseOrmEngine(super.t,
       {required super.dbContext, required super.useIsolateDefault});
+  @override
+  BaseContext get dbContext => super.dbContext as BaseContext;
 
   /// Try to convert anything (int, String) to an int.
   int? parseInt(Object? object) {

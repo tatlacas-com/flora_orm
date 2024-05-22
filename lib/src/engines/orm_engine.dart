@@ -21,7 +21,7 @@ abstract class OrmEngine<
     TEntity extends IEntity,
     TMeta extends EntityMeta<TEntity>,
     TDbContext extends DbContext<TEntity>> extends Equatable {
-  final TDbContext dbContext;
+  final DbContext dbContext;
   @protected
   final TEntity mType;
   TMeta get t => mType.meta as TMeta;
