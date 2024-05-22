@@ -4,7 +4,8 @@ import '../../tatlacas_orm.dart';
 import 'base_context.dart';
 import '../open_options.dart';
 
-class SqfliteInMemoryDbContext extends BaseContext {
+class SqfliteInMemoryDbContext<TEntity extends IEntity>
+    extends BaseContext<TEntity> {
   SqfliteInMemoryDbContext({
     required super.dbName,
     required super.dbVersion,

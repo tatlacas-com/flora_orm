@@ -5,7 +5,7 @@ import 'package:sqflite_common/sqlite_api.dart';
 
 import '../../tatlacas_orm.dart';
 
-abstract class BaseContext extends DbContext<IEntity> {
+abstract class BaseContext<TEntity extends IEntity> extends DbContext<TEntity> {
   BaseContext({
     required super.dbName,
     required super.dbVersion,

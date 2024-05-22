@@ -8,7 +8,7 @@ abstract class DbContext<TEntity extends IEntity> {
   });
   final int dbVersion;
   final String dbName;
-  final List<TEntity> tables;
+  final List<IEntity> tables;
 
   Future<String> getDbPath();
 

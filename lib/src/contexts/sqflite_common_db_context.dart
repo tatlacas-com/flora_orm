@@ -6,19 +6,20 @@ import '../../tatlacas_orm.dart';
 import 'base_context.dart';
 import '../open_options.dart';
 
-class SqfliteCommonDbContext extends BaseContext {
+class SqfliteCommonDbContext<TEntity extends IEntity>
+    extends BaseContext<TEntity> {
   SqfliteCommonDbContext({
     required super.dbName,
     required super.dbVersion,
     required super.tables,
   });
 
-  SqfliteCommonDbContext copyWith({
+  SqfliteCommonDbContext<TEntity> copyWith({
     String? dbName,
     int? dbVersion,
     List<IEntity>? tables,
   }) {
-    return SqfliteCommonDbContext(
+    return SqfliteCommonDbContext<TEntity>(
       dbName: dbName ?? this.dbName,
       dbVersion: dbVersion ?? this.dbVersion,
       tables: tables ?? this.tables,

@@ -23,7 +23,7 @@ void main() {
         return '.';
       });
     });
-    var dbContext = SqfliteCommonDbContext(
+    var dbContext = SqfliteCommonDbContext<TestEntity>(
       dbVersion: 1,
       dbName: 'common_storage_db',
       tables: [const TestEntity()],
