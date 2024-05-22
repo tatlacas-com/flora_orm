@@ -14,6 +14,7 @@ class DbColumn<TColumnType> {
   });
   final String? name;
   final String? alias;
+  // write function name. defaults to toMap
   final String? writeFn;
   final bool encodedJson;
   final bool primaryKey;

@@ -73,6 +73,36 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           const ${className}Meta();
           ''');
 
+    metaCode.writeln('''
+  @override
+  SqlColumn<$className, String> get id => 
+  SqlColumn<$className, String>(
+        'id',
+        primaryKey: true,
+        write: (entity) => entity.id,
+        read: (json, entity, value) =>
+            entity.copyWith(id: value, json: json),
+      );
+
+  @override
+  SqlColumn<$className, DateTime> get createdAt =>
+      SqlColumn<$className, DateTime>(
+        'createdAt',
+        write: (entity) => entity.createdAt,
+        read: (json, entity, value) =>
+            entity.copyWith(createdAt: value, json: json),
+      );
+
+  @override
+  SqlColumn<$className, DateTime> get updatedAt =>
+      SqlColumn<$className, DateTime>(
+        'updatedAt',
+        write: (entity) => entity.updatedAt,
+        read: (json, entity, value) =>
+            entity.copyWith(updatedAt: value, json: json),
+      );
+    ''');
+
     mixinCode.writeln('''
   @override
   String get tableName => '${tableName ?? convertClassNameToSnakeCase(className)}';
@@ -219,36 +249,6 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
   $columnType? write$fieldNameCamel();
  ''');
           }
-
-          /*  metaCode.writeln('''
-  @override
-  SqlColumn<$className, String> get id => 
-  SqlColumn<$className, String>(
-        'id',
-        primaryKey: true,
-        write: (entity) => entity.id,
-        read: (json, entity, value) =>
-            entity.copyWith(id: value, json: json),
-      );
-
-  @override
-  SqlColumn<$className, DateTime> get createdAt =>
-      SqlColumn<$className, DateTime>(
-        'createdAt',
-        write: (entity) => entity.createdAt,
-        read: (json, entity, value) =>
-            entity.copyWith(createdAt: value, json: json),
-      );
-
-  @override
-  SqlColumn<$className, DateTime> get updatedAt =>
-      SqlColumn<$className, DateTime>(
-        'updatedAt',
-        write: (entity) => entity.updatedAt,
-        read: (json, entity, value) =>
-            entity.copyWith(updatedAt: value, json: json),
-      );
-    '''); */
 
           metaCode.writeln('''
       SqlColumn<$className, $columnType> get $fieldName =>
