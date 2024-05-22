@@ -68,8 +68,10 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
 
     mixinCode.writeln(
         'mixin _${className}Mixin on Entity<$className, ${className}Meta> {');
-    metaCode.writeln('''class ${className}Meta extends  EntityMeta<$className> {
-          
+    metaCode.writeln(
+        '''class ${className}Meta extends  EntityMeta<$className> {     
+  @override
+  String get tableName => '${tableName ?? convertClassNameToSnakeCase(className)}';
           const ${className}Meta();
           ''');
 
@@ -104,11 +106,11 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     ''');
 
     mixinCode.writeln('''
-  @override
-  String get tableName => '${tableName ?? convertClassNameToSnakeCase(className)}';
+  
+  static const ${className}Meta _meta = ${className}Meta();
 
   @override
-  final ${className}Meta meta = const ${className}Meta();
+  ${className}Meta get meta => _meta;
     ''');
     final Map<String, _ExtraField> extraFields = {};
     extraFields.addEntries(
@@ -236,7 +238,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
       Map<String, dynamic> map = jsonDecode(val);
       $alias = $jsonEncodedType.fromMap(map);
     }
-    return entity.copyWith(
+    return copyWith(
       $fieldName: ${notNull ? 'val' : 'CopyWith(val)'},
       $alias: ${aliasNotNull ? alias : 'CopyWith($alias)'},
       json: json,

@@ -2,6 +2,9 @@ import 'package:tatlacas_orm/tatlacas_orm.dart';
 
 class TestEntityMeta extends EntityMeta<TestEntity> {
   const TestEntityMeta();
+
+  @override
+  String get tableName => 'test_entity';
   @override
   Iterable<SqlColumn<TestEntity, dynamic>> get columns =>
       throw UnimplementedError();
@@ -14,6 +17,50 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
 
   @override
   SqlColumn<IEntity, DateTime> get updatedAt => throw UnimplementedError();
+
+  get testString => SqlColumn<TestEntity, String>(
+        'testString',
+        write: (entity) => entity.testString,
+        read: (json, entity, value) => entity.copyWith(testString: value),
+      );
+
+  get testUpgrade => SqlColumn<TestEntity, String>(
+        'testUpgrade',
+        write: (entity) => entity.testUpgrade,
+        read: (json, entity, value) => entity.copyWith(testUpgrade: value),
+      );
+
+  get testDateTime => SqlColumn<TestEntity, DateTime>(
+        'testDateTime',
+        write: (entity) => entity.testDateTime,
+        read: (json, entity, value) => entity.copyWith(testDateTime: value),
+      );
+
+  get testInt => SqlColumn<TestEntity, int>(
+        'testInt',
+        write: (entity) => entity.testInt,
+        read: (json, entity, value) => entity.copyWith(testInt: value),
+      );
+
+  get testIntWithDefault => SqlColumn<TestEntity, int>(
+        'testIntWithDefault',
+        write: (entity) => entity.testIntWithDefault,
+        defaultValue: 100,
+        read: (json, entity, value) =>
+            entity.copyWith(testIntWithDefault: value),
+      );
+
+  get testBool => SqlColumn<TestEntity, bool>(
+        'testBool',
+        write: (entity) => entity.testBool,
+        read: (json, entity, value) => entity.copyWith(testBool: value),
+      );
+
+  get testDouble => SqlColumn<TestEntity, double>(
+        'testDouble',
+        write: (entity) => entity.testDouble,
+        read: (json, entity, value) => entity.copyWith(testDouble: value),
+      );
 }
 
 class TestEntity extends Entity<TestEntity, TestEntityMeta> {
@@ -36,50 +83,6 @@ class TestEntity extends Entity<TestEntity, TestEntityMeta> {
   final int? testIntWithDefault;
   final bool? testBool;
   final double? testDouble;
-
-  get columnTestString => SqlColumn<TestEntity, String>(
-        'testString',
-        write: (entity) => entity.testString,
-        read: (json, entity, value) => entity.copyWith(testString: value),
-      );
-
-  get columnTestUpgrade => SqlColumn<TestEntity, String>(
-        'testUpgrade',
-        write: (entity) => entity.testUpgrade,
-        read: (json, entity, value) => entity.copyWith(testUpgrade: value),
-      );
-
-  get columTestDateTime => SqlColumn<TestEntity, DateTime>(
-        'testDateTime',
-        write: (entity) => entity.testDateTime,
-        read: (json, entity, value) => entity.copyWith(testDateTime: value),
-      );
-
-  get columnTestInt => SqlColumn<TestEntity, int>(
-        'testInt',
-        write: (entity) => entity.testInt,
-        read: (json, entity, value) => entity.copyWith(testInt: value),
-      );
-
-  get columnTestIntWithDefault => SqlColumn<TestEntity, int>(
-        'testIntWithDefault',
-        write: (entity) => entity.testIntWithDefault,
-        defaultValue: 100,
-        read: (json, entity, value) =>
-            entity.copyWith(testIntWithDefault: value),
-      );
-
-  get columnTestBool => SqlColumn<TestEntity, bool>(
-        'testBool',
-        write: (entity) => entity.testBool,
-        read: (json, entity, value) => entity.copyWith(testBool: value),
-      );
-
-  get columnTestDouble => SqlColumn<TestEntity, double>(
-        'testDouble',
-        write: (entity) => entity.testDouble,
-        read: (json, entity, value) => entity.copyWith(testDouble: value),
-      );
 
   @override
   TestEntity copyWith({
@@ -110,18 +113,15 @@ class TestEntity extends Entity<TestEntity, TestEntityMeta> {
   }
 
   @override
-  String get tableName => 'test_entity';
-
-  @override
   List<String> upgradeTable(int oldVersion, int newVersion) {
     if (newVersion == 2) {
       return [
-        dropTable(tableName),
+        dropTable(meta.tableName),
         createTable(newVersion),
       ];
     }
     if (newVersion == 4) {
-      return [addColumn(columnTestUpgrade)];
+      return [addColumn(meta.testUpgrade)];
     }
     return [];
   }

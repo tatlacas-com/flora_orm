@@ -7,7 +7,7 @@ import 'package:tatlacas_orm/src/engines/base_engine.dart';
 import '../dummy/test_entity.dart';
 
 @isTest
-void run(BaseEngine<TestEntity, BaseContext> storage) {
+void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
   test('insert(entity) should insert entity', () async {
     final entity = TestEntity(
         testBool: true,
@@ -60,24 +60,24 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     fxn() async => await storage.getEntity(
           columns: (t) => [],
           filter: (t) => Filter(
-            t.meta.id,
+            t.id,
             value: insertedEntity!.id,
           )
               .and(
-                entity.columnTestInt,
-                value: entity.testInt,
+                t.testInt,
+                value: t.testInt,
               )
               .and(
-                entity.columnTestBool,
-                value: entity.testBool,
+                t.testBool,
+                value: t.testBool,
               )
               .and(
-                entity.columnTestDouble,
-                value: entity.testDouble,
+                t.testDouble,
+                value: t.testDouble,
               )
               .and(
-                entity.columTestDateTime,
-                value: entity.testDateTime,
+                t.testDateTime,
+                value: t.testDateTime,
               ),
         );
     expect(
@@ -99,20 +99,20 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
         value: insertedEntity!.id,
       )
           .and(
-            entity.columnTestInt,
-            value: entity.testInt,
+            t.testInt,
+            value: t.testInt,
           )
           .and(
-            entity.columnTestBool,
-            value: entity.testBool,
+            t.testBool,
+            value: t.testBool,
           )
           .and(
-            entity.columnTestDouble,
-            value: entity.testDouble,
+            t.testDouble,
+            value: t.testDouble,
           )
           .and(
-            entity.columTestDateTime,
-            value: entity.testDateTime,
+            t.testDateTime,
+            value: t.testDateTime,
           ),
     );
     expect(json, isNotNull);
@@ -130,26 +130,26 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
-      columns: (t) => [entity.columnTestInt],
+      columns: (t) => [t.testInt],
       filter: (t) => Filter(
         entity.meta.id,
         value: insertedEntity!.id,
       )
           .and(
-            entity.columnTestInt,
-            value: entity.testInt,
+            t.testInt,
+            value: t.testInt,
           )
           .and(
-            entity.columnTestBool,
-            value: entity.testBool,
+            t.testBool,
+            value: t.testBool,
           )
           .and(
-            entity.columnTestDouble,
-            value: entity.testDouble,
+            t.testDouble,
+            value: t.testDouble,
           )
           .and(
-            entity.columTestDateTime,
-            value: entity.testDateTime,
+            t.testDateTime,
+            value: t.testDateTime,
           ),
     );
     expect(json, isNotNull);
@@ -199,10 +199,10 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
         )
       ],
       filter: (t) => Filter(
-        entity.columnTestInt,
+        t.testInt,
         condition: SqlCondition.isNull,
       ).and(
-        entity.columnTestDouble,
+        t.testDouble,
         condition: SqlCondition.isNull,
       ),
     );
@@ -226,7 +226,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
         )
       ],
       filter: (t) => Filter(
-        entity.columnTestString,
+        t.testString,
         condition: SqlCondition.notNull,
       ),
     );
@@ -251,7 +251,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
         )
       ],
       filter: (t) => Filter(
-        entity.columnTestInt,
+        t.testInt,
         condition: SqlCondition.lessThan,
         value: -14,
       ),
@@ -277,7 +277,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
         )
       ],
       filter: (t) => Filter(
-        entity.columnTestInt,
+        t.testInt,
         condition: SqlCondition.greaterThan,
         value: 19999,
       ),
@@ -303,7 +303,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
         )
       ],
       filter: (t) => Filter(
-        entity.columnTestInt,
+        t.testInt,
         condition: SqlCondition.greaterThanOrEqual,
         value: 100,
       ),
@@ -329,7 +329,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
         )
       ],
       filter: (t) => Filter(
-        entity.columnTestInt,
+        t.testInt,
         condition: SqlCondition.greaterThanOrEqual,
         value: -10,
       ),
@@ -355,7 +355,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
         )
       ],
       filter: (t) => Filter(
-        entity.columnTestInt,
+        t.testInt,
         condition: SqlCondition.between,
         value: 1000,
         value2: 1002,
@@ -382,7 +382,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
         )
       ],
       filter: (t) => Filter(
-        entity.columnTestInt,
+        t.testInt,
         condition: SqlCondition.notBetween,
         value: -500,
         value2: 2019,
@@ -409,7 +409,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
         )
       ],
       filter: (t) => Filter(
-        entity.columnTestInt,
+        t.testInt,
         condition: SqlCondition.isIn,
         value: const [11001],
       ),
@@ -435,7 +435,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
         )
       ],
       filter: (t) => Filter(
-        entity.columnTestInt,
+        t.testInt,
         condition: SqlCondition.notIn,
         value: const [11001, 11005],
       ),
@@ -461,7 +461,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
         )
       ],
       filter: (t) => Filter(
-        entity.columnTestString,
+        t.testString,
         condition: SqlCondition.like,
         value: '%Like%',
       ),
@@ -487,7 +487,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
         )
       ],
       filter: (t) => Filter(
-        entity.columnTestString,
+        t.testString,
         condition: SqlCondition.notLike,
         value: '%Dummy%',
       ),
@@ -515,22 +515,22 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
       ],
       filter: (t) => Filter.lb()
           .filter(
-            entity.columnTestString,
+            t.testString,
             condition: SqlCondition.like,
             value: '%Dummy%',
           )
           .and(
-            entity.columnTestInt,
+            t.testInt,
             value: 10,
           )
           .rb()
           .or(
-            entity.columnTestString,
+            t.testString,
             value: 'Loveable',
             lb: true,
           )
           .and(
-            entity.columnTestInt,
+            t.testInt,
             value: 11002,
             rb: true,
           ),
@@ -558,7 +558,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     var insertedEntity1 = await storage.insert(entity1);
     expect(insertedEntity1, isNotNull);
     var json = await storage.getEntities(
-      orderBy: (t) => [SqlOrder(column: entity.columnTestInt)],
+      orderBy: (t) => [SqlOrder(column: t.testInt)],
       filter: (t) => Filter(
         entity.meta.id,
         value: insertedEntity!.id,
@@ -579,7 +579,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
   test('getEntities() should return empty array', () async {
     const entity = TestEntity();
     var json = await storage.getEntities(
-      orderBy: (t) => [SqlOrder(column: entity.columnTestInt)],
+      orderBy: (t) => [SqlOrder(column: t.testInt)],
       filter: (t) => Filter(
         entity.meta.id,
         value: 'xyzNotFound',
@@ -627,7 +627,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     var json = await storage.getEntities(
       orderBy: (t) => [
         SqlOrder(
-          column: entity.columnTestInt,
+          column: t.testInt,
           direction: OrderDirection.desc,
         )
       ],
@@ -707,7 +707,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
               entity.meta.id,
               value: insertedEntity!.id,
             ),
-        columnValues: (t) => {t.columnTestString: 'Updated ax1'});
+        columnValues: (t) => {t.testString: 'Updated ax1'});
     expect(total, 1);
     var json = await storage.getEntity(
         filter: (t) => Filter(entity.meta.id, value: insertedEntity?.id));
@@ -848,7 +848,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     var insertedEntity1 = await storage.insert(entity1);
     expect(insertedEntity1, isNotNull);
     var sum = await storage.getSum<int>(
-      column: (t) => t.columnTestInt,
+      column: (t) => t.testInt,
       filter: (t) => Filter(
         entity.meta.id,
         value: insertedEntity!.id,
@@ -859,7 +859,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     );
     expect(sum, 18);
     sum = await storage.getSum<int>(
-      column: (t) => t.columnTestInt,
+      column: (t) => t.testInt,
     );
     expect(sum, greaterThan(0));
   });
@@ -883,8 +883,8 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     expect(insertedEntity1, isNotNull);
     var json = await storage.getSumProduct<double>(
       columns: (t) => [
-        entity.columnTestInt,
-        entity.columnTestDouble,
+        t.testInt,
+        t.testDouble,
       ],
       filter: (t) => Filter(
         entity.meta.id,
@@ -915,7 +915,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     var insertedEntity1 = await storage.insert(entity1);
     expect(insertedEntity1, isNotNull);
     var json = await storage.getSum<double>(
-      column: (t) => t.columnTestDouble,
+      column: (t) => t.testDouble,
       filter: (t) => Filter(
         entity.meta.id,
         value: insertedEntity!.id,

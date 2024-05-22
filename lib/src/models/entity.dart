@@ -24,8 +24,6 @@ abstract class IEntity {
     Map<String, dynamic>? json,
   });
 
-  String get tableName;
-
   EntityMeta get meta;
 
   List<String> upgradeTable(int oldVersion, int newVersion);
@@ -52,6 +50,8 @@ abstract class IEntity {
 
 abstract class EntityMeta<TEntity extends IEntity> {
   const EntityMeta();
+  String get tableName;
+
   Iterable<SqlColumn<TEntity, dynamic>> get columns;
   SqlColumn<IEntity, String> get id;
 
@@ -146,7 +146,7 @@ abstract class Entity<TEntity extends IEntity,
 
   List<String> recreateTable(int newVersion) {
     return [
-      dropTable(tableName),
+      dropTable(meta.tableName),
       createTable(newVersion),
     ];
   }
@@ -176,7 +176,7 @@ abstract class Entity<TEntity extends IEntity,
       composite = ',\n PRIMARY KEY ($keys)';
     }
     return '''
-  CREATE TABLE IF NOT EXISTS $tableName (
+  CREATE TABLE IF NOT EXISTS ${meta.tableName} (
   ${stringBuffer.toString()}$composite)
   ''';
   }
@@ -199,7 +199,7 @@ abstract class Entity<TEntity extends IEntity,
   String addColumn(SqlColumn column) {
     var str = StringBuffer();
     columnDefinition(column, str);
-    return 'ALTER TABLE $tableName ADD ${column.name} ${getColumnType(column.columnType)}${str.toString()}';
+    return 'ALTER TABLE ${meta.tableName} ADD ${column.name} ${getColumnType(column.columnType)}${str.toString()}';
   }
 
   @protected

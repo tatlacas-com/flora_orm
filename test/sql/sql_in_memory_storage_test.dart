@@ -14,8 +14,9 @@ void main() {
       dbName: 'common_storage_db',
       tables: <IEntity>[const TestEntity()],
     );
-    var storage =
-        SqfliteInMemoryEngine(const TestEntity(), dbContext: dbContext);
+    var storage = SqfliteInMemoryEngine<TestEntity, TestEntityMeta>(
+        const TestEntity(),
+        dbContext: dbContext);
 
     group('Test Db upgrade', () {
       late Database database;

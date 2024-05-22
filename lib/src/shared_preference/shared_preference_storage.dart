@@ -7,8 +7,9 @@ import 'package:tatlacas_orm/src/engines/base_engine.dart';
 import 'package:tatlacas_orm/src/shared_preference/shared_preference_context.dart';
 import 'package:uuid/uuid.dart';
 
-class SharedPreferenceStorage<TEntity extends IEntity>
-    extends BaseEngine<TEntity, SharedPreferenceContext> {
+class SharedPreferenceStorage<TEntity extends IEntity,
+        TMeta extends EntityMeta<TEntity>>
+    extends BaseEngine<TEntity, TMeta, SharedPreferenceContext> {
   SharedPreferenceStorage(super.t,
       {required super.dbContext, super.useIsolateDefault = true});
   @protected
@@ -46,9 +47,9 @@ class SharedPreferenceStorage<TEntity extends IEntity>
 
   @override
   Future<TEntity?> getEntity({
-    Iterable<SqlColumn>? Function(TEntity t)? columns,
-    List<SqlOrder>? Function(TEntity t)? orderBy,
-    required Filter Function(TEntity t) filter,
+    Iterable<SqlColumn>? Function(TMeta t)? columns,
+    List<SqlOrder>? Function(TMeta t)? orderBy,
+    required Filter Function(TMeta t) filter,
     int? offset,
     final bool? useIsolate,
   }) async {
@@ -79,7 +80,7 @@ class SharedPreferenceStorage<TEntity extends IEntity>
 
   @override
   Future<int> delete({
-    final Filter Function(TEntity t)? filter,
+    final Filter Function(TMeta t)? filter,
     final bool? useIsolate,
   }) async {
     final item = filter == null
@@ -97,9 +98,9 @@ class SharedPreferenceStorage<TEntity extends IEntity>
 
   @override
   Future<int> update({
-    required Filter Function(TEntity t) filter,
+    required Filter Function(TMeta t) filter,
     TEntity? entity,
-    Map<SqlColumn, dynamic> Function(TEntity t)? columnValues,
+    Map<SqlColumn, dynamic> Function(TMeta t)? columnValues,
     final bool? useIsolate,
   }) async {
     var query = filter(t)
@@ -109,13 +110,13 @@ class SharedPreferenceStorage<TEntity extends IEntity>
     if (query.isNotEmpty == true) {
       var createdAt = entity?.createdAt;
       if (entity == null) {
-        final res = await getEntityMap(
-            filter: filter, columns: (t) => [t.meta.createdAt]);
-        if (res?.containsKey(t.meta.createdAt.name) == true) {
-          createdAt = res![t.meta.createdAt.name];
+        final res =
+            await getEntityMap(filter: filter, columns: (t) => [t.createdAt]);
+        if (res?.containsKey(t.createdAt.name) == true) {
+          createdAt = res![t.createdAt.name];
         }
       }
-      entity = (entity ?? t).updateDates(createdAt: createdAt) as TEntity;
+      entity = (entity ?? mType).updateDates(createdAt: createdAt) as TEntity;
       final update = columnValues != null
           ? entity.toStorageJson(columnValues: columnValues(t))
           : entity.toMap();
@@ -128,9 +129,9 @@ class SharedPreferenceStorage<TEntity extends IEntity>
 
   @override
   Future<List<TEntity>> query({
-    Filter Function(TEntity t)? filter,
-    Iterable<SqlColumn>? Function(TEntity t)? columns,
-    List<SqlOrder>? Function(TEntity t)? orderBy,
+    Filter Function(TMeta t)? filter,
+    Iterable<SqlColumn>? Function(TMeta t)? columns,
+    List<SqlOrder>? Function(TMeta t)? orderBy,
     int? limit,
     int? offset,
     final bool? useIsolate,
@@ -140,7 +141,7 @@ class SharedPreferenceStorage<TEntity extends IEntity>
 
   @override
   Future<List<Map<String, Object?>>> rawQuery(
-    Filter Function(TEntity t)? filter,
+    Filter Function(TMeta t)? filter,
     String query, {
     final bool? useIsolate,
   }) async {

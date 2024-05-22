@@ -8,22 +8,26 @@ import '../models/entity.dart';
 import '../models/sql.dart';
 import '../models/sql_order.dart';
 
-class WhereParams<TEntity extends IEntity> {
+class WhereParams<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>> {
   WhereParams({
     required this.filter,
     required this.t,
   });
-  Filter Function(TEntity t) filter;
-  final TEntity t;
+  Filter Function(TMeta t) filter;
+  final TMeta t;
 }
 
-abstract class SqlEngine<TEntity extends IEntity,
+abstract class SqlEngine<
+    TEntity extends IEntity,
+    TMeta extends EntityMeta<TEntity>,
     TDbContext extends DbContext<IEntity>> extends Equatable {
   final TDbContext dbContext;
-  final TEntity t;
+  @protected
+  final TEntity mType;
+  TMeta get t => mType.meta as TMeta;
   final bool useIsolateDefault;
 
-  const SqlEngine(this.t,
+  const SqlEngine(this.mType,
       {required this.dbContext, this.useIsolateDefault = true});
 
   Future<TEntity?> insert(
@@ -41,91 +45,91 @@ abstract class SqlEngine<TEntity extends IEntity,
   Future<List<TEntity>?> insertOrUpdateList(Iterable<TEntity> items);
 
   Future<TEntity?> getEntity({
-    List<SqlColumn>? Function(TEntity t)? columns,
-    List<SqlOrder>? Function(TEntity t)? orderBy,
-    required Filter Function(TEntity t) filter,
+    List<SqlColumn>? Function(TMeta t)? columns,
+    List<SqlOrder>? Function(TMeta t)? orderBy,
+    required Filter Function(TMeta t) filter,
     int? offset,
     final bool? useIsolate,
   });
   Future<Map<String, dynamic>?> getEntityMap({
-    List<SqlColumn>? Function(TEntity t)? columns,
-    List<SqlOrder>? Function(TEntity t)? orderBy,
-    required Filter Function(TEntity t) filter,
+    List<SqlColumn>? Function(TMeta t)? columns,
+    List<SqlOrder>? Function(TMeta t)? orderBy,
+    required Filter Function(TMeta t) filter,
     int? offset,
     final bool? useIsolate,
   });
 
   Future<T> getSum<T>({
-    required SqlColumn Function(TEntity t) column,
-    Filter Function(TEntity t)? filter,
+    required SqlColumn Function(TMeta t) column,
+    Filter Function(TMeta t)? filter,
     final bool? useIsolate,
   });
 
   Future<T> getSumProduct<T>({
-    required List<SqlColumn> Function(TEntity t) columns,
-    Filter Function(TEntity t)? filter,
+    required List<SqlColumn> Function(TMeta t) columns,
+    Filter Function(TMeta t)? filter,
     final bool? useIsolate,
   });
 
   Future<int> getCount({
-    Filter Function(TEntity t)? filter,
+    Filter Function(TMeta t)? filter,
     final bool? useIsolate,
   });
 
   Future<int> delete({
-    Filter Function(TEntity t)? filter,
+    Filter Function(TMeta t)? filter,
     final bool? useIsolate,
   });
 
   Future<int> update({
-    required Filter Function(TEntity t) filter,
+    required Filter Function(TMeta t) filter,
     TEntity entity,
-    Map<SqlColumn, dynamic> Function(TEntity t)? columnValues,
+    Map<SqlColumn, dynamic> Function(TMeta t)? columnValues,
     final bool? useIsolate,
   });
 
   @protected
   Future<List<TEntity>> query({
-    Filter Function(TEntity t)? filter,
-    List<SqlColumn>? Function(TEntity t)? columns,
-    List<SqlOrder>? Function(TEntity t)? orderBy,
+    Filter Function(TMeta t)? filter,
+    List<SqlColumn>? Function(TMeta t)? columns,
+    List<SqlOrder>? Function(TMeta t)? orderBy,
     int? limit,
     int? offset,
     final bool? useIsolate,
   });
   @protected
   Future<List<Map<String, dynamic>>> queryMap({
-    Filter Function(TEntity t)? filter,
-    List<SqlColumn>? Function(TEntity t)? columns,
-    List<SqlOrder>? Function(TEntity t)? orderBy,
+    Filter Function(TMeta t)? filter,
+    List<SqlColumn>? Function(TMeta t)? columns,
+    List<SqlOrder>? Function(TMeta t)? orderBy,
     int? limit,
     int? offset,
     final bool? useIsolate,
   });
 
   Future<List<TEntity>> getEntities({
-    List<SqlColumn>? Function(TEntity t)? columns,
-    List<SqlOrder>? Function(TEntity t)? orderBy,
-    Filter Function(TEntity t)? filter,
+    List<SqlColumn>? Function(TMeta t)? columns,
+    List<SqlOrder>? Function(TMeta t)? orderBy,
+    Filter Function(TMeta t)? filter,
     final bool? useIsolate,
   });
   Future<List<Map<String, dynamic>>> getEntityMaps({
-    List<SqlColumn>? Function(TEntity t)? columns,
-    List<SqlOrder>? Function(TEntity t)? orderBy,
-    Filter Function(TEntity t)? filter,
+    List<SqlColumn>? Function(TMeta t)? columns,
+    List<SqlOrder>? Function(TMeta t)? orderBy,
+    Filter Function(TMeta t)? filter,
     final bool? useIsolate,
   });
 
   @protected
   Future<List<Map<String, Object?>>> rawQuery(
-    Filter Function(TEntity t)? filter,
+    Filter Function(TMeta t)? filter,
     String query, {
     final bool? useIsolate,
   });
 
   @protected
   Future<FormattedQuery> whereString(
-    Filter Function(TEntity t) filter,
+    Filter Function(TMeta t) filter,
     bool? useIsolate,
   ) async {
     final sqlWhere = filter(t);

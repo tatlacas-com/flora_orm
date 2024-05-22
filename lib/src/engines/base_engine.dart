@@ -35,8 +35,9 @@ class InsertPrep<TEntity extends IEntity> {
   final Map<String, dynamic> map;
 }
 
-class BaseEngine<TEntity extends IEntity, TDbContext extends BaseContext>
-    extends SqlEngine<TEntity, TDbContext> {
+class BaseEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
+        TDbContext extends BaseContext>
+    extends SqlEngine<TEntity, TMeta, TDbContext> {
   const BaseEngine(super.t,
       {required super.dbContext, required super.useIsolateDefault});
 
@@ -62,7 +63,8 @@ class BaseEngine<TEntity extends IEntity, TDbContext extends BaseContext>
     final response = !spawnIsolate
         ? wInsertOrUpdate(item)
         : await compute(wInsertOrUpdate, item);
-    final updated = await db.insert(response.entity.tableName, response.map,
+    final updated = await db.insert(
+        response.entity.meta.tableName, response.map,
         conflictAlgorithm: ConflictAlgorithm.abort);
     return updated > 0 ? response.entity as TEntity? : null;
   }
@@ -79,7 +81,7 @@ class BaseEngine<TEntity extends IEntity, TDbContext extends BaseContext>
           element = element.copyWith(id: const Uuid().v4()) as TEntity;
         }
         element = element.updateDates() as TEntity;
-        batch.insert(element.tableName, element.toMap(),
+        batch.insert(element.meta.tableName, element.toMap(),
             conflictAlgorithm: ConflictAlgorithm.abort);
         updatedItems.add(element);
       }
@@ -99,22 +101,23 @@ class BaseEngine<TEntity extends IEntity, TDbContext extends BaseContext>
     final response = !spawnIsolate
         ? wInsertOrUpdate(item)
         : await compute(wInsertOrUpdate, item);
-    final updated = await db.insert(response.entity.tableName, response.map,
+    final updated = await db.insert(
+        response.entity.meta.tableName, response.map,
         conflictAlgorithm: ConflictAlgorithm.replace);
     return updated > 0 ? response.entity as TEntity? : null;
   }
 
   @override
   Future<TEntity?> getEntity({
-    Iterable<SqlColumn>? Function(TEntity t)? columns,
-    List<SqlOrder>? Function(TEntity t)? orderBy,
-    required Filter Function(TEntity t) filter,
+    Iterable<SqlColumn>? Function(TMeta t)? columns,
+    List<SqlOrder>? Function(TMeta t)? orderBy,
+    required Filter Function(TMeta t) filter,
     int? offset,
     final bool? useIsolate,
   }) async {
     List<TEntity> maps = await query(
       filter: filter,
-      columns: columns ?? (t) => t.meta.columns,
+      columns: columns ?? (t) => t.columns,
       limit: 1,
       offset: offset,
       orderBy: orderBy,
@@ -128,15 +131,15 @@ class BaseEngine<TEntity extends IEntity, TDbContext extends BaseContext>
 
   @override
   Future<Map<String, dynamic>?> getEntityMap({
-    Iterable<SqlColumn>? Function(TEntity t)? columns,
-    List<SqlOrder>? Function(TEntity t)? orderBy,
-    required Filter Function(TEntity t) filter,
+    Iterable<SqlColumn>? Function(TMeta t)? columns,
+    List<SqlOrder>? Function(TMeta t)? orderBy,
+    required Filter Function(TMeta t) filter,
     int? offset,
     final bool? useIsolate,
   }) async {
     List<Map<String, dynamic>> maps = await queryMap(
       filter: filter,
-      columns: columns ?? (t) => t.meta.columns,
+      columns: columns ?? (t) => t.columns,
       limit: 1,
       offset: offset,
       orderBy: orderBy,
@@ -150,8 +153,8 @@ class BaseEngine<TEntity extends IEntity, TDbContext extends BaseContext>
 
   @override
   Future<T> getSum<T>({
-    required SqlColumn Function(TEntity t) column,
-    Filter Function(TEntity t)? filter,
+    required SqlColumn Function(TMeta t) column,
+    Filter Function(TMeta t)? filter,
     final bool? useIsolate,
   }) async {
     List<Map> result = await rawQuery(
@@ -170,8 +173,8 @@ class BaseEngine<TEntity extends IEntity, TDbContext extends BaseContext>
 
   @override
   Future<T> getSumProduct<T>({
-    required Iterable<SqlColumn> Function(TEntity t) columns,
-    Filter Function(TEntity t)? filter,
+    required Iterable<SqlColumn> Function(TMeta t) columns,
+    Filter Function(TMeta t)? filter,
     final bool? useIsolate,
   }) async {
     final cols = columns(t).map((e) => e.name).join(' * ');
@@ -200,9 +203,9 @@ class BaseEngine<TEntity extends IEntity, TDbContext extends BaseContext>
 
   @override
   Future<List<TEntity>> getEntities({
-    Iterable<SqlColumn>? Function(TEntity t)? columns,
-    List<SqlOrder>? Function(TEntity t)? orderBy,
-    Filter Function(TEntity t)? filter,
+    Iterable<SqlColumn>? Function(TMeta t)? columns,
+    List<SqlOrder>? Function(TMeta t)? orderBy,
+    Filter Function(TMeta t)? filter,
     int? limit,
     int? offset,
     final bool? useIsolate,
@@ -211,7 +214,7 @@ class BaseEngine<TEntity extends IEntity, TDbContext extends BaseContext>
       filter: filter,
       limit: limit,
       offset: offset,
-      columns: columns ?? (t) => t.meta.columns,
+      columns: columns ?? (t) => t.columns,
       orderBy: orderBy,
       useIsolate: useIsolate,
     );
@@ -223,9 +226,9 @@ class BaseEngine<TEntity extends IEntity, TDbContext extends BaseContext>
 
   @override
   Future<List<Map<String, dynamic>>> getEntityMaps({
-    Iterable<SqlColumn>? Function(TEntity t)? columns,
-    List<SqlOrder>? Function(TEntity t)? orderBy,
-    Filter Function(TEntity t)? filter,
+    Iterable<SqlColumn>? Function(TMeta t)? columns,
+    List<SqlOrder>? Function(TMeta t)? orderBy,
+    Filter Function(TMeta t)? filter,
     int? limit,
     int? offset,
     final bool? useIsolate,
@@ -234,7 +237,7 @@ class BaseEngine<TEntity extends IEntity, TDbContext extends BaseContext>
       filter: filter,
       limit: limit,
       offset: offset,
-      columns: columns ?? (t) => t.meta.columns,
+      columns: columns ?? (t) => t.columns,
       orderBy: orderBy,
       useIsolate: useIsolate,
     );
@@ -257,7 +260,7 @@ class BaseEngine<TEntity extends IEntity, TDbContext extends BaseContext>
         }
         element = element.updateDates() as TEntity;
         updatedItems.add(element);
-        batch.insert(element.tableName, element.toMap(),
+        batch.insert(element.meta.tableName, element.toMap(),
             conflictAlgorithm: ConflictAlgorithm.replace);
       }
       result = await _finishBatch(batch, updatedItems);
@@ -281,7 +284,7 @@ class BaseEngine<TEntity extends IEntity, TDbContext extends BaseContext>
 
   @override
   Future<int> getCount({
-    Filter Function(TEntity t)? filter,
+    Filter Function(TMeta t)? filter,
     final bool? useIsolate,
   }) async {
     List<Map<String, Object?>> result = await rawQuery(
@@ -300,7 +303,7 @@ class BaseEngine<TEntity extends IEntity, TDbContext extends BaseContext>
 
   @override
   Future<int> delete({
-    final Filter Function(TEntity t)? filter,
+    final Filter Function(TMeta t)? filter,
     final bool? useIsolate,
   }) async {
     final db = await dbContext.database;
@@ -319,9 +322,9 @@ class BaseEngine<TEntity extends IEntity, TDbContext extends BaseContext>
 
   @override
   Future<int> update({
-    required Filter Function(TEntity t) filter,
+    required Filter Function(TMeta t) filter,
     TEntity? entity,
-    Map<SqlColumn, dynamic> Function(TEntity t)? columnValues,
+    Map<SqlColumn, dynamic> Function(TMeta t)? columnValues,
     final bool? useIsolate,
   }) async {
     assert(entity != null || columnValues != null);
@@ -329,18 +332,18 @@ class BaseEngine<TEntity extends IEntity, TDbContext extends BaseContext>
     final formattedQuery = await whereString(filter, useIsolate);
     var createdAt = entity?.createdAt;
     if (entity == null) {
-      final res = await getEntityMap(
-          filter: filter, columns: (t) => [t.meta.createdAt]);
-      if (res?.containsKey(t.meta.createdAt.name) == true) {
-        createdAt = DateTime.parse(res![t.meta.createdAt.name]);
+      final res =
+          await getEntityMap(filter: filter, columns: (t) => [t.createdAt]);
+      if (res?.containsKey(t.createdAt.name) == true) {
+        createdAt = DateTime.parse(res![t.createdAt.name]);
       }
     }
-    entity = (entity ?? t).updateDates(createdAt: createdAt) as TEntity;
+    entity = (entity ?? mType).updateDates(createdAt: createdAt) as TEntity;
     final update = columnValues != null
         ? entity.toStorageJson(columnValues: columnValues(t))
         : entity.toDb();
     return await db.update(
-      entity.tableName,
+      t.tableName,
       update,
       where: formattedQuery.filter,
       whereArgs: formattedQuery.whereArgs,
@@ -350,9 +353,9 @@ class BaseEngine<TEntity extends IEntity, TDbContext extends BaseContext>
   @override
   @protected
   Future<List<TEntity>> query({
-    Filter Function(TEntity t)? filter,
-    Iterable<SqlColumn>? Function(TEntity t)? columns,
-    List<SqlOrder>? Function(TEntity t)? orderBy,
+    Filter Function(TMeta t)? filter,
+    Iterable<SqlColumn>? Function(TMeta t)? columns,
+    List<SqlOrder>? Function(TMeta t)? orderBy,
     int? limit,
     int? offset,
     final bool? useIsolate,
@@ -397,7 +400,7 @@ class BaseEngine<TEntity extends IEntity, TDbContext extends BaseContext>
       );
     }
     final spawnIsolate = useIsolate ?? useIsolateDefault;
-    final args = Args<TEntity>(t: t.copyWith(), maps: maps);
+    final args = Args<TEntity>(t: mType.copyWith(), maps: maps);
     if (!spawnIsolate) {
       return entitiesFromMap(args).map<TEntity>((e) => e as TEntity).toList();
     }
@@ -408,9 +411,9 @@ class BaseEngine<TEntity extends IEntity, TDbContext extends BaseContext>
   @override
   @protected
   Future<List<Map<String, dynamic>>> queryMap({
-    Filter Function(TEntity t)? filter,
-    Iterable<SqlColumn>? Function(TEntity t)? columns,
-    List<SqlOrder>? Function(TEntity t)? orderBy,
+    Filter Function(TMeta t)? filter,
+    Iterable<SqlColumn>? Function(TMeta t)? columns,
+    List<SqlOrder>? Function(TMeta t)? orderBy,
     int? limit,
     int? offset,
     final bool? useIsolate,
@@ -460,7 +463,7 @@ class BaseEngine<TEntity extends IEntity, TDbContext extends BaseContext>
   @override
   @protected
   Future<List<Map<String, Object?>>> rawQuery(
-    Filter Function(TEntity t)? filter,
+    Filter Function(TMeta t)? filter,
     String query, {
     final bool? useIsolate,
   }) async {

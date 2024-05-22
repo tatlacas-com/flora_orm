@@ -28,12 +28,13 @@ void main() {
       dbName: 'common_storage_db',
       tables: [const TestEntity()],
     );
-    var storage = SqfliteCommonEngine(const TestEntity(), dbContext: dbContext);
+    var storage = SqfliteCommonEngine<TestEntity, TestEntityMeta>(
+        const TestEntity(),
+        dbContext: dbContext);
     test('drop database', () async {
       var database = await dbContext.database;
       try {
-        await database
-            .rawDelete('drop table if exists ${const TestEntity().tableName}');
+        await database.rawDelete('drop table if exists ${storage.t.tableName}');
       } catch (e) {
         debugPrint(e.toString());
       }
