@@ -4,13 +4,13 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tatlacas_orm/tatlacas_orm.dart';
 import 'package:tatlacas_orm/src/engines/base_orm_engine.dart';
-import 'package:tatlacas_orm/src/shared_preference/shared_preference_context.dart';
+import 'package:tatlacas_orm/src/contexts/shared_preference_context.dart';
 import 'package:uuid/uuid.dart';
 
-class SharedPreferenceStorage<TEntity extends IEntity,
+class SharedPreferenceEngine<TEntity extends IEntity,
         TMeta extends EntityMeta<TEntity>>
     extends BaseOrmEngine<TEntity, TMeta, SharedPreferenceContext<TEntity>> {
-  SharedPreferenceStorage(super.t,
+  SharedPreferenceEngine(super.t,
       {required super.dbContext, super.useIsolateDefault = true});
   @protected
   final Future<SharedPreferences> prefs = SharedPreferences.getInstance();
