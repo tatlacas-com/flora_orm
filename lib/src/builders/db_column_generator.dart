@@ -437,8 +437,6 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     metaCode.writeln('''
       @override
       Iterable<SqlColumn<$className, dynamic>> get columns => [
-      ''');
-    mixinCode.writeln('''
       id,
       createdAt,
       updatedAt,
