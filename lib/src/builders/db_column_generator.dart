@@ -73,9 +73,10 @@ typedef ${className}Orm
     = OrmEngine<$className, ${className}Meta, DbContext<$className>>;
 
 class ${className}Meta extends  EntityMeta<$className> {     
+  const ${className}Meta();
+
   @override
   String get tableName => '${tableName ?? convertClassNameToSnakeCase(className)}';
-          const ${className}Meta();
           ''');
 
     metaCode.writeln('''
