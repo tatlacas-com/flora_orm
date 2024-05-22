@@ -435,7 +435,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
       }''');
     mixinCode.writeln('}');
     columnsClassCode.writeln('}');
-
+    mixinCode.write(columnsClassCode.toString());
     return mixinCode.toString();
   }
 
