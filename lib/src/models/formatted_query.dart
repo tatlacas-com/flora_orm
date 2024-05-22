@@ -1,13 +1,13 @@
 import 'package:equatable/equatable.dart';
 
 class FormattedQuery extends Equatable {
-  const FormattedQuery({required this.whereArgs,required this.where});
-  final String where;
+  const FormattedQuery({required this.whereArgs, required this.filter});
+  final String filter;
   final List<dynamic>? whereArgs;
 
   @override
-  List<Object?> get props => [where,whereArgs];
+  List<Object?> get props => [filter, whereArgs];
 
   @override
-  String toString() => 'FormattedQuery {where:$where, whereArgs:$whereArgs}';
+  String toString() => 'FormattedQuery {where:$filter, whereArgs:$whereArgs}';
 }

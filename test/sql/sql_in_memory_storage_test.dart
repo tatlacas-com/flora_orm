@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:tatlacas_orm/sqflite_in_memory_storage.dart';
+import 'package:tatlacas_orm/engines/sqflite_in_memory_engine.dart';
 import 'package:tatlacas_orm/tatlacas_orm.dart';
 
 import '../dummy/test_entity.dart';
@@ -15,7 +15,7 @@ void main() {
       tables: <IEntity>[const TestEntity()],
     );
     var storage =
-        SqfliteInMemoryStorage(const TestEntity(), dbContext: dbContext);
+        SqfliteInMemoryEngine(const TestEntity(), dbContext: dbContext);
 
     group('Test Db upgrade', () {
       late Database database;
@@ -25,7 +25,7 @@ void main() {
           dbVersion: 2,
         );
         storage =
-            SqfliteInMemoryStorage(const TestEntity(), dbContext: dbContext);
+            SqfliteInMemoryEngine(const TestEntity(), dbContext: dbContext);
         database = await dbContext.database;
       });
 
@@ -44,7 +44,7 @@ void main() {
           dbVersion: 3,
         );
         storage =
-            SqfliteInMemoryStorage(const TestEntity(), dbContext: dbContext);
+            SqfliteInMemoryEngine(const TestEntity(), dbContext: dbContext);
         database = await dbContext.database;
       });
 

@@ -3,12 +3,12 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tatlacas_orm/tatlacas_orm.dart';
-import 'package:tatlacas_orm/src/base_storage.dart';
+import 'package:tatlacas_orm/src/engines/base_engine.dart';
 import 'package:tatlacas_orm/src/shared_preference/shared_preference_context.dart';
 import 'package:uuid/uuid.dart';
 
 class SharedPreferenceStorage<TEntity extends IEntity>
-    extends BaseStorage<TEntity, SharedPreferenceContext> {
+    extends BaseEngine<TEntity, SharedPreferenceContext> {
   SharedPreferenceStorage(super.t,
       {required super.dbContext, super.useIsolateDefault = true});
   @protected
@@ -48,7 +48,7 @@ class SharedPreferenceStorage<TEntity extends IEntity>
   Future<TEntity?> getEntity({
     Iterable<SqlColumn>? Function(TEntity t)? columns,
     List<SqlOrder>? Function(TEntity t)? orderBy,
-    required SqlWhere Function(TEntity t) where,
+    required Filter Function(TEntity t) filter,
     int? offset,
     final bool? useIsolate,
   }) async {
@@ -79,12 +79,12 @@ class SharedPreferenceStorage<TEntity extends IEntity>
 
   @override
   Future<int> delete({
-    final SqlWhere Function(TEntity t)? where,
+    final Filter Function(TEntity t)? filter,
     final bool? useIsolate,
   }) async {
-    final item = where == null
+    final item = filter == null
         ? null
-        : where(t)
+        : filter(t)
             .filters
             .where((element) => element.column?.name == 'id')
             .toList();
@@ -97,12 +97,12 @@ class SharedPreferenceStorage<TEntity extends IEntity>
 
   @override
   Future<int> update({
-    required SqlWhere Function(TEntity t) where,
+    required Filter Function(TEntity t) filter,
     TEntity? entity,
     Map<SqlColumn, dynamic> Function(TEntity t)? columnValues,
     final bool? useIsolate,
   }) async {
-    var query = where(t)
+    var query = filter(t)
         .filters
         .where((element) => element.column?.name == 'id')
         .toList();
@@ -110,7 +110,7 @@ class SharedPreferenceStorage<TEntity extends IEntity>
       var createdAt = entity?.createdAt;
       if (entity == null) {
         final res = await getEntityMap(
-            where: where, columns: (t) => [t.columnCreatedAt]);
+            filter: filter, columns: (t) => [t.columnCreatedAt]);
         if (res?.containsKey(t.columnCreatedAt.name) == true) {
           createdAt = res![t.columnCreatedAt.name];
         }
@@ -128,7 +128,7 @@ class SharedPreferenceStorage<TEntity extends IEntity>
 
   @override
   Future<List<TEntity>> query({
-    SqlWhere Function(TEntity t)? where,
+    Filter Function(TEntity t)? filter,
     Iterable<SqlColumn>? Function(TEntity t)? columns,
     List<SqlOrder>? Function(TEntity t)? orderBy,
     int? limit,
@@ -140,7 +140,7 @@ class SharedPreferenceStorage<TEntity extends IEntity>
 
   @override
   Future<List<Map<String, Object?>>> rawQuery(
-    SqlWhere Function(TEntity t)? where,
+    Filter Function(TEntity t)? filter,
     String query, {
     final bool? useIsolate,
   }) async {

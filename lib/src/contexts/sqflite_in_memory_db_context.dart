@@ -1,8 +1,8 @@
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import '../tatlacas_orm.dart';
+import '../../tatlacas_orm.dart';
 
 import 'base_context.dart';
-import 'open_options.dart';
+import '../open_options.dart';
 
 class SqfliteInMemoryDbContext extends BaseContext {
   SqfliteInMemoryDbContext({

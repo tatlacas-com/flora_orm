@@ -1,7 +1,7 @@
 library tatlacas_orm;
 
-export 'src/db_context.dart';
-export 'src/sql_storage.dart';
+export 'src/contexts/db_context.dart';
+export 'src/engines/sql_engine.dart';
 export 'src/models/entity.dart';
 export 'src/models/sql_column.dart';
 export 'src/models/sql_condition.dart';

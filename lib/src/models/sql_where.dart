@@ -4,9 +4,9 @@ import 'sql_column.dart';
 import 'sql_condition.dart';
 import 'sql_where_condition.dart';
 
-class SqlWhere extends Equatable {
+class Filter extends Equatable {
   /// [lb] adds left bracket, [rb] adds right bracket
-  SqlWhere(
+  Filter(
     SqlColumn? column, {
     SqlCondition condition = SqlCondition.equalTo,
     dynamic value,
@@ -33,10 +33,10 @@ class SqlWhere extends Equatable {
   }
 
   // ignore: prefer_const_constructors_in_immutables
-  SqlWhere._({this.filters = const []});
+  Filter._({this.filters = const []});
 
-  factory SqlWhere.lb() {
-    return SqlWhere._(
+  factory Filter.lb() {
+    return Filter._(
         filters: [
       const SqlWhereCondition(leftBracket: true, isBracketOnly: true)
     ].toList());
@@ -67,26 +67,26 @@ class SqlWhere extends Equatable {
     );
   }
 
-  SqlWhere lb() {
-    return SqlWhere(null, filters: [
+  Filter lb() {
+    return Filter(null, filters: [
       ...filters,
       const SqlWhereCondition(leftBracket: true, isBracketOnly: true)
     ]);
   }
 
-  SqlWhere rb() {
-    return SqlWhere(null, filters: [
+  Filter rb() {
+    return Filter(null, filters: [
       ...filters,
       const SqlWhereCondition(rightBracket: true, isBracketOnly: true)
     ]);
   }
 
-  SqlWhere and(SqlColumn column,
+  Filter and(SqlColumn column,
       {SqlCondition condition = SqlCondition.equalTo,
       dynamic value,
       bool lb = false,
       bool rb = false}) {
-    return SqlWhere(null, filters: [
+    return Filter(null, filters: [
       ...filters,
       _addFilter(
         column,
@@ -99,12 +99,14 @@ class SqlWhere extends Equatable {
     ]);
   }
 
-  SqlWhere query(SqlColumn column,
-      {SqlCondition condition = SqlCondition.equalTo,
-      dynamic value,
-      bool lb = false,
-      bool rb = false}) {
-    return SqlWhere(null, filters: [
+  Filter filter(
+    SqlColumn column, {
+    SqlCondition condition = SqlCondition.equalTo,
+    dynamic value,
+    bool lb = false,
+    bool rb = false,
+  }) {
+    return Filter(null, filters: [
       ...filters,
       _addFilter(
         column,
@@ -116,12 +118,12 @@ class SqlWhere extends Equatable {
     ]);
   }
 
-  SqlWhere or(SqlColumn column,
+  Filter or(SqlColumn column,
       {SqlCondition condition = SqlCondition.equalTo,
       dynamic value,
       bool lb = false,
       bool rb = false}) {
-    return SqlWhere(null, filters: [
+    return Filter(null, filters: [
       ...filters,
       _addFilter(
         column,

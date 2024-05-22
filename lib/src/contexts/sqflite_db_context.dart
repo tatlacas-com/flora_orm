@@ -8,14 +8,11 @@ import 'package:sqflite/sqflite.dart';
 import 'base_context.dart';
 
 class SqfliteDbContext extends BaseContext {
-
   SqfliteDbContext({
     required super.dbName,
     required super.dbVersion,
     required super.tables,
   });
-
-
 
   @override
   Future<String> getDbPath() async =>
@@ -35,5 +32,4 @@ class SqfliteDbContext extends BaseContext {
       version: dbVersion,
     );
   }
-
 }

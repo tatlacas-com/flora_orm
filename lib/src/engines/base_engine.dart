@@ -1,9 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:sqflite_common/sqlite_api.dart';
-import 'package:tatlacas_orm/src/base_context.dart';
+import 'package:tatlacas_orm/src/contexts/base_context.dart';
+import 'package:tatlacas_orm/src/engines/sql_engine.dart';
+import 'package:tatlacas_orm/src/models/entity.dart';
+import 'package:tatlacas_orm/src/models/sql_column.dart';
+import 'package:tatlacas_orm/src/models/sql_order.dart';
+import 'package:tatlacas_orm/src/models/sql_where.dart';
 import 'package:uuid/uuid.dart';
-
-import '../tatlacas_orm.dart';
 
 class Args<TEntity extends IEntity> {
   Args({required this.t, required this.maps});
@@ -32,9 +35,9 @@ class InsertPrep<TEntity extends IEntity> {
   final Map<String, dynamic> map;
 }
 
-class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
-    extends SqlStorage<TEntity, TDbContext> {
-  const BaseStorage(super.t,
+class BaseEngine<TEntity extends IEntity, TDbContext extends BaseContext>
+    extends SqlEngine<TEntity, TDbContext> {
+  const BaseEngine(super.t,
       {required super.dbContext, required super.useIsolateDefault});
 
   /// Try to convert anything (int, String) to an int.
@@ -105,12 +108,12 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   Future<TEntity?> getEntity({
     Iterable<SqlColumn>? Function(TEntity t)? columns,
     List<SqlOrder>? Function(TEntity t)? orderBy,
-    required SqlWhere Function(TEntity t) where,
+    required Filter Function(TEntity t) filter,
     int? offset,
     final bool? useIsolate,
   }) async {
     List<TEntity> maps = await query(
-      where: where,
+      filter: filter,
       columns: columns ?? (t) => t.allColumns,
       limit: 1,
       offset: offset,
@@ -127,12 +130,12 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   Future<Map<String, dynamic>?> getEntityMap({
     Iterable<SqlColumn>? Function(TEntity t)? columns,
     List<SqlOrder>? Function(TEntity t)? orderBy,
-    required SqlWhere Function(TEntity t) where,
+    required Filter Function(TEntity t) filter,
     int? offset,
     final bool? useIsolate,
   }) async {
     List<Map<String, dynamic>> maps = await queryMap(
-      where: where,
+      filter: filter,
       columns: columns ?? (t) => t.allColumns,
       limit: 1,
       offset: offset,
@@ -148,11 +151,11 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   @override
   Future<T> getSum<T>({
     required SqlColumn Function(TEntity t) column,
-    SqlWhere Function(TEntity t)? where,
+    Filter Function(TEntity t)? filter,
     final bool? useIsolate,
   }) async {
     List<Map> result = await rawQuery(
-      where,
+      filter,
       'SELECT SUM (${column(t).name}) FROM ${t.tableName}',
       useIsolate: useIsolate,
     );
@@ -168,12 +171,12 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   @override
   Future<T> getSumProduct<T>({
     required Iterable<SqlColumn> Function(TEntity t) columns,
-    SqlWhere Function(TEntity t)? where,
+    Filter Function(TEntity t)? filter,
     final bool? useIsolate,
   }) async {
     final cols = columns(t).map((e) => e.name).join(' * ');
     List<Map> result = await rawQuery(
-      where,
+      filter,
       'SELECT SUM ($cols) FROM ${t.tableName}',
       useIsolate: useIsolate,
     );
@@ -199,13 +202,13 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   Future<List<TEntity>> getEntities({
     Iterable<SqlColumn>? Function(TEntity t)? columns,
     List<SqlOrder>? Function(TEntity t)? orderBy,
-    SqlWhere Function(TEntity t)? where,
+    Filter Function(TEntity t)? filter,
     int? limit,
     int? offset,
     final bool? useIsolate,
   }) async {
     List<TEntity> maps = await query(
-      where: where,
+      filter: filter,
       limit: limit,
       offset: offset,
       columns: columns ?? (t) => t.allColumns,
@@ -222,13 +225,13 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   Future<List<Map<String, dynamic>>> getEntityMaps({
     Iterable<SqlColumn>? Function(TEntity t)? columns,
     List<SqlOrder>? Function(TEntity t)? orderBy,
-    SqlWhere Function(TEntity t)? where,
+    Filter Function(TEntity t)? filter,
     int? limit,
     int? offset,
     final bool? useIsolate,
   }) async {
     List<Map<String, Object?>> maps = await queryMap(
-      where: where,
+      filter: filter,
       limit: limit,
       offset: offset,
       columns: columns ?? (t) => t.allColumns,
@@ -278,11 +281,11 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
 
   @override
   Future<int> getCount({
-    SqlWhere Function(TEntity t)? where,
+    Filter Function(TEntity t)? filter,
     final bool? useIsolate,
   }) async {
     List<Map<String, Object?>> result = await rawQuery(
-      where,
+      filter,
       'SELECT COUNT (*) FROM ${t.tableName}',
       useIsolate: useIsolate,
     );
@@ -297,37 +300,37 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
 
   @override
   Future<int> delete({
-    final SqlWhere Function(TEntity t)? where,
+    final Filter Function(TEntity t)? filter,
     final bool? useIsolate,
   }) async {
     final db = await dbContext.database;
-    final formattedQuery = where != null
+    final formattedQuery = filter != null
         ? await whereString(
-            where,
+            filter,
             useIsolate,
           )
         : null;
     return await db.delete(
       t.tableName,
-      where: formattedQuery?.where,
+      where: formattedQuery?.filter,
       whereArgs: formattedQuery?.whereArgs,
     );
   }
 
   @override
   Future<int> update({
-    required SqlWhere Function(TEntity t) where,
+    required Filter Function(TEntity t) filter,
     TEntity? entity,
     Map<SqlColumn, dynamic> Function(TEntity t)? columnValues,
     final bool? useIsolate,
   }) async {
     assert(entity != null || columnValues != null);
     final db = await dbContext.database;
-    final formattedQuery = await whereString(where, useIsolate);
+    final formattedQuery = await whereString(filter, useIsolate);
     var createdAt = entity?.createdAt;
     if (entity == null) {
-      final res =
-          await getEntityMap(where: where, columns: (t) => [t.columnCreatedAt]);
+      final res = await getEntityMap(
+          filter: filter, columns: (t) => [t.columnCreatedAt]);
       if (res?.containsKey(t.columnCreatedAt.name) == true) {
         createdAt = DateTime.parse(res![t.columnCreatedAt.name]);
       }
@@ -339,7 +342,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
     return await db.update(
       entity.tableName,
       update,
-      where: formattedQuery.where,
+      where: formattedQuery.filter,
       whereArgs: formattedQuery.whereArgs,
     );
   }
@@ -347,7 +350,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   @override
   @protected
   Future<List<TEntity>> query({
-    SqlWhere Function(TEntity t)? where,
+    Filter Function(TEntity t)? filter,
     Iterable<SqlColumn>? Function(TEntity t)? columns,
     List<SqlOrder>? Function(TEntity t)? orderBy,
     int? limit,
@@ -373,7 +376,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
             '${e.column.name} ${e.direction == OrderDirection.desc ? ' DESC' : ''}')
         .join(',');
 
-    if (where == null) {
+    if (filter == null) {
       maps = await db.query(
         t.tableName,
         columns: cols,
@@ -382,11 +385,11 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
         offset: offset,
       );
     } else {
-      final formattedQuery = await whereString(where, useIsolate);
+      final formattedQuery = await whereString(filter, useIsolate);
       maps = await db.query(
         t.tableName,
         columns: cols,
-        where: formattedQuery.where,
+        where: formattedQuery.filter,
         whereArgs: formattedQuery.whereArgs,
         orderBy: orderByFilter,
         limit: limit,
@@ -405,7 +408,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   @override
   @protected
   Future<List<Map<String, dynamic>>> queryMap({
-    SqlWhere Function(TEntity t)? where,
+    Filter Function(TEntity t)? filter,
     Iterable<SqlColumn>? Function(TEntity t)? columns,
     List<SqlOrder>? Function(TEntity t)? orderBy,
     int? limit,
@@ -431,7 +434,7 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
             '${e.column.name} ${e.direction == OrderDirection.desc ? ' DESC' : ''}')
         .join(',');
 
-    if (where == null) {
+    if (filter == null) {
       maps = await db.query(
         t.tableName,
         columns: cols,
@@ -440,11 +443,11 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
         offset: offset,
       );
     } else {
-      final formattedQuery = await whereString(where, useIsolate);
+      final formattedQuery = await whereString(filter, useIsolate);
       maps = await db.query(
         t.tableName,
         columns: cols,
-        where: formattedQuery.where,
+        where: formattedQuery.filter,
         whereArgs: formattedQuery.whereArgs,
         orderBy: orderByFilter,
         limit: limit,
@@ -457,17 +460,17 @@ class BaseStorage<TEntity extends IEntity, TDbContext extends BaseContext>
   @override
   @protected
   Future<List<Map<String, Object?>>> rawQuery(
-    SqlWhere Function(TEntity t)? where,
+    Filter Function(TEntity t)? filter,
     String query, {
     final bool? useIsolate,
   }) async {
     final db = await dbContext.database;
-    if (where == null) {
+    if (filter == null) {
       return await db.rawQuery(query);
     } else {
-      final formattedQuery = await whereString(where, useIsolate);
+      final formattedQuery = await whereString(filter, useIsolate);
       return await db.rawQuery(
-          '$query WHERE ${formattedQuery.where}', formattedQuery.whereArgs);
+          '$query WHERE ${formattedQuery.filter}', formattedQuery.whereArgs);
     }
   }
 

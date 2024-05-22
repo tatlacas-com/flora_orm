@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite_common/sqlite_api.dart';
 
-import '../tatlacas_orm.dart';
+import '../../tatlacas_orm.dart';
 
 abstract class BaseContext extends DbContext<IEntity> {
   BaseContext({
