@@ -7,7 +7,9 @@ import 'package:tatlacas_orm/src/engines/base_orm_engine.dart';
 import '../dummy/test_entity.dart';
 
 @isTest
-void run(BaseOrmEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
+void run(
+    BaseOrmEngine<TestEntity, TestEntityMeta, BaseContext<TestEntity>>
+        storage) {
   test('insert(entity) should insert entity', () async {
     final entity = TestEntity(
         testBool: true,

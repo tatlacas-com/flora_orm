@@ -9,7 +9,7 @@ import 'sql_storage_test_runs.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   group('Test Sql In Memory Storage', () {
-    var dbContext = SqfliteInMemoryDbContext(
+    var dbContext = SqfliteInMemoryDbContext<TestEntity>(
       dbVersion: 1,
       dbName: 'common_storage_db',
       tables: <IEntity>[const TestEntity()],

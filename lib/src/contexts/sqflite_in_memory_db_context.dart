@@ -12,12 +12,12 @@ class SqfliteInMemoryDbContext<TEntity extends IEntity>
     required super.tables,
   });
 
-  SqfliteInMemoryDbContext copyWith({
+  SqfliteInMemoryDbContext<TEntity> copyWith({
     String? dbName,
     int? dbVersion,
     List<IEntity>? tables,
   }) {
-    return SqfliteInMemoryDbContext(
+    return SqfliteInMemoryDbContext<TEntity>(
       dbName: dbName ?? this.dbName,
       dbVersion: dbVersion ?? this.dbVersion,
       tables: tables ?? this.tables,

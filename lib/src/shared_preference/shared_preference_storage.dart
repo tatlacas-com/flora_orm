@@ -9,7 +9,7 @@ import 'package:uuid/uuid.dart';
 
 class SharedPreferenceStorage<TEntity extends IEntity,
         TMeta extends EntityMeta<TEntity>>
-    extends BaseOrmEngine<TEntity, TMeta, SharedPreferenceContext> {
+    extends BaseOrmEngine<TEntity, TMeta, SharedPreferenceContext<TEntity>> {
   SharedPreferenceStorage(super.t,
       {required super.dbContext, super.useIsolateDefault = true});
   @protected

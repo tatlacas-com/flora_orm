@@ -5,7 +5,7 @@ import '../contexts/sqflite_common_db_context.dart';
 
 class SqfliteCommonEngine<TEntity extends IEntity,
         TMeta extends EntityMeta<TEntity>>
-    extends BaseOrmEngine<TEntity, TMeta, SqfliteCommonDbContext> {
+    extends BaseOrmEngine<TEntity, TMeta, SqfliteCommonDbContext<TEntity>> {
   const SqfliteCommonEngine(super.t,
       {required super.dbContext, super.useIsolateDefault = true});
 }

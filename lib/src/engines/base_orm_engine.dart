@@ -36,7 +36,7 @@ class InsertPrep<TEntity extends IEntity> {
 }
 
 class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
-        TDbContext extends BaseContext>
+        TDbContext extends BaseContext<TEntity>>
     extends OrmEngine<TEntity, TMeta, TDbContext> {
   const BaseOrmEngine(super.t,
       {required super.dbContext, required super.useIsolateDefault});
