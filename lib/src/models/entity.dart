@@ -26,15 +26,7 @@ abstract class IEntity {
 
   String get tableName;
 
-  SqlColumn<IEntity, String> get columnId;
-
-  SqlColumn<IEntity, DateTime> get columnCreatedAt;
-
-  SqlColumn<IEntity, DateTime> get columnUpdatedAt;
-
-  Iterable<SqlColumn> get columns;
-
-  Iterable<SqlColumn> get allColumns;
+  EntityMeta get meta;
 
   List<String> upgradeTable(int oldVersion, int newVersion);
 
@@ -58,8 +50,18 @@ abstract class IEntity {
   IEntity load(Map<String, dynamic> json);
 }
 
-abstract class Entity<TEntity extends IEntity> extends Equatable
-    implements IEntity {
+abstract class EntityMeta<TEntity extends IEntity> {
+  const EntityMeta();
+  Iterable<SqlColumn<TEntity, dynamic>> get columns;
+  SqlColumn<IEntity, String> get id;
+
+  SqlColumn<IEntity, DateTime> get createdAt;
+
+  SqlColumn<IEntity, DateTime> get updatedAt;
+}
+
+abstract class Entity<TEntity extends IEntity,
+    TMeta extends EntityMeta<TEntity>> extends Equatable implements IEntity {
   const Entity({
     this.id,
     this.createdAt,
@@ -71,6 +73,9 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
   final DateTime? createdAt;
   @override
   final DateTime? updatedAt;
+
+  @override
+  TMeta get meta;
 
   @override
   List<Object?> get props => [
@@ -86,47 +91,12 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
   }
 
   @override
-  Iterable<SqlColumn<TEntity, dynamic>> get columns;
-
-  @override
-  Iterable<SqlColumn<TEntity, dynamic>> get allColumns =>
-      <SqlColumn<TEntity, dynamic>>[columnId, columnCreatedAt, columnUpdatedAt]
-          .followedBy(columns);
-
-  @override
   TEntity copyWith({
     String? id,
     DateTime? createdAt,
     DateTime? updatedAt,
     Map<String, dynamic>? json,
   });
-
-  @override
-  SqlColumn<TEntity, String> get columnId => SqlColumn<TEntity, String>(
-        'id',
-        primaryKey: true,
-        write: (entity) => entity.id,
-        read: (json, entity, value) =>
-            entity.copyWith(id: value, json: json) as TEntity,
-      );
-
-  @override
-  SqlColumn<TEntity, DateTime> get columnCreatedAt =>
-      SqlColumn<TEntity, DateTime>(
-        'createdAt',
-        write: (entity) => entity.createdAt,
-        read: (json, entity, value) =>
-            entity.copyWith(createdAt: value, json: json) as TEntity,
-      );
-
-  @override
-  SqlColumn<TEntity, DateTime> get columnUpdatedAt =>
-      SqlColumn<TEntity, DateTime>(
-        'updatedAt',
-        write: (entity) => entity.updatedAt,
-        read: (json, entity, value) =>
-            entity.copyWith(updatedAt: value, json: json) as TEntity,
-      );
 
   List<SqlColumn<TEntity, dynamic>> get compositePrimaryKey =>
       <SqlColumn<TEntity, dynamic>>[];
@@ -144,7 +114,7 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
   @override
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {};
-    for (var column in allColumns) {
+    for (var column in meta.columns) {
       column.commitValue(this as TEntity, map);
     }
     return map;
@@ -153,7 +123,7 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
   @override
   Map<String, dynamic> toDb() {
     Map<String, dynamic> map = {};
-    for (var column in allColumns) {
+    for (var column in meta.columns) {
       column.commitValue(this as TEntity, map);
     }
     return map;
@@ -163,7 +133,7 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
   @override
   TEntity load(Map<String, dynamic> json) {
     TEntity entity = this as TEntity;
-    for (var column in allColumns) {
+    for (var column in meta.columns) {
       final value = column.getValueFrom(json);
       if (column is SqlColumn<TEntity, double> && value is int) {
         entity = column.read(json, entity, value.toDouble());
@@ -185,11 +155,11 @@ abstract class Entity<TEntity extends IEntity> extends Equatable
   String createTable(int version) {
     int indx = 1;
     StringBuffer stringBuffer = StringBuffer();
-    for (var element in allColumns) {
+    for (var element in meta.columns) {
       stringBuffer
           .write('${element.name} ${getColumnType(element.columnType)}');
       columnDefinition(element, stringBuffer);
-      if (indx++ != allColumns.length) stringBuffer.write(',');
+      if (indx++ != meta.columns.length) stringBuffer.write(',');
     }
 
     var composite = '';

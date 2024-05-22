@@ -114,7 +114,7 @@ class BaseEngine<TEntity extends IEntity, TDbContext extends BaseContext>
   }) async {
     List<TEntity> maps = await query(
       filter: filter,
-      columns: columns ?? (t) => t.allColumns,
+      columns: columns ?? (t) => t.meta.columns,
       limit: 1,
       offset: offset,
       orderBy: orderBy,
@@ -136,7 +136,7 @@ class BaseEngine<TEntity extends IEntity, TDbContext extends BaseContext>
   }) async {
     List<Map<String, dynamic>> maps = await queryMap(
       filter: filter,
-      columns: columns ?? (t) => t.allColumns,
+      columns: columns ?? (t) => t.meta.columns,
       limit: 1,
       offset: offset,
       orderBy: orderBy,
@@ -211,7 +211,7 @@ class BaseEngine<TEntity extends IEntity, TDbContext extends BaseContext>
       filter: filter,
       limit: limit,
       offset: offset,
-      columns: columns ?? (t) => t.allColumns,
+      columns: columns ?? (t) => t.meta.columns,
       orderBy: orderBy,
       useIsolate: useIsolate,
     );
@@ -234,7 +234,7 @@ class BaseEngine<TEntity extends IEntity, TDbContext extends BaseContext>
       filter: filter,
       limit: limit,
       offset: offset,
-      columns: columns ?? (t) => t.allColumns,
+      columns: columns ?? (t) => t.meta.columns,
       orderBy: orderBy,
       useIsolate: useIsolate,
     );
@@ -330,9 +330,9 @@ class BaseEngine<TEntity extends IEntity, TDbContext extends BaseContext>
     var createdAt = entity?.createdAt;
     if (entity == null) {
       final res = await getEntityMap(
-          filter: filter, columns: (t) => [t.columnCreatedAt]);
-      if (res?.containsKey(t.columnCreatedAt.name) == true) {
-        createdAt = DateTime.parse(res![t.columnCreatedAt.name]);
+          filter: filter, columns: (t) => [t.meta.createdAt]);
+      if (res?.containsKey(t.meta.createdAt.name) == true) {
+        createdAt = DateTime.parse(res![t.meta.createdAt.name]);
       }
     }
     entity = (entity ?? t).updateDates(createdAt: createdAt) as TEntity;

@@ -110,9 +110,9 @@ class SharedPreferenceStorage<TEntity extends IEntity>
       var createdAt = entity?.createdAt;
       if (entity == null) {
         final res = await getEntityMap(
-            filter: filter, columns: (t) => [t.columnCreatedAt]);
-        if (res?.containsKey(t.columnCreatedAt.name) == true) {
-          createdAt = res![t.columnCreatedAt.name];
+            filter: filter, columns: (t) => [t.meta.createdAt]);
+        if (res?.containsKey(t.meta.createdAt.name) == true) {
+          createdAt = res![t.meta.createdAt.name];
         }
       }
       entity = (entity ?? t).updateDates(createdAt: createdAt) as TEntity;

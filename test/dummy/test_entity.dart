@@ -1,6 +1,22 @@
 import 'package:tatlacas_orm/tatlacas_orm.dart';
 
-class TestEntity extends Entity<TestEntity> {
+class TestEntityMeta extends EntityMeta<TestEntity> {
+  const TestEntityMeta();
+  @override
+  Iterable<SqlColumn<TestEntity, dynamic>> get columns =>
+      throw UnimplementedError();
+
+  @override
+  SqlColumn<IEntity, DateTime> get createdAt => throw UnimplementedError();
+
+  @override
+  SqlColumn<IEntity, String> get id => throw UnimplementedError();
+
+  @override
+  SqlColumn<IEntity, DateTime> get updatedAt => throw UnimplementedError();
+}
+
+class TestEntity extends Entity<TestEntity, TestEntityMeta> {
   const TestEntity({
     super.id,
     super.createdAt,
@@ -94,16 +110,6 @@ class TestEntity extends Entity<TestEntity> {
   }
 
   @override
-  Iterable<SqlColumn<TestEntity, dynamic>> get columns => [
-        columnTestString,
-        columnTestDouble,
-        columTestDateTime,
-        columnTestBool,
-        columnTestIntWithDefault,
-        columnTestInt,
-      ];
-
-  @override
   String get tableName => 'test_entity';
 
   @override
@@ -130,4 +136,7 @@ class TestEntity extends Entity<TestEntity> {
         testIntWithDefault,
         testDouble,
       ]).toList();
+
+  @override
+  final TestEntityMeta meta = const TestEntityMeta();
 }

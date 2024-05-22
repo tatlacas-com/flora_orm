@@ -60,7 +60,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     fxn() async => await storage.getEntity(
           columns: (t) => [],
           filter: (t) => Filter(
-            t.columnId,
+            t.meta.id,
             value: insertedEntity!.id,
           )
               .and(
@@ -95,7 +95,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
       filter: (t) => Filter(
-        entity.columnId,
+        entity.meta.id,
         value: insertedEntity!.id,
       )
           .and(
@@ -132,7 +132,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     var json = await storage.getEntity(
       columns: (t) => [entity.columnTestInt],
       filter: (t) => Filter(
-        entity.columnId,
+        entity.meta.id,
         value: insertedEntity!.id,
       )
           .and(
@@ -169,12 +169,12 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     var json = await storage.getEntity(
       orderBy: (t) => [
         SqlOrder(
-          column: entity.columnCreatedAt,
+          column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
       filter: (t) => Filter(
-        entity.columnId,
+        entity.meta.id,
         condition: SqlCondition.notEqualTo,
         value: '12',
       ),
@@ -194,7 +194,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     var json = await storage.getEntity(
       orderBy: (t) => [
         SqlOrder(
-          column: entity.columnCreatedAt,
+          column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
@@ -221,7 +221,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     var json = await storage.getEntity(
       orderBy: (t) => [
         SqlOrder(
-          column: entity.columnCreatedAt,
+          column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
@@ -246,7 +246,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     var json = await storage.getEntity(
       orderBy: (t) => [
         SqlOrder(
-          column: entity.columnCreatedAt,
+          column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
@@ -272,7 +272,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     var json = await storage.getEntity(
       orderBy: (t) => [
         SqlOrder(
-          column: entity.columnCreatedAt,
+          column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
@@ -298,7 +298,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     var json = await storage.getEntity(
       orderBy: (t) => [
         SqlOrder(
-          column: entity.columnCreatedAt,
+          column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
@@ -324,7 +324,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     var json = await storage.getEntity(
       orderBy: (t) => [
         SqlOrder(
-          column: entity.columnCreatedAt,
+          column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
@@ -350,7 +350,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     var json = await storage.getEntity(
       orderBy: (t) => [
         SqlOrder(
-          column: entity.columnCreatedAt,
+          column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
@@ -377,7 +377,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     var json = await storage.getEntity(
       orderBy: (t) => [
         SqlOrder(
-          column: entity.columnCreatedAt,
+          column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
@@ -404,7 +404,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     var json = await storage.getEntity(
       orderBy: (t) => [
         SqlOrder(
-          column: entity.columnCreatedAt,
+          column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
@@ -430,7 +430,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     var json = await storage.getEntity(
       orderBy: (t) => [
         SqlOrder(
-          column: entity.columnCreatedAt,
+          column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
@@ -456,7 +456,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     var json = await storage.getEntity(
       orderBy: (t) => [
         SqlOrder(
-          column: entity.columnCreatedAt,
+          column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
@@ -482,7 +482,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     var json = await storage.getEntity(
       orderBy: (t) => [
         SqlOrder(
-          column: entity.columnCreatedAt,
+          column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
@@ -509,7 +509,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     var json = await storage.getEntity(
       orderBy: (t) => [
         SqlOrder(
-          column: entity.columnCreatedAt,
+          column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
@@ -560,10 +560,10 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     var json = await storage.getEntities(
       orderBy: (t) => [SqlOrder(column: entity.columnTestInt)],
       filter: (t) => Filter(
-        entity.columnId,
+        entity.meta.id,
         value: insertedEntity!.id,
       ).or(
-        entity.columnId,
+        entity.meta.id,
         value: insertedEntity1!.id,
       ),
     );
@@ -581,7 +581,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     var json = await storage.getEntities(
       orderBy: (t) => [SqlOrder(column: entity.columnTestInt)],
       filter: (t) => Filter(
-        entity.columnId,
+        entity.meta.id,
         value: 'xyzNotFound',
       ),
     );
@@ -597,7 +597,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
         testString: 'Testing a');
     var insertedEntity = await storage.insert(entity);
     var json = await storage.getEntities(
-      orderBy: (t) => [SqlOrder(column: entity.columnCreatedAt)],
+      orderBy: (t) => [SqlOrder(column: entity.meta.createdAt)],
     );
     expect(json, isNotNull);
     expect(json.length, greaterThan(0));
@@ -632,10 +632,10 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
         )
       ],
       filter: (t) => Filter(
-        entity.columnId,
+        entity.meta.id,
         value: insertedEntity!.id,
       ).or(
-        entity.columnId,
+        entity.meta.id,
         value: insertedEntity1!.id,
       ),
     );
@@ -686,7 +686,7 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     var total = await storage.update(
       entity: entity,
       filter: (t) => Filter(
-        entity.columnId,
+        entity.meta.id,
         value: entity.id,
       ),
     );
@@ -704,13 +704,13 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     var total = await storage.update(
         filter: (t) => Filter(
-              entity.columnId,
+              entity.meta.id,
               value: insertedEntity!.id,
             ),
         columnValues: (t) => {t.columnTestString: 'Updated ax1'});
     expect(total, 1);
     var json = await storage.getEntity(
-        filter: (t) => Filter(entity.columnId, value: insertedEntity?.id));
+        filter: (t) => Filter(entity.meta.id, value: insertedEntity?.id));
     insertedEntity = insertedEntity?.copyWith(testString: 'Updated ax1');
     entity = json!;
     expect(entity, insertedEntity);
@@ -791,10 +791,10 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     expect(insertedEntity!.length, 2);
     var total = await storage.getCount(
       filter: (t) => Filter(
-        entity.columnId,
+        entity.meta.id,
         value: insertedEntity[0].id,
       ).or(
-        entity.columnId,
+        entity.meta.id,
         value: insertedEntity[1].id,
       ),
     );
@@ -820,10 +820,10 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     expect(insertedEntity!.length, 2);
     var total = await storage.delete(
       filter: (t) => Filter(
-        entity.columnId,
+        entity.meta.id,
         value: insertedEntity[0].id,
       ).or(
-        entity.columnId,
+        entity.meta.id,
         value: insertedEntity[1].id,
       ),
     );
@@ -850,10 +850,10 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     var sum = await storage.getSum<int>(
       column: (t) => t.columnTestInt,
       filter: (t) => Filter(
-        entity.columnId,
+        entity.meta.id,
         value: insertedEntity!.id,
       ).or(
-        entity.columnId,
+        entity.meta.id,
         value: insertedEntity1!.id,
       ),
     );
@@ -887,10 +887,10 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
         entity.columnTestDouble,
       ],
       filter: (t) => Filter(
-        entity.columnId,
+        entity.meta.id,
         value: insertedEntity!.id,
       ).or(
-        entity.columnId,
+        entity.meta.id,
         value: insertedEntity1!.id,
       ),
     );
@@ -917,10 +917,10 @@ void run(BaseEngine<TestEntity, BaseContext> storage) {
     var json = await storage.getSum<double>(
       column: (t) => t.columnTestDouble,
       filter: (t) => Filter(
-        entity.columnId,
+        entity.meta.id,
         value: insertedEntity!.id,
       ).or(
-        entity.columnId,
+        entity.meta.id,
         value: insertedEntity1!.id,
       ),
     );

@@ -51,8 +51,6 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     final className = classElement.name;
 
     final tableName = annotation.read('tableName').literalValue as String?;
-    final hasSuperColumns =
-        annotation.read('hasSuperColumns').literalValue as bool? ?? false;
 
     if (!const TypeChecker.fromRuntime(Entity).isAssignableFrom(element)) {
       throw Exception('$className is not an Entity class');
@@ -61,7 +59,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
     final fields = classElement.fields;
 
     final mixinCode = StringBuffer();
-    final columnsClassCode = StringBuffer();
+    final metaCode = StringBuffer();
     final columnsList = StringBuffer();
     final copyWithList = StringBuffer();
     final getList = StringBuffer();
@@ -72,13 +70,15 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
         element.supertype?.getDisplayString(withNullability: false);
 
     mixinCode.writeln('mixin _${className}Mixin on $extendedClassName {');
-    columnsClassCode.writeln('class ${className}Columns {');
+    metaCode
+        .writeln('class ${className}Meta extends  EntityMeta<$className> {');
 
     mixinCode.writeln('''
   @override
   String get tableName => '${tableName ?? convertClassNameToSnakeCase(className)}';
 
-  final ${className}Columns = ${className}Columns();
+  @override
+  final ${className}Meta meta = const ${className}Meta();
     ''');
     final Map<String, _ExtraField> extraFields = {};
     extraFields.addEntries(
@@ -111,7 +111,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
             continue;
           }
           if (const TypeChecker.fromRuntime(DbColumn).isExactlyType(tp)) {
-            columnsList.writeln('column$fieldNameCamel,');
+            columnsList.writeln('$fieldName,');
             fieldAnnotations.add(annotation);
           }
         }
@@ -220,58 +220,88 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
  ''');
           }
 
-          columnsClassCode.writeln('''
+          metaCode.writeln('''
+  @override
+  SqlColumn<$className, String> get id => 
+  SqlColumn<$className, String>(
+        'id',
+        primaryKey: true,
+        write: (entity) => entity.id,
+        read: (json, entity, value) =>
+            entity.copyWith(id: value, json: json),
+      );
+
+  @override
+  SqlColumn<$className, DateTime> get createdAt =>
+      SqlColumn<$className, DateTime>(
+        'createdAt',
+        write: (entity) => entity.createdAt,
+        read: (json, entity, value) =>
+            entity.copyWith(createdAt: value, json: json),
+      );
+
+  @override
+  SqlColumn<$className, DateTime> get updatedAt =>
+      SqlColumn<$className, DateTime>(
+        'updatedAt',
+        write: (entity) => entity.updatedAt,
+        read: (json, entity, value) =>
+            entity.copyWith(updatedAt: value, json: json),
+      );
+    ''');
+
+          metaCode.writeln('''
       SqlColumn<$className, $columnType> get $fieldName =>
         SqlColumn<$className, $columnType>(
           '$name',
     ''');
           if (alias != null) {
-            columnsClassCode.writeln('''
+            metaCode.writeln('''
            alias: '$alias',
     ''');
           }
           if (jsonEncoded) {
-            columnsClassCode.writeln('''
+            metaCode.writeln('''
            jsonEncodeAlias: $jsonEncoded,
     ''');
           }
           if (primaryKey == true) {
-            columnsClassCode.writeln('''
+            metaCode.writeln('''
            primaryKey: $primaryKey,
     ''');
           }
           if (unique == true) {
-            columnsClassCode.writeln('''
+            metaCode.writeln('''
            unique: $unique,
     ''');
           }
           if (autoIncrementPrimary == true) {
-            columnsClassCode.writeln('''
+            metaCode.writeln('''
            autoIncrementPrimary: $autoIncrementPrimary,
     ''');
           }
           if (notNull == true) {
-            columnsClassCode.writeln('''
+            metaCode.writeln('''
            notNull: $notNull,
     ''');
           }
           if (defaultValue != null) {
             if (field.type.isDartCoreString) {
-              columnsClassCode.writeln('''
+              metaCode.writeln('''
            defaultValue: '$defaultValue',
     ''');
             } else {
-              columnsClassCode.writeln('''
+              metaCode.writeln('''
            defaultValue: $defaultValue,
     ''');
             }
           }
           if (hasWrite) {
-            columnsClassCode.writeln('''
+            metaCode.writeln('''
           write: (entity) => write$fieldNameCamel(entity),
     ''');
           } else if (jsonEncoded) {
-            columnsClassCode.writeln('''
+            metaCode.writeln('''
           write: (entity) {
     ''');
             final finder = PropertyFinder(alias!);
@@ -280,23 +310,23 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
             if (property.type.isDartCoreList) {
               jsonEncodedType =
                   property.type.getDisplayString(withNullability: false);
-              columnsClassCode.writeln('''
+              metaCode.writeln('''
             final map = entity.$alias${aliasNotNull ? '' : '?'}.map((p) => p.toMap()).toList();
     ''');
             } else {
-              columnsClassCode.writeln('''
+              metaCode.writeln('''
             if(entity.$alias == null){
                 return null;
             }
             final map = entity.$alias?.${writeFn ?? 'toMap'}();
     ''');
             }
-            columnsClassCode.writeln('''
+            metaCode.writeln('''
             return jsonEncode(map);
             },
     ''');
           } else {
-            columnsClassCode.writeln('''
+            metaCode.writeln('''
           write: (entity) => entity.$fieldName,
     ''');
           }
@@ -316,7 +346,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
                   extraFields.remove(alias);
                 }
               }
-              columnsClassCode.writeln('''
+              metaCode.writeln('''
           read: (json, entity, value){
             if ('null' == value){
               return read$fieldNameCamel(json, null, entity);
@@ -326,18 +356,18 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
         );
     ''');
             } else {
-              columnsClassCode.writeln('''
+              metaCode.writeln('''
           read: (json, entity, value) => read$fieldNameCamel(json, value, entity),
         );
     ''');
             }
           } else if (notNull) {
-            columnsClassCode.writeln('''
+            metaCode.writeln('''
           read: (json, entity, value) => entity.copyWith($fieldName: value, json: json),
         );
     ''');
           } else {
-            columnsClassCode.writeln('''
+            metaCode.writeln('''
           read: (json, entity, value) => entity.copyWith($fieldName: CopyWith(value), json: json),
         );
     ''');
@@ -404,16 +434,17 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
       $propsList
       ];''');
 
-    columnsClassCode.writeln('''
+    metaCode.writeln('''
       @override
       Iterable<SqlColumn<$className, dynamic>> get columns => [
       ''');
-    if (hasSuperColumns) {
-      mixinCode.writeln('''
-      ...super.columns,
+    mixinCode.writeln('''
+      id,
+      createdAt,
+      updatedAt,
       ''');
-    }
-    columnsClassCode.writeln('''
+
+    metaCode.writeln('''
       $columnsList
       ];''');
 
@@ -434,8 +465,8 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
         );
       }''');
     mixinCode.writeln('}');
-    columnsClassCode.writeln('}');
-    mixinCode.write(columnsClassCode.toString());
+    metaCode.writeln('}');
+    mixinCode.write(metaCode.toString());
     return mixinCode.toString();
   }
 
