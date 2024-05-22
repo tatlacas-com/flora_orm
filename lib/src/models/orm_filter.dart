@@ -1,19 +1,19 @@
 import 'package:equatable/equatable.dart';
 
-import 'sql_column.dart';
-import 'sql_condition.dart';
-import 'sql_where_condition.dart';
+import 'orm_column.dart';
+import 'orm_condition.dart';
+import 'orm_filter_condition.dart';
 
-class Filter extends Equatable {
+class OrmFilter extends Equatable {
   /// [lb] adds left bracket, [rb] adds right bracket
-  Filter(
-    SqlColumn? column, {
-    SqlCondition condition = SqlCondition.equalTo,
+  OrmFilter(
+    OrmColumn? column, {
+    OrmCondition condition = OrmCondition.equalTo,
     dynamic value,
     dynamic value2,
     bool lb = false,
     bool rb = false,
-    List<SqlWhereCondition> filters = const [],
+    List<OrmFilterCondition> filters = const [],
   }) {
     if (column != null) {
       this.filters = [
@@ -33,19 +33,19 @@ class Filter extends Equatable {
   }
 
   // ignore: prefer_const_constructors_in_immutables
-  Filter._({this.filters = const []});
+  OrmFilter._({this.filters = const []});
 
-  factory Filter.lb() {
-    return Filter._(
+  factory OrmFilter.lb() {
+    return OrmFilter._(
         filters: [
-      const SqlWhereCondition(leftBracket: true, isBracketOnly: true)
+      const OrmFilterCondition(leftBracket: true, isBracketOnly: true)
     ].toList());
   }
-  late final List<SqlWhereCondition> filters;
+  late final List<OrmFilterCondition> filters;
 
-  SqlWhereCondition _addFilter(
-    SqlColumn column, {
-    SqlCondition condition = SqlCondition.equalTo,
+  OrmFilterCondition _addFilter(
+    OrmColumn column, {
+    OrmCondition condition = OrmCondition.equalTo,
     dynamic value,
     dynamic value2,
     bool lb = false,
@@ -54,7 +54,7 @@ class Filter extends Equatable {
     bool and = false,
     bool or = false,
   }) {
-    return SqlWhereCondition(
+    return OrmFilterCondition(
       column: column,
       condition: condition,
       value: value,
@@ -67,26 +67,26 @@ class Filter extends Equatable {
     );
   }
 
-  Filter lb() {
-    return Filter(null, filters: [
+  OrmFilter lb() {
+    return OrmFilter(null, filters: [
       ...filters,
-      const SqlWhereCondition(leftBracket: true, isBracketOnly: true)
+      const OrmFilterCondition(leftBracket: true, isBracketOnly: true)
     ]);
   }
 
-  Filter rb() {
-    return Filter(null, filters: [
+  OrmFilter rb() {
+    return OrmFilter(null, filters: [
       ...filters,
-      const SqlWhereCondition(rightBracket: true, isBracketOnly: true)
+      const OrmFilterCondition(rightBracket: true, isBracketOnly: true)
     ]);
   }
 
-  Filter and(SqlColumn column,
-      {SqlCondition condition = SqlCondition.equalTo,
+  OrmFilter and(OrmColumn column,
+      {OrmCondition condition = OrmCondition.equalTo,
       dynamic value,
       bool lb = false,
       bool rb = false}) {
-    return Filter(null, filters: [
+    return OrmFilter(null, filters: [
       ...filters,
       _addFilter(
         column,
@@ -99,14 +99,14 @@ class Filter extends Equatable {
     ]);
   }
 
-  Filter filter(
-    SqlColumn column, {
-    SqlCondition condition = SqlCondition.equalTo,
+  OrmFilter filter(
+    OrmColumn column, {
+    OrmCondition condition = OrmCondition.equalTo,
     dynamic value,
     bool lb = false,
     bool rb = false,
   }) {
-    return Filter(null, filters: [
+    return OrmFilter(null, filters: [
       ...filters,
       _addFilter(
         column,
@@ -118,12 +118,12 @@ class Filter extends Equatable {
     ]);
   }
 
-  Filter or(SqlColumn column,
-      {SqlCondition condition = SqlCondition.equalTo,
+  OrmFilter or(OrmColumn column,
+      {OrmCondition condition = OrmCondition.equalTo,
       dynamic value,
       bool lb = false,
       bool rb = false}) {
-    return Filter(null, filters: [
+    return OrmFilter(null, filters: [
       ...filters,
       _addFilter(
         column,

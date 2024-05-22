@@ -2,10 +2,10 @@ import 'package:tatlacas_orm/src/engines/isolates/db_value.isolate.dart';
 import 'package:tatlacas_orm/src/engines/isolates/get_condition.isolate.dart';
 import 'package:tatlacas_orm/src/models/entity.dart';
 import 'package:tatlacas_orm/src/models/formatted_query.dart';
-import 'package:tatlacas_orm/src/models/sql_condition.dart';
-import 'package:tatlacas_orm/src/models/sql_where.dart';
+import 'package:tatlacas_orm/src/models/orm_condition.dart';
+import 'package:tatlacas_orm/src/models/orm_filter.dart';
 
-FormattedQuery getWhereString<TEntity extends IEntity>(Filter filter) {
+FormattedQuery getWhereString<TEntity extends IEntity>(OrmFilter filter) {
   StringBuffer stringBuffer = StringBuffer();
   final whereArgs = <dynamic>[];
   for (var element in filter.filters) {
@@ -23,10 +23,10 @@ FormattedQuery getWhereString<TEntity extends IEntity>(Filter filter) {
 
     stringBuffer.write(element.column!.name);
     stringBuffer.write(getCondition(element.condition));
-    if (element.condition != SqlCondition.isNull &&
-        element.condition != SqlCondition.notNull) {
-      if ((element.condition == SqlCondition.isIn ||
-              element.condition == SqlCondition.notIn) &&
+    if (element.condition != OrmCondition.isNull &&
+        element.condition != OrmCondition.notNull) {
+      if ((element.condition == OrmCondition.isIn ||
+              element.condition == OrmCondition.notIn) &&
           element.value is List) {
         final args = element.value as List;
         final argsQ = args.map((e) => '?').toList();
@@ -37,8 +37,8 @@ FormattedQuery getWhereString<TEntity extends IEntity>(Filter filter) {
         whereArgs.add(dbValue(element.value));
       }
     }
-    if (element.condition == SqlCondition.between ||
-        element.condition == SqlCondition.notBetween) {
+    if (element.condition == OrmCondition.between ||
+        element.condition == OrmCondition.notBetween) {
       whereArgs.add(element.value2);
     }
     if (element.rightBracket) stringBuffer.write(')');

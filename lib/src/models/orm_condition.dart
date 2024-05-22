@@ -1,4 +1,4 @@
-enum SqlCondition {
+enum OrmCondition {
   equalTo,
   notEqualTo,
   lessThan,

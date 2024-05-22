@@ -1,6 +1,6 @@
 import '../../tatlacas_orm.dart';
 
-import 'base_engine.dart';
+import 'base_orm_engine.dart';
 import '../contexts/sqflite_common_db_context.dart';
 
 class SqfliteCommonEngine<TEntity extends IEntity,

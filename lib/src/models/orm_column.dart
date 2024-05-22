@@ -3,10 +3,10 @@ import 'dart:convert';
 import 'package:equatable/equatable.dart';
 
 import 'entity.dart';
-import 'sql_column_extension.dart';
+import 'orm_column_extension.dart';
 
-class SqlColumn<TEntity extends IEntity, TType> extends Equatable {
-  SqlColumn(
+class OrmColumn<TEntity extends IEntity, TType> extends Equatable {
+  OrmColumn(
     this.name, {
     this.alias,
     this.jsonEncodeAlias = false,

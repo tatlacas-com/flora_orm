@@ -1,12 +1,12 @@
 import 'package:equatable/equatable.dart';
 
-import 'sql_column.dart';
-import 'sql_condition.dart';
+import 'orm_column.dart';
+import 'orm_condition.dart';
 
-class SqlWhereCondition extends Equatable {
-  const SqlWhereCondition({
+class OrmFilterCondition extends Equatable {
+  const OrmFilterCondition({
     this.column,
-    this.condition = SqlCondition.equalTo,
+    this.condition = OrmCondition.equalTo,
     this.value,
     this.value2,
     this.leftBracket = false,
@@ -15,8 +15,8 @@ class SqlWhereCondition extends Equatable {
     this.and = false,
     this.or = false,
   });
-  final SqlColumn? column;
-  final SqlCondition condition;
+  final OrmColumn? column;
+  final OrmCondition condition;
   final dynamic value;
   final dynamic value2;
   final bool leftBracket;

@@ -68,8 +68,11 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
 
     mixinCode.writeln(
         'mixin _${className}Mixin on Entity<$className, ${className}Meta> {');
-    metaCode.writeln(
-        '''class ${className}Meta extends  EntityMeta<$className> {     
+    metaCode.writeln('''
+typedef ${className}Orm
+    = OrmEngine<$className, ${className}Meta, DbContext<$className>>;
+
+class ${className}Meta extends  EntityMeta<$className> {     
   @override
   String get tableName => '${tableName ?? convertClassNameToSnakeCase(className)}';
           const ${className}Meta();
@@ -77,8 +80,8 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
 
     metaCode.writeln('''
   @override
-  SqlColumn<$className, String> get id => 
-  SqlColumn<$className, String>(
+  OrmColumn<$className, String> get id => 
+  OrmColumn<$className, String>(
         'id',
         primaryKey: true,
         write: (entity) => entity.id,
@@ -87,8 +90,8 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
       );
 
   @override
-  SqlColumn<$className, DateTime> get createdAt =>
-      SqlColumn<$className, DateTime>(
+  OrmColumn<$className, DateTime> get createdAt =>
+      OrmColumn<$className, DateTime>(
         'createdAt',
         write: (entity) => entity.createdAt,
         read: (json, entity, value) =>
@@ -96,8 +99,8 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
       );
 
   @override
-  SqlColumn<$className, DateTime> get updatedAt =>
-      SqlColumn<$className, DateTime>(
+  OrmColumn<$className, DateTime> get updatedAt =>
+      OrmColumn<$className, DateTime>(
         'updatedAt',
         write: (entity) => entity.updatedAt,
         read: (json, entity, value) =>
@@ -253,8 +256,8 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
           }
 
           metaCode.writeln('''
-      SqlColumn<$className, $columnType> get $fieldName =>
-        SqlColumn<$className, $columnType>(
+      OrmColumn<$className, $columnType> get $fieldName =>
+        OrmColumn<$className, $columnType>(
           '$name',
     ''');
           if (alias != null) {
@@ -438,7 +441,7 @@ class DbColumnGenerator extends GeneratorForAnnotation<DbEntity> {
 
     metaCode.writeln('''
       @override
-      Iterable<SqlColumn<$className, dynamic>> get columns => [
+      Iterable<OrmColumn<$className, dynamic>> get columns => [
       id,
       createdAt,
       updatedAt,

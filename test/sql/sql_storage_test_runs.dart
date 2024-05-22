@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:meta/meta.dart';
 import 'package:tatlacas_orm/tatlacas_orm.dart';
 import 'package:tatlacas_orm/src/contexts/base_context.dart';
-import 'package:tatlacas_orm/src/engines/base_engine.dart';
+import 'package:tatlacas_orm/src/engines/base_orm_engine.dart';
 
 import '../dummy/test_entity.dart';
 
@@ -59,7 +59,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     fxn() async => await storage.getEntity(
           columns: (t) => [],
-          filter: (t) => Filter(
+          filter: (t) => OrmFilter(
             t.id,
             value: insertedEntity!.id,
           )
@@ -94,7 +94,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
-      filter: (t) => Filter(
+      filter: (t) => OrmFilter(
         entity.meta.id,
         value: insertedEntity!.id,
       )
@@ -131,7 +131,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
       columns: (t) => [t.testInt],
-      filter: (t) => Filter(
+      filter: (t) => OrmFilter(
         entity.meta.id,
         value: insertedEntity!.id,
       )
@@ -168,14 +168,14 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
       orderBy: (t) => [
-        SqlOrder(
+        OrmOrder(
           column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter(
+      filter: (t) => OrmFilter(
         entity.meta.id,
-        condition: SqlCondition.notEqualTo,
+        condition: OrmCondition.notEqualTo,
         value: '12',
       ),
     );
@@ -193,17 +193,17 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
       orderBy: (t) => [
-        SqlOrder(
+        OrmOrder(
           column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter(
+      filter: (t) => OrmFilter(
         t.testInt,
-        condition: SqlCondition.isNull,
+        condition: OrmCondition.isNull,
       ).and(
         t.testDouble,
-        condition: SqlCondition.isNull,
+        condition: OrmCondition.isNull,
       ),
     );
     expect(json, isNotNull);
@@ -220,14 +220,14 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
       orderBy: (t) => [
-        SqlOrder(
+        OrmOrder(
           column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter(
+      filter: (t) => OrmFilter(
         t.testString,
-        condition: SqlCondition.notNull,
+        condition: OrmCondition.notNull,
       ),
     );
     expect(json, isNotNull);
@@ -245,14 +245,14 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
       orderBy: (t) => [
-        SqlOrder(
+        OrmOrder(
           column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter(
+      filter: (t) => OrmFilter(
         t.testInt,
-        condition: SqlCondition.lessThan,
+        condition: OrmCondition.lessThan,
         value: -14,
       ),
     );
@@ -271,14 +271,14 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
       orderBy: (t) => [
-        SqlOrder(
+        OrmOrder(
           column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter(
+      filter: (t) => OrmFilter(
         t.testInt,
-        condition: SqlCondition.greaterThan,
+        condition: OrmCondition.greaterThan,
         value: 19999,
       ),
     );
@@ -297,14 +297,14 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
       orderBy: (t) => [
-        SqlOrder(
+        OrmOrder(
           column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter(
+      filter: (t) => OrmFilter(
         t.testInt,
-        condition: SqlCondition.greaterThanOrEqual,
+        condition: OrmCondition.greaterThanOrEqual,
         value: 100,
       ),
     );
@@ -323,14 +323,14 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
       orderBy: (t) => [
-        SqlOrder(
+        OrmOrder(
           column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter(
+      filter: (t) => OrmFilter(
         t.testInt,
-        condition: SqlCondition.greaterThanOrEqual,
+        condition: OrmCondition.greaterThanOrEqual,
         value: -10,
       ),
     );
@@ -349,14 +349,14 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
       orderBy: (t) => [
-        SqlOrder(
+        OrmOrder(
           column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter(
+      filter: (t) => OrmFilter(
         t.testInt,
-        condition: SqlCondition.between,
+        condition: OrmCondition.between,
         value: 1000,
         value2: 1002,
       ),
@@ -376,14 +376,14 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
       orderBy: (t) => [
-        SqlOrder(
+        OrmOrder(
           column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter(
+      filter: (t) => OrmFilter(
         t.testInt,
-        condition: SqlCondition.notBetween,
+        condition: OrmCondition.notBetween,
         value: -500,
         value2: 2019,
       ),
@@ -403,14 +403,14 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
       orderBy: (t) => [
-        SqlOrder(
+        OrmOrder(
           column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter(
+      filter: (t) => OrmFilter(
         t.testInt,
-        condition: SqlCondition.isIn,
+        condition: OrmCondition.isIn,
         value: const [11001],
       ),
     );
@@ -429,14 +429,14 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
       orderBy: (t) => [
-        SqlOrder(
+        OrmOrder(
           column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter(
+      filter: (t) => OrmFilter(
         t.testInt,
-        condition: SqlCondition.notIn,
+        condition: OrmCondition.notIn,
         value: const [11001, 11005],
       ),
     );
@@ -455,14 +455,14 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
       orderBy: (t) => [
-        SqlOrder(
+        OrmOrder(
           column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter(
+      filter: (t) => OrmFilter(
         t.testString,
-        condition: SqlCondition.like,
+        condition: OrmCondition.like,
         value: '%Like%',
       ),
     );
@@ -481,14 +481,14 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
       orderBy: (t) => [
-        SqlOrder(
+        OrmOrder(
           column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter(
+      filter: (t) => OrmFilter(
         t.testString,
-        condition: SqlCondition.notLike,
+        condition: OrmCondition.notLike,
         value: '%Dummy%',
       ),
     );
@@ -508,15 +508,15 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     var json = await storage.getEntity(
       orderBy: (t) => [
-        SqlOrder(
+        OrmOrder(
           column: entity.meta.createdAt,
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter.lb()
+      filter: (t) => OrmFilter.lb()
           .filter(
             t.testString,
-            condition: SqlCondition.like,
+            condition: OrmCondition.like,
             value: '%Dummy%',
           )
           .and(
@@ -558,8 +558,8 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     var insertedEntity1 = await storage.insert(entity1);
     expect(insertedEntity1, isNotNull);
     var json = await storage.getEntities(
-      orderBy: (t) => [SqlOrder(column: t.testInt)],
-      filter: (t) => Filter(
+      orderBy: (t) => [OrmOrder(column: t.testInt)],
+      filter: (t) => OrmFilter(
         entity.meta.id,
         value: insertedEntity!.id,
       ).or(
@@ -579,8 +579,8 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
   test('getEntities() should return empty array', () async {
     const entity = TestEntity();
     var json = await storage.getEntities(
-      orderBy: (t) => [SqlOrder(column: t.testInt)],
-      filter: (t) => Filter(
+      orderBy: (t) => [OrmOrder(column: t.testInt)],
+      filter: (t) => OrmFilter(
         entity.meta.id,
         value: 'xyzNotFound',
       ),
@@ -597,7 +597,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
         testString: 'Testing a');
     var insertedEntity = await storage.insert(entity);
     var json = await storage.getEntities(
-      orderBy: (t) => [SqlOrder(column: entity.meta.createdAt)],
+      orderBy: (t) => [OrmOrder(column: entity.meta.createdAt)],
     );
     expect(json, isNotNull);
     expect(json.length, greaterThan(0));
@@ -626,12 +626,12 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity1, isNotNull);
     var json = await storage.getEntities(
       orderBy: (t) => [
-        SqlOrder(
+        OrmOrder(
           column: t.testInt,
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter(
+      filter: (t) => OrmFilter(
         entity.meta.id,
         value: insertedEntity!.id,
       ).or(
@@ -685,7 +685,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     entity = (insertedEntity as TestEntity).copyWith(testString: 'Updated a');
     var total = await storage.update(
       entity: entity,
-      filter: (t) => Filter(
+      filter: (t) => OrmFilter(
         entity.meta.id,
         value: entity.id,
       ),
@@ -703,14 +703,14 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var total = await storage.update(
-        filter: (t) => Filter(
+        filter: (t) => OrmFilter(
               entity.meta.id,
               value: insertedEntity!.id,
             ),
         columnValues: (t) => {t.testString: 'Updated ax1'});
     expect(total, 1);
     var json = await storage.getEntity(
-        filter: (t) => Filter(entity.meta.id, value: insertedEntity?.id));
+        filter: (t) => OrmFilter(entity.meta.id, value: insertedEntity?.id));
     insertedEntity = insertedEntity?.copyWith(testString: 'Updated ax1');
     entity = json!;
     expect(entity, insertedEntity);
@@ -790,7 +790,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     expect(insertedEntity!.length, 2);
     var total = await storage.getCount(
-      filter: (t) => Filter(
+      filter: (t) => OrmFilter(
         entity.meta.id,
         value: insertedEntity[0].id,
       ).or(
@@ -819,7 +819,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity, isNotNull);
     expect(insertedEntity!.length, 2);
     var total = await storage.delete(
-      filter: (t) => Filter(
+      filter: (t) => OrmFilter(
         entity.meta.id,
         value: insertedEntity[0].id,
       ).or(
@@ -849,7 +849,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity1, isNotNull);
     var sum = await storage.getSum<int>(
       column: (t) => t.testInt,
-      filter: (t) => Filter(
+      filter: (t) => OrmFilter(
         entity.meta.id,
         value: insertedEntity!.id,
       ).or(
@@ -886,7 +886,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
         t.testInt,
         t.testDouble,
       ],
-      filter: (t) => Filter(
+      filter: (t) => OrmFilter(
         entity.meta.id,
         value: insertedEntity!.id,
       ).or(
@@ -916,7 +916,7 @@ void run(BaseEngine<TestEntity, TestEntityMeta, BaseContext> storage) {
     expect(insertedEntity1, isNotNull);
     var json = await storage.getSum<double>(
       column: (t) => t.testDouble,
-      filter: (t) => Filter(
+      filter: (t) => OrmFilter(
         entity.meta.id,
         value: insertedEntity!.id,
       ).or(

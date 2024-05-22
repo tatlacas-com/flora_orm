@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
-import 'sql.dart';
-import 'sql_column_extension.dart';
+import 'orm.dart';
+import 'orm_column_extension.dart';
 
 abstract class IEntity {
   const IEntity({
@@ -43,7 +43,7 @@ abstract class IEntity {
   Map<String, dynamic> toDb();
 
   Map<String, dynamic> toStorageJson(
-      {required Map<SqlColumn, dynamic> columnValues});
+      {required Map<OrmColumn, dynamic> columnValues});
 
   IEntity load(Map<String, dynamic> json);
 }
@@ -52,12 +52,12 @@ abstract class EntityMeta<TEntity extends IEntity> {
   const EntityMeta();
   String get tableName;
 
-  Iterable<SqlColumn<TEntity, dynamic>> get columns;
-  SqlColumn<IEntity, String> get id;
+  Iterable<OrmColumn<TEntity, dynamic>> get columns;
+  OrmColumn<IEntity, String> get id;
 
-  SqlColumn<IEntity, DateTime> get createdAt;
+  OrmColumn<IEntity, DateTime> get createdAt;
 
-  SqlColumn<IEntity, DateTime> get updatedAt;
+  OrmColumn<IEntity, DateTime> get updatedAt;
 }
 
 abstract class Entity<TEntity extends IEntity,
@@ -98,8 +98,8 @@ abstract class Entity<TEntity extends IEntity,
     Map<String, dynamic>? json,
   });
 
-  List<SqlColumn<TEntity, dynamic>> get compositePrimaryKey =>
-      <SqlColumn<TEntity, dynamic>>[];
+  List<OrmColumn<TEntity, dynamic>> get compositePrimaryKey =>
+      <OrmColumn<TEntity, dynamic>>[];
 
   @override
   TEntity updateDates({DateTime? createdAt}) {
@@ -135,7 +135,7 @@ abstract class Entity<TEntity extends IEntity,
     TEntity entity = this as TEntity;
     for (var column in meta.columns) {
       final value = column.getValueFrom(json);
-      if (column is SqlColumn<TEntity, double> && value is int) {
+      if (column is OrmColumn<TEntity, double> && value is int) {
         entity = column.read(json, entity, value.toDouble());
       } else {
         entity = column.read(json, entity, value);
@@ -187,7 +187,7 @@ abstract class Entity<TEntity extends IEntity,
 
   @override
   Map<String, dynamic> toStorageJson(
-      {required Map<SqlColumn, dynamic> columnValues}) {
+      {required Map<OrmColumn, dynamic> columnValues}) {
     Map<String, dynamic> map = {};
     columnValues.forEach((key, value) {
       key.setValue(map, value);
@@ -196,7 +196,7 @@ abstract class Entity<TEntity extends IEntity,
   }
 
   @protected
-  String addColumn(SqlColumn column) {
+  String addColumn(OrmColumn column) {
     var str = StringBuffer();
     columnDefinition(column, str);
     return 'ALTER TABLE ${meta.tableName} ADD ${column.name} ${getColumnType(column.columnType)}${str.toString()}';
@@ -221,7 +221,7 @@ abstract class Entity<TEntity extends IEntity,
   }
 
   @protected
-  void columnDefinition(SqlColumn element, StringBuffer stringBuffer) {
+  void columnDefinition(OrmColumn element, StringBuffer stringBuffer) {
     if (element.primaryKey) stringBuffer.write(' PRIMARY KEY');
     if (element.autoIncrementPrimary) stringBuffer.write(' AUTOINCREMENT');
     if (element.unique) stringBuffer.write(' UNIQUE');

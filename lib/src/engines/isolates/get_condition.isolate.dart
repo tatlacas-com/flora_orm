@@ -1,34 +1,34 @@
-import 'package:tatlacas_orm/src/models/sql_condition.dart';
+import 'package:tatlacas_orm/src/models/orm_condition.dart';
 
-String getCondition(SqlCondition condition) {
+String getCondition(OrmCondition condition) {
   switch (condition) {
-    case SqlCondition.equalTo:
+    case OrmCondition.equalTo:
       return ' = ? ';
-    case SqlCondition.notEqualTo:
+    case OrmCondition.notEqualTo:
       return ' <> ? ';
-    case SqlCondition.isNull:
+    case OrmCondition.isNull:
       return ' IS NULL ';
-    case SqlCondition.notNull:
+    case OrmCondition.notNull:
       return ' IS NOT NULL ';
-    case SqlCondition.lessThan:
+    case OrmCondition.lessThan:
       return ' < ? ';
-    case SqlCondition.greaterThan:
+    case OrmCondition.greaterThan:
       return ' > ? ';
-    case SqlCondition.greaterThanOrEqual:
+    case OrmCondition.greaterThanOrEqual:
       return ' >= ? ';
-    case SqlCondition.lessThanOrEqual:
+    case OrmCondition.lessThanOrEqual:
       return ' <= ? ';
-    case SqlCondition.between:
+    case OrmCondition.between:
       return ' BETWEEN ? AND ? ';
-    case SqlCondition.notBetween:
+    case OrmCondition.notBetween:
       return ' NOT BETWEEN ? AND ? ';
-    case SqlCondition.isIn:
+    case OrmCondition.isIn:
       return ' IN ';
-    case SqlCondition.notIn:
+    case OrmCondition.notIn:
       return ' NOT IN ';
-    case SqlCondition.like:
+    case OrmCondition.like:
       return ' LIKE ? ';
-    case SqlCondition.notLike:
+    case OrmCondition.notLike:
       return ' NOT LIKE ? ';
   }
 }

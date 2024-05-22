@@ -1,6 +1,6 @@
 import '../../tatlacas_orm.dart';
 
-import 'base_engine.dart';
+import 'base_orm_engine.dart';
 import '../contexts/sqflite_in_memory_db_context.dart';
 
 class SqfliteInMemoryEngine<TEntity extends IEntity,
