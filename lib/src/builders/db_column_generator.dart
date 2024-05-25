@@ -174,9 +174,9 @@ class ${className}Meta extends  EntityMeta<$className> {
 
           final String name =
               dbColumnAnnotation.getField('name')?.toStringValue() ?? fieldName;
-          final jsonEncoded =
-              dbColumnAnnotation.getField('encodedJson')?.toBoolValue() ??
-                  !isDefaultType;
+          final jsonEncoded = !isDefaultType ||
+              (dbColumnAnnotation.getField('encodedJson')?.toBoolValue() ??
+                  false);
           final String? alias =
               dbColumnAnnotation.getField('alias')?.toStringValue() ??
                   (jsonEncoded && isDefaultType
@@ -186,21 +186,23 @@ class ${className}Meta extends  EntityMeta<$className> {
           final String? writeFn =
               dbColumnAnnotation.getField('writeFn')?.toStringValue();
 
-          final bool hasRead =
-              dbColumnAnnotation.getField('hasRead')?.toBoolValue() ?? false;
-          final bool hasWrite =
-              dbColumnAnnotation.getField('hasWrite')?.toBoolValue() ?? false;
-          final bool primaryKey =
-              dbColumnAnnotation.getField('primaryKey')?.toBoolValue() ?? false;
-          final bool autoIncrementPrimary = dbColumnAnnotation
-                  .getField('autoIncrementPrimary')
-                  ?.toBoolValue() ??
-              false;
+          final bool hasRead = isDefaultType &&
+              (dbColumnAnnotation.getField('hasRead')?.toBoolValue() ?? false);
+          final bool hasWrite = isDefaultType &&
+              (dbColumnAnnotation.getField('hasWrite')?.toBoolValue() ?? false);
+          final bool primaryKey = isDefaultType &&
+              (dbColumnAnnotation.getField('primaryKey')?.toBoolValue() ??
+                  false);
+          final bool autoIncrementPrimary = isDefaultType &&
+              (dbColumnAnnotation
+                      .getField('autoIncrementPrimary')
+                      ?.toBoolValue() ??
+                  false);
           final bool notNull =
               dbColumnAnnotation.getField('notNull')?.toBoolValue() ??
                   (field.type.nullabilitySuffix == NullabilitySuffix.none);
-          final bool unique =
-              dbColumnAnnotation.getField('unique')?.toBoolValue() ?? false;
+          final bool unique = isDefaultType &&
+              (dbColumnAnnotation.getField('unique')?.toBoolValue() ?? false);
           dynamic defaultValue = dbColumnAnnotation.getField('defaultValue');
           if (field.type.isDartCoreBool) {
             defaultValue =
@@ -219,16 +221,21 @@ class ${className}Meta extends  EntityMeta<$className> {
           String? jsonEncodedType;
           final annotationSource = annotation.toSource().trim();
 
-          final start = annotationSource.indexOf('<');
-          final end = annotationSource.indexOf('>');
-          if (start != -1) {
-            final t = annotationSource.substring(start + 1, end);
-            if (jsonEncoded && isDefaultType) {
-              jsonEncodedType = t;
-            } else {
-              columnType = t;
+          if (isDefaultType) {
+            final start = annotationSource.indexOf('<');
+            final end = annotationSource.indexOf('>');
+            if (start != -1) {
+              final t = annotationSource.substring(start + 1, end);
+              if (jsonEncoded && isDefaultType) {
+                jsonEncodedType = t;
+              } else {
+                columnType = t;
+              }
             }
+          } else {
+            columnType = 'String';
           }
+
           FieldElement? aliasProperty;
           bool aliasNotNull = false;
           if (alias != null && (hasRead || jsonEncoded)) {
@@ -260,6 +267,7 @@ class ${className}Meta extends  EntityMeta<$className> {
     return copyWith(
       $fieldName: ${notNull ? 'items' : 'CopyWith(items)'},
     );
+  }
  ''');
             } else {
               mixinCode.writeln('''
@@ -271,6 +279,7 @@ class ${className}Meta extends  EntityMeta<$className> {
     return copyWith(
       $fieldName: ${notNull ? 'item' : 'CopyWith(item)'},
     );
+  }
  ''');
             }
           }
@@ -279,7 +288,7 @@ class ${className}Meta extends  EntityMeta<$className> {
             mixinCode.writeln('''
   $className read$fieldNameCamel(Map<String, dynamic> json, value);
  ''');
-          } else if (jsonEncoded) {
+          } else if (jsonEncoded && isDefaultType) {
             mixinCode.writeln('''
   $className read$fieldNameCamel(Map<String, dynamic> json, value){
     $jsonEncodedType? $alias;
@@ -312,7 +321,7 @@ class ${className}Meta extends  EntityMeta<$className> {
            alias: '$alias',
     ''');
           }
-          if (jsonEncoded) {
+          if (jsonEncoded && isDefaultType) {
             metaCode.writeln('''
            jsonEncodeAlias: $jsonEncoded,
     ''');
@@ -353,24 +362,32 @@ class ${className}Meta extends  EntityMeta<$className> {
           write: (entity) => entity.write$fieldNameCamel(),
     ''');
           } else if (jsonEncoded) {
+            var typeName = isDefaultType ? alias : fieldName;
             metaCode.writeln('''
           write: (entity) {
     ''');
-            final finder = PropertyFinder(alias!);
-            classElement.accept(finder);
-            final property = finder.foundProperty!;
-            if (property.type.isDartCoreList) {
+            var isDartCoreList = isDefaultType ? false : isList;
+            if (isDefaultType) {
+              final finder = PropertyFinder(alias!);
+              classElement.accept(finder);
+              final property = finder.foundProperty!;
+              isDartCoreList = property.type.isDartCoreList;
               jsonEncodedType =
                   property.type.getDisplayString(withNullability: false);
+            }
+            final isNotNull = isDefaultType ? aliasNotNull : notNull;
+
+            if (isDartCoreList) {
               metaCode.writeln('''
-            final map = entity.$alias${aliasNotNull ? '' : '?'}.map((p) => p.toMap()).toList();
+            final map = entity.$typeName${isNotNull ? '' : '?'}.map((p) => p.toMap()).toList();
     ''');
             } else {
+              var typeName = isDefaultType ? alias : fieldName;
               metaCode.writeln('''
-            if(entity.$alias == null){
+            if(entity.$typeName == null){
                 return null;
             }
-            final map = entity.$alias?.${writeFn ?? 'toMap'}();
+            final map = entity.$typeName?.${writeFn ?? 'toMap'}();
     ''');
             }
             metaCode.writeln('''
