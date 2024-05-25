@@ -441,11 +441,15 @@ class ${className}Meta extends  EntityMeta<$className> {
         );
     ''');
           }
+          final prefix = isList ? 'List<' : '';
+          final suffix = isList ? '>' : '';
           if (notNull) {
-            copyWithPropsList.writeln('$fieldType? $fieldName,');
+            if (isList) {}
+            copyWithPropsList.writeln('$prefix$fieldType$suffix? $fieldName,');
             copyWithList.writeln('$fieldName: $fieldName ?? this.$fieldName,');
           } else {
-            copyWithPropsList.writeln('CopyWith<$fieldType?>? $fieldName,');
+            copyWithPropsList
+                .writeln('CopyWith<$prefix$fieldType$suffix?>? $fieldName,');
             copyWithList.writeln(
                 '$fieldName: $fieldName != null ? $fieldName.value : this.$fieldName,');
           }

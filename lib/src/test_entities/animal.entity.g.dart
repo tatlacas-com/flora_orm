@@ -52,7 +52,7 @@ mixin _AnimalEntityMixin on Entity<AnimalEntity, AnimalEntityMeta> {
     DateTime? updatedAt,
     CopyWith<String?>? text,
     CopyWith<Testing?>? testing,
-    CopyWith<Testing?>? testing2,
+    CopyWith<List<Testing>?>? testing2,
     Map<String, dynamic>? json,
   }) {
     return AnimalEntity(
