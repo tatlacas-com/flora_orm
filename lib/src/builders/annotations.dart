@@ -1,6 +1,9 @@
 const column = OrmColumn();
 const entity = OrmEntity();
 
+/// Supported types:
+///                 [String], [int], [double], [bool] and [double].
+/// All other types will be stored as json, and can be encoded/decoded using the read/write functions associated with the column
 class OrmColumn<TColumnType> {
   const OrmColumn({
     this.name,

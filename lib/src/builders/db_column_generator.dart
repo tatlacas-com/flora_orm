@@ -136,9 +136,22 @@ class ${className}Meta extends  EntityMeta<$className> {
       if (const TypeChecker.fromRuntime(OrmColumn)
           .hasAnnotationOfExact(field)) {
         final fieldName = field.name;
-        final fieldType = field.type.getDisplayString(withNullability: false);
+        var fieldType = field.type.getDisplayString(withNullability: false);
         final fieldTypeFull =
             field.type.getDisplayString(withNullability: true);
+
+        final isDefaultType =
+            ['String', 'DateTime', 'int', 'bool', 'double'].contains(fieldType);
+
+        final isList = fieldType.startsWith('List');
+        if (isList) {
+          final start = fieldTypeFull.indexOf('<');
+          final end = fieldTypeFull.indexOf('>');
+          if (start != -1) {
+            fieldType = fieldTypeFull.substring(start + 1, end);
+          }
+        }
+
         final fieldNameCamel = _toUpperCamelCase(fieldName);
         final fieldMetadata = field.metadata;
         final List<ElementAnnotation> fieldAnnotations = [];
@@ -163,10 +176,12 @@ class ${className}Meta extends  EntityMeta<$className> {
               dbColumnAnnotation.getField('name')?.toStringValue() ?? fieldName;
           final jsonEncoded =
               dbColumnAnnotation.getField('encodedJson')?.toBoolValue() ??
-                  false;
+                  !isDefaultType;
           final String? alias =
               dbColumnAnnotation.getField('alias')?.toStringValue() ??
-                  (jsonEncoded ? fieldName.replaceAll('Json', '') : null);
+                  (jsonEncoded && isDefaultType
+                      ? fieldName.replaceAll('Json', '')
+                      : null);
 
           final String? writeFn =
               dbColumnAnnotation.getField('writeFn')?.toStringValue();
@@ -208,7 +223,7 @@ class ${className}Meta extends  EntityMeta<$className> {
           final end = annotationSource.indexOf('>');
           if (start != -1) {
             final t = annotationSource.substring(start + 1, end);
-            if (jsonEncoded) {
+            if (jsonEncoded && isDefaultType) {
               jsonEncodedType = t;
             } else {
               columnType = t;
@@ -230,6 +245,36 @@ class ${className}Meta extends  EntityMeta<$className> {
   $jsonEncodedType${aliasNotNull ? '' : '?'} get $alias;
  ''');
           }
+
+          if (!isDefaultType) {
+            mixinCode.writeln('''
+  $className read$fieldNameCamel(Map<String, dynamic> json, value){
+ ''');
+            if (isList) {
+              mixinCode.writeln('''
+    List<$fieldType>? items;
+    if (value != null) {
+      List<dynamic> map = jsonDecode(value);
+      items = map.map<$fieldType>((e) => $fieldType.fromMap(e)).toList();
+    }
+    return copyWith(
+      $fieldName: ${notNull ? 'items' : 'CopyWith(items)'},
+    );
+ ''');
+            } else {
+              mixinCode.writeln('''
+    $fieldType? item;
+    if (value != null) {
+      Map<String, dynamic> map = jsonDecode(value);
+      item = $fieldType.fromMap(map);
+    }
+    return copyWith(
+      $fieldName: ${notNull ? 'item' : 'CopyWith(item)'},
+    );
+ ''');
+            }
+          }
+
           if (hasRead) {
             mixinCode.writeln('''
   $className read$fieldNameCamel(Map<String, dynamic> json, value);
