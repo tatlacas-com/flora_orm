@@ -1,5 +1,8 @@
-class DbColumn<TColumnType> {
-  const DbColumn({
+const column = Column();
+const ormEntity = OrmEntity();
+
+class Column<TColumnType> {
+  const Column({
     this.name,
     this.alias,
     this.writeFn,
@@ -26,8 +29,8 @@ class DbColumn<TColumnType> {
   final dynamic defaultValue;
 }
 
-class DbEntity {
-  const DbEntity({
+class OrmEntity {
+  const OrmEntity({
     this.tableName,
   });
   final String? tableName;
