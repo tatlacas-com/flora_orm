@@ -1,8 +1,8 @@
-const column = Column();
-const ormEntity = OrmEntity();
+const column = OrmColumn();
+const entity = OrmEntity();
 
-class Column<TColumnType> {
-  const Column({
+class OrmColumn<TColumnType> {
+  const OrmColumn({
     this.name,
     this.alias,
     this.writeFn,

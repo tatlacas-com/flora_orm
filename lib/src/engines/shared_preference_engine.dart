@@ -47,7 +47,7 @@ class SharedPreferenceEngine<TEntity extends IEntity,
 
   @override
   Future<TEntity?> getEntity({
-    Iterable<OrmColumn>? Function(TMeta t)? columns,
+    Iterable<ColumnDefinition>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     required Filter Function(TMeta t) filter,
     int? offset,
@@ -100,7 +100,7 @@ class SharedPreferenceEngine<TEntity extends IEntity,
   Future<int> update({
     required Filter Function(TMeta t) filter,
     TEntity? entity,
-    Map<OrmColumn, dynamic> Function(TMeta t)? columnValues,
+    Map<ColumnDefinition, dynamic> Function(TMeta t)? columnValues,
     final bool? useIsolate,
   }) async {
     var query = filter(t)
@@ -130,7 +130,7 @@ class SharedPreferenceEngine<TEntity extends IEntity,
   @override
   Future<List<TEntity>> query({
     Filter Function(TMeta t)? filter,
-    Iterable<OrmColumn>? Function(TMeta t)? columns,
+    Iterable<ColumnDefinition>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? limit,
     int? offset,

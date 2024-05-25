@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import 'orm_column.dart';
+import 'column_definition.dart';
 import 'orm_condition.dart';
 
 class FilterCondition extends Equatable {
@@ -15,7 +15,7 @@ class FilterCondition extends Equatable {
     this.and = false,
     this.or = false,
   });
-  final OrmColumn? column;
+  final ColumnDefinition? column;
   final OrmCondition condition;
   final dynamic value;
   final dynamic value2;

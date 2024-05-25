@@ -1,13 +1,13 @@
 import 'package:equatable/equatable.dart';
 
-import 'orm_column.dart';
+import 'column_definition.dart';
 import 'orm_condition.dart';
 import 'filter_condition.dart';
 
 class Filter extends Equatable {
   /// [lb] adds left bracket, [rb] adds right bracket
   Filter(
-    OrmColumn? column, {
+    ColumnDefinition? column, {
     OrmCondition condition = OrmCondition.equalTo,
     dynamic value,
     dynamic value2,
@@ -43,7 +43,7 @@ class Filter extends Equatable {
   late final List<FilterCondition> filters;
 
   FilterCondition _addFilter(
-    OrmColumn column, {
+    ColumnDefinition column, {
     OrmCondition condition = OrmCondition.equalTo,
     dynamic value,
     dynamic value2,
@@ -80,7 +80,7 @@ class Filter extends Equatable {
     ]);
   }
 
-  Filter and(OrmColumn column,
+  Filter and(ColumnDefinition column,
       {OrmCondition condition = OrmCondition.equalTo,
       dynamic value,
       bool lb = false,
@@ -99,7 +99,7 @@ class Filter extends Equatable {
   }
 
   Filter filter(
-    OrmColumn column, {
+    ColumnDefinition column, {
     OrmCondition condition = OrmCondition.equalTo,
     dynamic value,
     bool lb = false,
@@ -117,7 +117,7 @@ class Filter extends Equatable {
     ]);
   }
 
-  Filter or(OrmColumn column,
+  Filter or(ColumnDefinition column,
       {OrmCondition condition = OrmCondition.equalTo,
       dynamic value,
       bool lb = false,

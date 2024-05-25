@@ -6,43 +6,45 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
   @override
   String get tableName => 'test_entity';
   @override
-  Iterable<OrmColumn<TestEntity, dynamic>> get columns =>
+  Iterable<ColumnDefinition<TestEntity, dynamic>> get columns =>
       throw UnimplementedError();
 
   @override
-  OrmColumn<IEntity, DateTime> get createdAt => throw UnimplementedError();
+  ColumnDefinition<IEntity, DateTime> get createdAt =>
+      throw UnimplementedError();
 
   @override
-  OrmColumn<IEntity, String> get id => throw UnimplementedError();
+  ColumnDefinition<IEntity, String> get id => throw UnimplementedError();
 
   @override
-  OrmColumn<IEntity, DateTime> get updatedAt => throw UnimplementedError();
+  ColumnDefinition<IEntity, DateTime> get updatedAt =>
+      throw UnimplementedError();
 
-  get testString => OrmColumn<TestEntity, String>(
+  get testString => ColumnDefinition<TestEntity, String>(
         'testString',
         write: (entity) => entity.testString,
         read: (json, entity, value) => entity.copyWith(testString: value),
       );
 
-  get testUpgrade => OrmColumn<TestEntity, String>(
+  get testUpgrade => ColumnDefinition<TestEntity, String>(
         'testUpgrade',
         write: (entity) => entity.testUpgrade,
         read: (json, entity, value) => entity.copyWith(testUpgrade: value),
       );
 
-  get testDateTime => OrmColumn<TestEntity, DateTime>(
+  get testDateTime => ColumnDefinition<TestEntity, DateTime>(
         'testDateTime',
         write: (entity) => entity.testDateTime,
         read: (json, entity, value) => entity.copyWith(testDateTime: value),
       );
 
-  get testInt => OrmColumn<TestEntity, int>(
+  get testInt => ColumnDefinition<TestEntity, int>(
         'testInt',
         write: (entity) => entity.testInt,
         read: (json, entity, value) => entity.copyWith(testInt: value),
       );
 
-  get testIntWithDefault => OrmColumn<TestEntity, int>(
+  get testIntWithDefault => ColumnDefinition<TestEntity, int>(
         'testIntWithDefault',
         write: (entity) => entity.testIntWithDefault,
         defaultValue: 100,
@@ -50,13 +52,13 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
             entity.copyWith(testIntWithDefault: value),
       );
 
-  get testBool => OrmColumn<TestEntity, bool>(
+  get testBool => ColumnDefinition<TestEntity, bool>(
         'testBool',
         write: (entity) => entity.testBool,
         read: (json, entity, value) => entity.copyWith(testBool: value),
       );
 
-  get testDouble => OrmColumn<TestEntity, double>(
+  get testDouble => ColumnDefinition<TestEntity, double>(
         'testDouble',
         write: (entity) => entity.testDouble,
         read: (json, entity, value) => entity.copyWith(testDouble: value),

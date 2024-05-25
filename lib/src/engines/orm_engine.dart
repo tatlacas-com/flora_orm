@@ -45,14 +45,14 @@ abstract class OrmEngine<
   Future<List<TEntity>?> insertOrUpdateList(Iterable<TEntity> items);
 
   Future<TEntity?> getEntity({
-    List<OrmColumn>? Function(TMeta t)? columns,
+    List<ColumnDefinition>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     required Filter Function(TMeta t) filter,
     int? offset,
     final bool? useIsolate,
   });
   Future<Map<String, dynamic>?> getEntityMap({
-    List<OrmColumn>? Function(TMeta t)? columns,
+    List<ColumnDefinition>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     required Filter Function(TMeta t) filter,
     int? offset,
@@ -60,13 +60,13 @@ abstract class OrmEngine<
   });
 
   Future<T> getSum<T>({
-    required OrmColumn Function(TMeta t) column,
+    required ColumnDefinition Function(TMeta t) column,
     Filter Function(TMeta t)? filter,
     final bool? useIsolate,
   });
 
   Future<T> getSumProduct<T>({
-    required List<OrmColumn> Function(TMeta t) columns,
+    required List<ColumnDefinition> Function(TMeta t) columns,
     Filter Function(TMeta t)? filter,
     final bool? useIsolate,
   });
@@ -84,14 +84,14 @@ abstract class OrmEngine<
   Future<int> update({
     required Filter Function(TMeta t) filter,
     TEntity entity,
-    Map<OrmColumn, dynamic> Function(TMeta t)? columnValues,
+    Map<ColumnDefinition, dynamic> Function(TMeta t)? columnValues,
     final bool? useIsolate,
   });
 
   @protected
   Future<List<TEntity>> query({
     Filter Function(TMeta t)? filter,
-    List<OrmColumn>? Function(TMeta t)? columns,
+    List<ColumnDefinition>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? limit,
     int? offset,
@@ -100,7 +100,7 @@ abstract class OrmEngine<
   @protected
   Future<List<Map<String, dynamic>>> queryMap({
     Filter Function(TMeta t)? filter,
-    List<OrmColumn>? Function(TMeta t)? columns,
+    List<ColumnDefinition>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? limit,
     int? offset,
@@ -108,13 +108,13 @@ abstract class OrmEngine<
   });
 
   Future<List<TEntity>> getEntities({
-    List<OrmColumn>? Function(TMeta t)? columns,
+    List<ColumnDefinition>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     Filter Function(TMeta t)? filter,
     final bool? useIsolate,
   });
   Future<List<Map<String, dynamic>>> getEntityMaps({
-    List<OrmColumn>? Function(TMeta t)? columns,
+    List<ColumnDefinition>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     Filter Function(TMeta t)? filter,
     final bool? useIsolate,

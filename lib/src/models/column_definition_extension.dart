@@ -1,8 +1,8 @@
 import 'entity.dart';
-import 'orm_column.dart';
+import 'column_definition.dart';
 
-extension OrmColumnX<TEntity extends IEntity, TType>
-    on OrmColumn<TEntity, TType> {
+extension ColumnDefinitionExtension<TEntity extends IEntity, TType>
+    on ColumnDefinition<TEntity, TType> {
   void setValue(Map<String, dynamic> map, TType? value) {
     map[name] = switch (columnType) {
       ColumnType.boolean => (value == true || value == 1) ? 1 : 0,

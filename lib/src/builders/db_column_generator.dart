@@ -34,7 +34,8 @@ class PropertyFinder extends RecursiveElementVisitor<void> {
 
 class DbColumnGenerator extends GeneratorForAnnotation<OrmEntity> {
   bool _hasDbAnnotation(FieldElement field) {
-    return const TypeChecker.fromRuntime(Column).hasAnnotationOfExact(field) ||
+    return const TypeChecker.fromRuntime(OrmColumn)
+            .hasAnnotationOfExact(field) ||
         const TypeChecker.fromRuntime(CopyableProp)
             .hasAnnotationOfExact(field) ||
         const TypeChecker.fromRuntime(NullableProp).hasAnnotationOfExact(field);
@@ -80,8 +81,8 @@ class ${className}Meta extends  EntityMeta<$className> {
 
     metaCode.writeln('''
   @override
-  OrmColumn<$className, String> get id => 
-  OrmColumn<$className, String>(
+  ColumnDefinition<$className, String> get id => 
+  ColumnDefinition<$className, String>(
         'id',
         primaryKey: true,
         write: (entity) => entity.id,
@@ -90,8 +91,8 @@ class ${className}Meta extends  EntityMeta<$className> {
       );
 
   @override
-  OrmColumn<$className, DateTime> get createdAt =>
-      OrmColumn<$className, DateTime>(
+  ColumnDefinition<$className, DateTime> get createdAt =>
+      ColumnDefinition<$className, DateTime>(
         'createdAt',
         write: (entity) => entity.createdAt,
         read: (json, entity, value) =>
@@ -99,8 +100,8 @@ class ${className}Meta extends  EntityMeta<$className> {
       );
 
   @override
-  OrmColumn<$className, DateTime> get updatedAt =>
-      OrmColumn<$className, DateTime>(
+  ColumnDefinition<$className, DateTime> get updatedAt =>
+      ColumnDefinition<$className, DateTime>(
         'updatedAt',
         write: (entity) => entity.updatedAt,
         read: (json, entity, value) =>
@@ -132,7 +133,8 @@ class ${className}Meta extends  EntityMeta<$className> {
           .toList(),
     );
     for (final field in fields) {
-      if (const TypeChecker.fromRuntime(Column).hasAnnotationOfExact(field)) {
+      if (const TypeChecker.fromRuntime(OrmColumn)
+          .hasAnnotationOfExact(field)) {
         final fieldName = field.name;
         final fieldType = field.type.getDisplayString(withNullability: false);
         final fieldTypeFull =
@@ -145,7 +147,7 @@ class ${className}Meta extends  EntityMeta<$className> {
           if (tp == null) {
             continue;
           }
-          if (const TypeChecker.fromRuntime(Column).isExactlyType(tp)) {
+          if (const TypeChecker.fromRuntime(OrmColumn).isExactlyType(tp)) {
             columnsList.writeln('$fieldName,');
             fieldAnnotations.add(annotation);
           }
@@ -256,8 +258,8 @@ class ${className}Meta extends  EntityMeta<$className> {
           }
 
           metaCode.writeln('''
-      OrmColumn<$className, $columnType> get $fieldName =>
-        OrmColumn<$className, $columnType>(
+      ColumnDefinition<$className, $columnType> get $fieldName =>
+        ColumnDefinition<$className, $columnType>(
           '$name',
     ''');
           if (alias != null) {
@@ -441,7 +443,7 @@ class ${className}Meta extends  EntityMeta<$className> {
 
     metaCode.writeln('''
       @override
-      Iterable<OrmColumn<$className, dynamic>> get columns => [
+      Iterable<ColumnDefinition<$className, dynamic>> get columns => [
       id,
       createdAt,
       updatedAt,

@@ -1,4 +1,4 @@
-export 'orm_column.dart';
+export 'column_definition.dart';
 export 'orm_condition.dart';
 export 'filter.dart';
 export 'filter_condition.dart';

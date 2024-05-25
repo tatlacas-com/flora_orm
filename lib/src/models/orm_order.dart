@@ -7,7 +7,7 @@ class OrmOrder extends Equatable {
     required this.column,
   });
   final OrderDirection direction;
-  final OrmColumn column;
+  final ColumnDefinition column;
 
   @override
   List<Object?> get props => [direction, column];
