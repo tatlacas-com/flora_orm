@@ -25,26 +25,34 @@ class AnimalEntity extends Entity<AnimalEntity, AnimalEntityMeta>
     this.num2,
   });
 
+  @override
   @column
   final String? text;
+  @override
   @column
   final List<String>? list;
+  @override
   @column
   final List<DateTime>? dt;
+  @override
   @column
   final DateTime? dt1;
+  @override
   @OrmColumn(isEnum: true)
   final Menum? numnum;
+  @override
   @OrmColumn(isEnum: true)
   final List<Menum>? num2;
+  @override
   @column
   final Testing? testing;
+  @override
   @column
   final List<Testing>? testing2;
 }
 
 class Testing extends Equatable {
-  Testing({required this.value});
+  const Testing({required this.value});
 
   final String value;
 
