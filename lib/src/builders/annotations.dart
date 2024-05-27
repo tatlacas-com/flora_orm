@@ -14,6 +14,7 @@ class OrmColumn<TColumnType> {
     this.unique = false,
     this.autoIncrementPrimary = false,
     this.hasRead = false,
+    this.isEnum = false,
     this.hasWrite = false,
     this.notNull,
     this.defaultValue,
@@ -24,6 +25,7 @@ class OrmColumn<TColumnType> {
   final String? writeFn;
   final bool encodedJson;
   final bool primaryKey;
+  final bool isEnum;
   final bool autoIncrementPrimary;
   final bool hasRead;
   final bool hasWrite;

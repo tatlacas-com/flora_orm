@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
+import 'package:tatlacas_orm/src/test_entities/copy_with.dart';
 
 import 'package:tatlacas_orm/tatlacas_orm.dart';
 
@@ -14,13 +15,28 @@ class AnimalEntity extends Entity<AnimalEntity, AnimalEntityMeta>
     super.id,
     super.createdAt,
     super.updatedAt,
-    required this.text,
-    required this.testing,
-    required this.testing2,
+    this.text,
+    this.testing,
+    this.list,
+    this.testing2,
+    this.dt,
+    this.dt1,
+    this.numnum,
+    this.num2,
   });
 
   @column
   final String? text;
+  @column
+  final List<String>? list;
+  @column
+  final List<DateTime>? dt;
+  @column
+  final DateTime? dt1;
+  @OrmColumn(isEnum: true)
+  final Menum? numnum;
+  @OrmColumn(isEnum: true)
+  final List<Menum>? num2;
   @column
   final Testing? testing;
   @column
@@ -51,4 +67,10 @@ class Testing extends Equatable {
 
   factory Testing.fromJson(String source) =>
       Testing.fromMap(json.decode(source) as Map<String, dynamic>);
+}
+
+enum Menum {
+  a,
+  b,
+  c,
 }
