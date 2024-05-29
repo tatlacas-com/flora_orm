@@ -288,13 +288,14 @@ class ${className}Meta extends  EntityMeta<$className> {
   }
  ''');
             } else {
-              final fnName = readFn != null ? '$readFn(map)' : 'fromMap(map)';
+              final fnName =
+                  readFn != null ? '$readFn(map)' : '$fieldType.fromMap(map)';
 
               mixinCode.writeln('''
     $fieldType? item;
     if (value != null) {
       Map<String, dynamic> map = jsonDecode(value);
-      item = ${isEnum ? '$fieldType.values.firstWhere((element) => element.name == map as String)' : '$fieldType.$fnName'} ;
+      item = ${isEnum ? '$fieldType.values.firstWhere((element) => element.name == map as String)' : fnName} ;
     }
     return copyWith(
       $fieldName: ${notNull ? 'item' : 'CopyWith(item)'},
