@@ -294,7 +294,7 @@ class ${className}Meta extends  EntityMeta<$className> {
               mixinCode.writeln('''
     $fieldType? item;
     if (value != null) {
-      ${isEnum ? 'Map<String, dynamic> map = jsonDecode(value);' : ''}
+      ${isEnum ? '' : 'Map<String, dynamic> map = jsonDecode(value);'}
       item = ${isEnum ? '$fieldType.values.firstWhere((element) => element.name == value as String)' : fnName} ;
     }
     return copyWith(
