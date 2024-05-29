@@ -9,13 +9,11 @@ class OrmColumn<TColumnType> {
     this.name,
     this.alias,
     this.writeFn,
-    this.encodedJson = false,
+    this.readFn,
     this.primaryKey = false,
     this.unique = false,
     this.autoIncrementPrimary = false,
-    this.hasRead = false,
     this.isEnum = false,
-    this.hasWrite = false,
     this.notNull,
     this.defaultValue,
   });
@@ -23,12 +21,11 @@ class OrmColumn<TColumnType> {
   final String? alias;
   // write function name. defaults to toMap
   final String? writeFn;
-  final bool encodedJson;
+  // read function name. defaults to fromMap
+  final String? readFn;
   final bool primaryKey;
   final bool isEnum;
   final bool autoIncrementPrimary;
-  final bool hasRead;
-  final bool hasWrite;
   final bool? notNull;
   final bool unique;
   final dynamic defaultValue;

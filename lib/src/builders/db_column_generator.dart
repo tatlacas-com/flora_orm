@@ -1,3 +1,4 @@
+import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/visitor.dart';
@@ -182,9 +183,7 @@ class ${className}Meta extends  EntityMeta<$className> {
 
           final String name =
               dbColumnAnnotation.getField('name')?.toStringValue() ?? fieldName;
-          final jsonEncoded = !isPremitiveType ||
-              (dbColumnAnnotation.getField('encodedJson')?.toBoolValue() ??
-                  false);
+          final jsonEncoded = !isPremitiveType;
           final String? alias =
               dbColumnAnnotation.getField('alias')?.toStringValue() ??
                   (jsonEncoded && isPremitiveType
@@ -194,10 +193,9 @@ class ${className}Meta extends  EntityMeta<$className> {
           final String? writeFn =
               dbColumnAnnotation.getField('writeFn')?.toStringValue();
 
-          final bool hasRead = isPremitiveType &&
-              (dbColumnAnnotation.getField('hasRead')?.toBoolValue() ?? false);
-          final bool hasWrite = isPremitiveType &&
-              (dbColumnAnnotation.getField('hasWrite')?.toBoolValue() ?? false);
+          final String? readFn =
+              dbColumnAnnotation.getField('readFn')?.toStringValue();
+
           final bool primaryKey = isPremitiveType &&
               (dbColumnAnnotation.getField('primaryKey')?.toBoolValue() ??
                   false);
@@ -211,19 +209,16 @@ class ${className}Meta extends  EntityMeta<$className> {
                   (field.type.nullabilitySuffix == NullabilitySuffix.none);
           final bool unique = isPremitiveType &&
               (dbColumnAnnotation.getField('unique')?.toBoolValue() ?? false);
-          dynamic defaultValue = dbColumnAnnotation.getField('defaultValue');
+          DartObject? df = dbColumnAnnotation.getField('defaultValue');
+          dynamic defaultValue;
           if (field.type.isDartCoreBool) {
-            defaultValue =
-                dbColumnAnnotation.getField('defaultValue')?.toBoolValue();
+            defaultValue = df?.toBoolValue();
           } else if (field.type.isDartCoreInt) {
-            defaultValue =
-                dbColumnAnnotation.getField('defaultValue')?.toIntValue();
+            defaultValue = df?.toIntValue();
           } else if (field.type.isDartCoreDouble) {
-            defaultValue =
-                dbColumnAnnotation.getField('defaultValue')?.toDoubleValue();
+            defaultValue = df?.toDoubleValue();
           } else {
-            defaultValue =
-                dbColumnAnnotation.getField('defaultValue')?.toStringValue();
+            defaultValue = df?.toStringValue();
           }
           var columnType = fieldType;
           String? jsonEncodedType;
@@ -246,7 +241,7 @@ class ${className}Meta extends  EntityMeta<$className> {
 
           FieldElement? aliasProperty;
           bool aliasNotNull = false;
-          if (alias != null && (hasRead || jsonEncoded)) {
+          if (alias != null && jsonEncoded) {
             final finder = PropertyFinder(alias);
             classElement.accept(finder);
             aliasProperty = finder.foundProperty!;
@@ -266,13 +261,14 @@ class ${className}Meta extends  EntityMeta<$className> {
   $className read$fieldNameCamel(Map<String, dynamic> json, value){
  ''');
             if (isList) {
+              final fnName = readFn != null ? '$readFn(e)' : 'fromMap(e)';
               final map = ogIsPremitiveType
                   ? (fieldType == 'DateTime'
                       ? 'DateTime.parse(e as String)'
                       : 'e as $fieldType')
                   : (isEnum
                       ? '$fieldType.values.firstWhere((element) => element.name == e as String)'
-                      : '$fieldType.fromMap(e)');
+                      : '$fieldType.$fnName');
               mixinCode.writeln('''
     List<$fieldType>? items;
     if (value != null) {
@@ -285,11 +281,13 @@ class ${className}Meta extends  EntityMeta<$className> {
   }
  ''');
             } else {
+              final fnName = readFn != null ? '$readFn(map)' : 'fromMap(map)';
+
               mixinCode.writeln('''
     $fieldType? item;
     if (value != null) {
       Map<String, dynamic> map = jsonDecode(value);
-      item = ${isEnum ? '$fieldType.values.firstWhere((element) => element.name == map as String)' : '$fieldType.fromMap(map)'} ;
+      item = ${isEnum ? '$fieldType.values.firstWhere((element) => element.name == map as String)' : '$fieldType.$fnName'} ;
     }
     return copyWith(
       $fieldName: ${notNull ? 'item' : 'CopyWith(item)'},
@@ -299,11 +297,9 @@ class ${className}Meta extends  EntityMeta<$className> {
             }
           }
 
-          if (hasRead) {
-            mixinCode.writeln('''
-  $className read$fieldNameCamel(Map<String, dynamic> json, value);
- ''');
-          } else if (jsonEncoded && isPremitiveType) {
+          if (jsonEncoded && isPremitiveType) {
+            final fnName = readFn != null ? '$readFn(map)' : 'fromMap(map)';
+
             mixinCode.writeln('''
   $className read$fieldNameCamel(Map<String, dynamic> json, value){
     $jsonEncodedType? $alias;
@@ -312,7 +308,7 @@ class ${className}Meta extends  EntityMeta<$className> {
       Map<String, dynamic> map = jsonDecode(val);
 ''');
             mixinCode.writeln('''
-      $alias = $jsonEncodedType.fromMap(map);
+      $alias = $jsonEncodedType.$fnName;
     }
     return copyWith(
       $fieldName: ${notNull ? 'val' : 'CopyWith(val)'},
@@ -320,11 +316,6 @@ class ${className}Meta extends  EntityMeta<$className> {
       json: json,
     );
   }
- ''');
-          }
-          if (hasWrite) {
-            mixinCode.writeln('''
-  $columnType? write$fieldNameCamel();
  ''');
           }
 
@@ -374,11 +365,7 @@ class ${className}Meta extends  EntityMeta<$className> {
     ''');
             }
           }
-          if (hasWrite) {
-            metaCode.writeln('''
-          write: (entity) => entity.write$fieldNameCamel(),
-    ''');
-          } else if (jsonEncoded) {
+          if (jsonEncoded) {
             var typeName = isPremitiveType ? alias : fieldName;
             metaCode.writeln('''
           write: (entity) {
@@ -430,7 +417,7 @@ class ${className}Meta extends  EntityMeta<$className> {
           write: (entity) => entity.$fieldName,
     ''');
           }
-          if (hasRead || jsonEncoded) {
+          if (jsonEncoded) {
             if (jsonEncoded) {
               if (alias != null) {
                 if (aliasNotNull) {
