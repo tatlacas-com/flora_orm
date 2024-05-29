@@ -294,8 +294,8 @@ class ${className}Meta extends  EntityMeta<$className> {
               mixinCode.writeln('''
     $fieldType? item;
     if (value != null) {
-      Map<String, dynamic> map = jsonDecode(value);
-      item = ${isEnum ? '$fieldType.values.firstWhere((element) => element.name == map as String)' : fnName} ;
+      ${isEnum ? 'Map<String, dynamic> map = jsonDecode(value);' : ''}
+      item = ${isEnum ? '$fieldType.values.firstWhere((element) => element.name == value as String)' : fnName} ;
     }
     return copyWith(
       $fieldName: ${notNull ? 'item' : 'CopyWith(item)'},
@@ -419,7 +419,7 @@ class ${className}Meta extends  EntityMeta<$className> {
               }
             }
             metaCode.writeln('''
-            return jsonEncode(map);
+            return ${isEnum ? 'map' : 'jsonEncode(map)'};
             },
     ''');
           } else {
@@ -445,9 +445,6 @@ class ${className}Meta extends  EntityMeta<$className> {
               }
               metaCode.writeln('''
           read: (json, entity, value){
-            if ('null' == value){
-              return entity.read$fieldNameCamel(json, null);
-            }
             return entity.read$fieldNameCamel(json, value);
           },
         );
