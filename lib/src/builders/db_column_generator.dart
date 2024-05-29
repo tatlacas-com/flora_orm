@@ -256,19 +256,26 @@ class ${className}Meta extends  EntityMeta<$className> {
  ''');
           }
 
+          if (readFn != null) {
+            mixinCode.writeln('''
+  $fieldType $readFn(Map<String, dynamic> json);
+ ''');
+          }
+
           if (!isPremitiveType) {
             mixinCode.writeln('''
   $className read$fieldNameCamel(Map<String, dynamic> json, value){
  ''');
             if (isList) {
-              final fnName = readFn != null ? '$readFn(e)' : 'fromMap(e)';
+              final fnName =
+                  readFn != null ? '$readFn(e)' : '$fieldType.fromMap(e)';
               final map = ogIsPremitiveType
                   ? (fieldType == 'DateTime'
                       ? 'DateTime.parse(e as String)'
                       : 'e as $fieldType')
                   : (isEnum
                       ? '$fieldType.values.firstWhere((element) => element.name == e as String)'
-                      : '$fieldType.$fnName');
+                      : fnName);
               mixinCode.writeln('''
     List<$fieldType>? items;
     if (value != null) {
@@ -298,7 +305,9 @@ class ${className}Meta extends  EntityMeta<$className> {
           }
 
           if (jsonEncoded && isPremitiveType) {
-            final fnName = readFn != null ? '$readFn(map)' : 'fromMap(map)';
+            final fnName = readFn != null
+                ? '$readFn(map)'
+                : '$jsonEncodedType.fromMap(map)';
 
             mixinCode.writeln('''
   $className read$fieldNameCamel(Map<String, dynamic> json, value){
@@ -308,7 +317,7 @@ class ${className}Meta extends  EntityMeta<$className> {
       Map<String, dynamic> map = jsonDecode(val);
 ''');
             mixinCode.writeln('''
-      $alias = $jsonEncodedType.$fnName;
+      $alias = $fnName;
     }
     return copyWith(
       $fieldName: ${notNull ? 'val' : 'CopyWith(val)'},
