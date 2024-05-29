@@ -408,12 +408,18 @@ class ${className}Meta extends  EntityMeta<$className> {
                   : (isPremitiveType
                       ? (fieldType == 'DateTime' ? '.toIso8601String()' : '')
                       : (isEnum ? '.name' : '.toMap()'));
-              metaCode.writeln('''
+              if (isNotNull) {
+                metaCode.writeln('''
+            final map = entity.$typeName$map;
+    ''');
+              } else {
+                metaCode.writeln('''
             if(entity.$typeName == null){
                 return null;
             }
             final map = entity.$typeName?$map;
     ''');
+              }
             }
             metaCode.writeln('''
             return jsonEncode(map);

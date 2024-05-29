@@ -23,6 +23,8 @@ class AnimalEntity extends Entity<AnimalEntity, AnimalEntityMeta>
     this.dt1,
     this.numnum,
     this.num2,
+    this.num4 = Menum.a,
+    this.num6 = const [],
   });
 
   @override
@@ -42,7 +44,13 @@ class AnimalEntity extends Entity<AnimalEntity, AnimalEntityMeta>
   final Menum? numnum;
   @override
   @OrmColumn(isEnum: true)
+  final Menum num4;
+  @override
+  @OrmColumn(isEnum: true)
   final List<Menum>? num2;
+  @override
+  @OrmColumn(isEnum: true)
+  final List<Menum> num6;
   @override
   @column
   final Testing? testing;

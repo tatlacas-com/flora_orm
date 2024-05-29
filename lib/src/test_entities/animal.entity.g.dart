@@ -46,6 +46,18 @@ mixin _AnimalEntityMixin on Entity<AnimalEntity, AnimalEntityMeta> {
     );
   }
 
+  AnimalEntity readNum4(Map<String, dynamic> json, value) {
+    Menum? item;
+    if (value != null) {
+      Map<String, dynamic> map = jsonDecode(value);
+      item =
+          Menum.values.firstWhere((element) => element.name == map as String);
+    }
+    return copyWith(
+      num4: item,
+    );
+  }
+
   AnimalEntity readNum2(Map<String, dynamic> json, value) {
     List<Menum>? items;
     if (value != null) {
@@ -57,6 +69,20 @@ mixin _AnimalEntityMixin on Entity<AnimalEntity, AnimalEntityMeta> {
     }
     return copyWith(
       num2: CopyWith(items),
+    );
+  }
+
+  AnimalEntity readNum6(Map<String, dynamic> json, value) {
+    List<Menum>? items;
+    if (value != null) {
+      List<dynamic> map = jsonDecode(value);
+      items = map
+          .map<Menum>((e) =>
+              Menum.values.firstWhere((element) => element.name == e as String))
+          .toList();
+    }
+    return copyWith(
+      num6: items,
     );
   }
 
@@ -87,7 +113,9 @@ mixin _AnimalEntityMixin on Entity<AnimalEntity, AnimalEntityMeta> {
   List<DateTime>? get dt;
   DateTime? get dt1;
   Menum? get numnum;
+  Menum get num4;
   List<Menum>? get num2;
+  List<Menum> get num6;
   Testing? get testing;
   List<Testing>? get testing2;
 
@@ -99,7 +127,9 @@ mixin _AnimalEntityMixin on Entity<AnimalEntity, AnimalEntityMeta> {
         dt,
         dt1,
         numnum,
+        num4,
         num2,
+        num6,
         testing,
         testing2,
       ];
@@ -113,7 +143,9 @@ mixin _AnimalEntityMixin on Entity<AnimalEntity, AnimalEntityMeta> {
     CopyWith<List<DateTime>?>? dt,
     CopyWith<DateTime?>? dt1,
     CopyWith<Menum?>? numnum,
+    Menum? num4,
     CopyWith<List<Menum>?>? num2,
+    List<Menum>? num6,
     CopyWith<Testing?>? testing,
     CopyWith<List<Testing>?>? testing2,
     Map<String, dynamic>? json,
@@ -127,7 +159,9 @@ mixin _AnimalEntityMixin on Entity<AnimalEntity, AnimalEntityMeta> {
       dt: dt != null ? dt.value : this.dt,
       dt1: dt1 != null ? dt1.value : this.dt1,
       numnum: numnum != null ? numnum.value : this.numnum,
+      num4: num4 ?? this.num4,
       num2: num2 != null ? num2.value : this.num2,
+      num6: num6 ?? this.num6,
       testing: testing != null ? testing.value : this.testing,
       testing2: testing2 != null ? testing2.value : this.testing2,
     );
@@ -236,6 +270,23 @@ class AnimalEntityMeta extends EntityMeta<AnimalEntity> {
         },
       );
 
+  ColumnDefinition<AnimalEntity, String> get num4 =>
+      ColumnDefinition<AnimalEntity, String>(
+        'num4',
+        notNull: true,
+        write: (entity) {
+          final map = entity.num4.name;
+
+          return jsonEncode(map);
+        },
+        read: (json, entity, value) {
+          if ('null' == value) {
+            return entity.readNum4(json, null);
+          }
+          return entity.readNum4(json, value);
+        },
+      );
+
   ColumnDefinition<AnimalEntity, String> get num2 =>
       ColumnDefinition<AnimalEntity, String>(
         'num2',
@@ -249,6 +300,23 @@ class AnimalEntityMeta extends EntityMeta<AnimalEntity> {
             return entity.readNum2(json, null);
           }
           return entity.readNum2(json, value);
+        },
+      );
+
+  ColumnDefinition<AnimalEntity, String> get num6 =>
+      ColumnDefinition<AnimalEntity, String>(
+        'num6',
+        notNull: true,
+        write: (entity) {
+          final map = entity.num6.map((p) => p.name).toList();
+
+          return jsonEncode(map);
+        },
+        read: (json, entity, value) {
+          if ('null' == value) {
+            return entity.readNum6(json, null);
+          }
+          return entity.readNum6(json, value);
         },
       );
 
@@ -297,7 +365,9 @@ class AnimalEntityMeta extends EntityMeta<AnimalEntity> {
         dt,
         dt1,
         numnum,
+        num4,
         num2,
+        num6,
         testing,
         testing2,
       ];
