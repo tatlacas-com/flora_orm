@@ -279,7 +279,7 @@ class ${className}Meta extends  EntityMeta<$className> {
               mixinCode.writeln('''
     List<$fieldType>? items;
     if (value != null) {
-      List<dynamic> map = jsonDecode(value);
+      List<dynamic> map = value is List ? value : jsonDecode(value);
       items = map.map<$fieldType>((e) => $map).toList();
     }
     return copyWith(
@@ -294,7 +294,7 @@ class ${className}Meta extends  EntityMeta<$className> {
               mixinCode.writeln('''
     $fieldType? item;
     if (value != null) {
-      ${isEnum ? '' : 'Map<String, dynamic> map = jsonDecode(value);'}
+      ${isEnum ? '' : 'Map<String, dynamic> map = value is Map<String, dynamic> ? value : jsonDecode(value);'}
       item = ${isEnum ? '$fieldType.values.firstWhere((element) => element.name == value as String)' : fnName} ;
     }
     return copyWith(
@@ -315,7 +315,7 @@ class ${className}Meta extends  EntityMeta<$className> {
     $jsonEncodedType? $alias;
     final val = value != null && value != 'null' ? value : null;
     if (val != null) {
-      Map<String, dynamic> map = jsonDecode(val);
+      Map<String, dynamic> map = val is Map<String, dynamic> ? val : jsonDecode(val);
 ''');
             mixinCode.writeln('''
       $alias = $fnName;
