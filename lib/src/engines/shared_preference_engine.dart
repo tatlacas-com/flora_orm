@@ -135,6 +135,7 @@ class SharedPreferenceEngine<TEntity extends IEntity,
     int? limit,
     int? offset,
     final bool? useIsolate,
+    Map<String, dynamic>? isolateArgs,
   }) async {
     return [];
   }

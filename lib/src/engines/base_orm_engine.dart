@@ -9,15 +9,24 @@ import 'package:tatlacas_orm/src/models/filter.dart';
 import 'package:uuid/uuid.dart';
 
 class Args<TEntity extends IEntity> {
-  Args({required this.t, required this.maps});
+  Args({
+    required this.t,
+    required this.maps,
+    required this.isolateArgs,
+  });
 
   final IEntity t;
   final List<Map<String, dynamic>> maps;
+
+  final Map<String, dynamic>? isolateArgs;
 }
 
 List<IEntity> entitiesFromMap<TEntity extends IEntity>(Args args) {
   List<TEntity> entities = [];
   for (final item in args.maps) {
+    if (args.isolateArgs != null) {
+      item.addAll(args.isolateArgs!);
+    }
     entities.add(args.t.load(item) as TEntity);
   }
   return entities;
@@ -361,6 +370,7 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
     int? limit,
     int? offset,
     final bool? useIsolate,
+    Map<String, dynamic>? isolateArgs,
   }) async {
     List<Map<String, dynamic>> maps;
     final db = await dbContext.database;
@@ -402,7 +412,11 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
       );
     }
     final spawnIsolate = useIsolate ?? useIsolateDefault;
-    final args = Args<TEntity>(t: mType.copyWith(), maps: maps);
+    final args = Args<TEntity>(
+      t: mType.copyWith(),
+      maps: maps,
+      isolateArgs: isolateArgs,
+    );
     if (!spawnIsolate) {
       return entitiesFromMap(args).map<TEntity>((e) => e as TEntity).toList();
     }

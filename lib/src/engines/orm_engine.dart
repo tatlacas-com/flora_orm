@@ -96,6 +96,7 @@ abstract class OrmEngine<
     int? limit,
     int? offset,
     final bool? useIsolate,
+    Map<String, dynamic>? isolateArgs,
   });
   @protected
   Future<List<Map<String, dynamic>>> queryMap({
