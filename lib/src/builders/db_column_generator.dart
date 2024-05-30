@@ -258,7 +258,7 @@ class ${className}Meta extends  EntityMeta<$className> {
 
           if (readFn != null) {
             mixinCode.writeln('''
-  $fieldType $readFn(Map<String, dynamic> json);
+  $fieldType $readFn(Map<String, dynamic> json, Map<String, dynamic> value);
  ''');
           }
 
@@ -268,7 +268,7 @@ class ${className}Meta extends  EntityMeta<$className> {
  ''');
             if (isList) {
               final fnName =
-                  readFn != null ? '$readFn(e)' : '$fieldType.fromMap(e)';
+                  readFn != null ? '$readFn(json, e)' : '$fieldType.fromMap(e)';
               final map = ogIsPremitiveType
                   ? (fieldType == 'DateTime'
                       ? 'DateTime.parse(e as String)'
@@ -288,8 +288,9 @@ class ${className}Meta extends  EntityMeta<$className> {
   }
  ''');
             } else {
-              final fnName =
-                  readFn != null ? '$readFn(map)' : '$fieldType.fromMap(map)';
+              final fnName = readFn != null
+                  ? '$readFn(json, map)'
+                  : '$fieldType.fromMap(map)';
 
               mixinCode.writeln('''
     $fieldType? item;
@@ -307,7 +308,7 @@ class ${className}Meta extends  EntityMeta<$className> {
 
           if (jsonEncoded && isPremitiveType) {
             final fnName = readFn != null
-                ? '$readFn(map)'
+                ? '$readFn(json, map)'
                 : '$jsonEncodedType.fromMap(map)';
 
             mixinCode.writeln('''
