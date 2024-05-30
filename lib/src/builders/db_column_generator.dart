@@ -274,7 +274,7 @@ class ${className}Meta extends  EntityMeta<$className> {
                       ? 'DateTime.parse(e as String)'
                       : 'e as $fieldType')
                   : (isEnum
-                      ? '$fieldType.values.firstWhere((element) => element.name == e as String)'
+                      ? '$fieldType.values.firstWhereOrNull((element) => element.name == e as String)'
                       : fnName);
               mixinCode.writeln('''
     List<$fieldType>? items;
@@ -296,7 +296,7 @@ class ${className}Meta extends  EntityMeta<$className> {
     $fieldType? item;
     if (value != null) {
       ${isEnum ? '' : 'Map<String, dynamic> map = value is Map<String, dynamic> ? value : jsonDecode(value);'}
-      item = ${isEnum ? '$fieldType.values.firstWhere((element) => element.name == value as String)' : fnName} ;
+      item = ${isEnum ? '$fieldType.values.firstWhereOrNull((element) => element.name == value as String)' : fnName} ;
     }
     return copyWith(
       $fieldName: ${notNull ? 'item' : 'CopyWith(item)'},
