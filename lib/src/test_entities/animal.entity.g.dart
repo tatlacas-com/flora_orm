@@ -15,7 +15,7 @@ mixin _AnimalEntityMixin on Entity<AnimalEntity, AnimalEntityMeta> {
   AnimalEntity readList(Map<String, dynamic> json, value) {
     List<String>? items;
     if (value != null) {
-      List<dynamic> map = jsonDecode(value);
+      List<dynamic> map = value is List ? value : jsonDecode(value);
       items = map.map<String>((e) => e as String).toList();
     }
     return copyWith(
@@ -26,7 +26,7 @@ mixin _AnimalEntityMixin on Entity<AnimalEntity, AnimalEntityMeta> {
   AnimalEntity readDt(Map<String, dynamic> json, value) {
     List<DateTime>? items;
     if (value != null) {
-      List<dynamic> map = jsonDecode(value);
+      List<dynamic> map = value is List ? value : jsonDecode(value);
       items = map.map<DateTime>((e) => DateTime.parse(e as String)).toList();
     }
     return copyWith(
@@ -37,9 +37,8 @@ mixin _AnimalEntityMixin on Entity<AnimalEntity, AnimalEntityMeta> {
   AnimalEntity readNumnum(Map<String, dynamic> json, value) {
     Menum? item;
     if (value != null) {
-      Map<String, dynamic> map = jsonDecode(value);
       item =
-          Menum.values.firstWhere((element) => element.name == map as String);
+          Menum.values.firstWhere((element) => element.name == value as String);
     }
     return copyWith(
       numnum: CopyWith(item),
@@ -49,9 +48,8 @@ mixin _AnimalEntityMixin on Entity<AnimalEntity, AnimalEntityMeta> {
   AnimalEntity readNum4(Map<String, dynamic> json, value) {
     Menum? item;
     if (value != null) {
-      Map<String, dynamic> map = jsonDecode(value);
       item =
-          Menum.values.firstWhere((element) => element.name == map as String);
+          Menum.values.firstWhere((element) => element.name == value as String);
     }
     return copyWith(
       num4: item,
@@ -61,7 +59,7 @@ mixin _AnimalEntityMixin on Entity<AnimalEntity, AnimalEntityMeta> {
   AnimalEntity readNum2(Map<String, dynamic> json, value) {
     List<Menum>? items;
     if (value != null) {
-      List<dynamic> map = jsonDecode(value);
+      List<dynamic> map = value is List ? value : jsonDecode(value);
       items = map
           .map<Menum>((e) =>
               Menum.values.firstWhere((element) => element.name == e as String))
@@ -75,7 +73,7 @@ mixin _AnimalEntityMixin on Entity<AnimalEntity, AnimalEntityMeta> {
   AnimalEntity readNum6(Map<String, dynamic> json, value) {
     List<Menum>? items;
     if (value != null) {
-      List<dynamic> map = jsonDecode(value);
+      List<dynamic> map = value is List ? value : jsonDecode(value);
       items = map
           .map<Menum>((e) =>
               Menum.values.firstWhere((element) => element.name == e as String))
@@ -89,7 +87,8 @@ mixin _AnimalEntityMixin on Entity<AnimalEntity, AnimalEntityMeta> {
   AnimalEntity readTesting(Map<String, dynamic> json, value) {
     Testing? item;
     if (value != null) {
-      Map<String, dynamic> map = jsonDecode(value);
+      Map<String, dynamic> map =
+          value is Map<String, dynamic> ? value : jsonDecode(value);
       item = Testing.fromMap(map);
     }
     return copyWith(
@@ -100,7 +99,7 @@ mixin _AnimalEntityMixin on Entity<AnimalEntity, AnimalEntityMeta> {
   AnimalEntity readTesting2(Map<String, dynamic> json, value) {
     List<Testing>? items;
     if (value != null) {
-      List<dynamic> map = jsonDecode(value);
+      List<dynamic> map = value is List ? value : jsonDecode(value);
       items = map.map<Testing>((e) => Testing.fromMap(e)).toList();
     }
     return copyWith(
@@ -118,6 +117,7 @@ mixin _AnimalEntityMixin on Entity<AnimalEntity, AnimalEntityMeta> {
   List<Menum> get num6;
   Testing? get testing;
   List<Testing>? get testing2;
+  List<TextSpan>? get textSpans;
 
   @override
   List<Object?> get props => [
@@ -132,6 +132,7 @@ mixin _AnimalEntityMixin on Entity<AnimalEntity, AnimalEntityMeta> {
         num6,
         testing,
         testing2,
+        textSpans,
       ];
   @override
   AnimalEntity copyWith({
@@ -148,6 +149,7 @@ mixin _AnimalEntityMixin on Entity<AnimalEntity, AnimalEntityMeta> {
     List<Menum>? num6,
     CopyWith<Testing?>? testing,
     CopyWith<List<Testing>?>? testing2,
+    CopyWith<List<TextSpan>?>? textSpans,
     Map<String, dynamic>? json,
   }) {
     return AnimalEntity(
@@ -164,6 +166,7 @@ mixin _AnimalEntityMixin on Entity<AnimalEntity, AnimalEntityMeta> {
       num6: num6 ?? this.num6,
       testing: testing != null ? testing.value : this.testing,
       testing2: testing2 != null ? testing2.value : this.testing2,
+      textSpans: textSpans != null ? textSpans.value : this.textSpans,
     );
   }
 }
@@ -220,9 +223,6 @@ class AnimalEntityMeta extends EntityMeta<AnimalEntity> {
           return jsonEncode(map);
         },
         read: (json, entity, value) {
-          if ('null' == value) {
-            return entity.readList(json, null);
-          }
           return entity.readList(json, value);
         },
       );
@@ -236,9 +236,6 @@ class AnimalEntityMeta extends EntityMeta<AnimalEntity> {
           return jsonEncode(map);
         },
         read: (json, entity, value) {
-          if ('null' == value) {
-            return entity.readDt(json, null);
-          }
           return entity.readDt(json, value);
         },
       );
@@ -260,12 +257,9 @@ class AnimalEntityMeta extends EntityMeta<AnimalEntity> {
           }
           final map = entity.numnum?.name;
 
-          return jsonEncode(map);
+          return map;
         },
         read: (json, entity, value) {
-          if ('null' == value) {
-            return entity.readNumnum(json, null);
-          }
           return entity.readNumnum(json, value);
         },
       );
@@ -277,12 +271,9 @@ class AnimalEntityMeta extends EntityMeta<AnimalEntity> {
         write: (entity) {
           final map = entity.num4.name;
 
-          return jsonEncode(map);
+          return map;
         },
         read: (json, entity, value) {
-          if ('null' == value) {
-            return entity.readNum4(json, null);
-          }
           return entity.readNum4(json, value);
         },
       );
@@ -296,9 +287,6 @@ class AnimalEntityMeta extends EntityMeta<AnimalEntity> {
           return jsonEncode(map);
         },
         read: (json, entity, value) {
-          if ('null' == value) {
-            return entity.readNum2(json, null);
-          }
           return entity.readNum2(json, value);
         },
       );
@@ -313,9 +301,6 @@ class AnimalEntityMeta extends EntityMeta<AnimalEntity> {
           return jsonEncode(map);
         },
         read: (json, entity, value) {
-          if ('null' == value) {
-            return entity.readNum6(json, null);
-          }
           return entity.readNum6(json, value);
         },
       );
@@ -332,9 +317,6 @@ class AnimalEntityMeta extends EntityMeta<AnimalEntity> {
           return jsonEncode(map);
         },
         read: (json, entity, value) {
-          if ('null' == value) {
-            return entity.readTesting(json, null);
-          }
           return entity.readTesting(json, value);
         },
       );
@@ -348,9 +330,6 @@ class AnimalEntityMeta extends EntityMeta<AnimalEntity> {
           return jsonEncode(map);
         },
         read: (json, entity, value) {
-          if ('null' == value) {
-            return entity.readTesting2(json, null);
-          }
           return entity.readTesting2(json, value);
         },
       );

@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:tatlacas_orm/src/test_entities/copy_with.dart';
 
 import 'package:tatlacas_orm/tatlacas_orm.dart';
@@ -21,6 +22,7 @@ class AnimalEntity extends Entity<AnimalEntity, AnimalEntityMeta>
     this.testing2,
     this.dt,
     this.dt1,
+    this.textSpans,
     this.numnum,
     this.num2,
     this.num4 = Menum.a,
@@ -57,6 +59,9 @@ class AnimalEntity extends Entity<AnimalEntity, AnimalEntityMeta>
   @override
   @column
   final List<Testing>? testing2;
+
+  @override
+  final List<TextSpan>? textSpans;
 }
 
 class Testing extends Equatable {

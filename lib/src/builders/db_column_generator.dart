@@ -419,7 +419,7 @@ class ${className}Meta extends  EntityMeta<$className> {
               }
             }
             metaCode.writeln('''
-            return ${isEnum ? 'map' : 'jsonEncode(map)'};
+            return ${isEnum && !isDartCoreList ? 'map' : 'jsonEncode(map)'};
             },
     ''');
           } else {
