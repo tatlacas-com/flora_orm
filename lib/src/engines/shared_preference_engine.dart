@@ -52,6 +52,8 @@ class SharedPreferenceEngine<TEntity extends IEntity,
     required Filter Function(TMeta t) filter,
     int? offset,
     final bool? useIsolate,
+    Map<String, dynamic>? isolateArgs,
+    void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   }) async {
     return null;
   }
@@ -136,6 +138,7 @@ class SharedPreferenceEngine<TEntity extends IEntity,
     int? offset,
     final bool? useIsolate,
     Map<String, dynamic>? isolateArgs,
+    void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   }) async {
     return [];
   }
@@ -145,6 +148,8 @@ class SharedPreferenceEngine<TEntity extends IEntity,
     Filter Function(TMeta t)? filter,
     String query, {
     final bool? useIsolate,
+    Map<String, dynamic>? isolateArgs,
+    void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   }) async {
     return [];
   }

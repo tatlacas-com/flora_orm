@@ -13,16 +13,19 @@ class Args<TEntity extends IEntity> {
     required this.t,
     required this.maps,
     required this.isolateArgs,
+    required this.onIsolatePreMap,
   });
 
   final IEntity t;
   final List<Map<String, dynamic>> maps;
 
   final Map<String, dynamic>? isolateArgs;
+  void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap;
 }
 
 List<IEntity> entitiesFromMap<TEntity extends IEntity>(Args args) {
   List<TEntity> entities = [];
+  args.onIsolatePreMap?.call(args.isolateArgs);
   for (final item in args.maps) {
     if (args.isolateArgs != null) {
       item.addAll(args.isolateArgs!);
@@ -125,6 +128,8 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
     required Filter Function(TMeta t) filter,
     int? offset,
     final bool? useIsolate,
+    Map<String, dynamic>? isolateArgs,
+    void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   }) async {
     List<TEntity> maps = await query(
       filter: filter,
@@ -133,6 +138,8 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
       offset: offset,
       orderBy: orderBy,
       useIsolate: useIsolate,
+      isolateArgs: isolateArgs,
+      onIsolatePreMap: onIsolatePreMap,
     );
     if (maps.isNotEmpty) {
       return maps.first;
@@ -147,6 +154,8 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
     required Filter Function(TMeta t) filter,
     int? offset,
     final bool? useIsolate,
+    Map<String, dynamic>? isolateArgs,
+    void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   }) async {
     List<Map<String, dynamic>> maps = await queryMap(
       filter: filter,
@@ -155,6 +164,8 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
       offset: offset,
       orderBy: orderBy,
       useIsolate: useIsolate,
+      isolateArgs: isolateArgs,
+      onIsolatePreMap: onIsolatePreMap,
     );
     if (maps.isNotEmpty) {
       return maps.first;
@@ -167,11 +178,15 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
     required ColumnDefinition Function(TMeta t) column,
     Filter Function(TMeta t)? filter,
     final bool? useIsolate,
+    Map<String, dynamic>? isolateArgs,
+    void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   }) async {
     List<Map> result = await rawQuery(
       filter,
       'SELECT SUM (${column(t).name}) FROM ${t.tableName}',
       useIsolate: useIsolate,
+      isolateArgs: isolateArgs,
+      onIsolatePreMap: onIsolatePreMap,
     );
     if (result.isNotEmpty) {
       final firstRow = result.first;
@@ -187,12 +202,16 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
     required Iterable<ColumnDefinition> Function(TMeta t) columns,
     Filter Function(TMeta t)? filter,
     final bool? useIsolate,
+    Map<String, dynamic>? isolateArgs,
+    void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   }) async {
     final cols = columns(t).map((e) => e.name).join(' * ');
     List<Map> result = await rawQuery(
       filter,
       'SELECT SUM ($cols) FROM ${t.tableName}',
       useIsolate: useIsolate,
+      isolateArgs: isolateArgs,
+      onIsolatePreMap: onIsolatePreMap,
     );
     if (result.isNotEmpty) {
       final firstRow = result.first;
@@ -220,6 +239,8 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
     int? limit,
     int? offset,
     final bool? useIsolate,
+    Map<String, dynamic>? isolateArgs,
+    void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   }) async {
     List<TEntity> maps = await query(
       filter: filter,
@@ -228,6 +249,8 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
       columns: columns ?? (t) => t.columns,
       orderBy: orderBy,
       useIsolate: useIsolate,
+      isolateArgs: isolateArgs,
+      onIsolatePreMap: onIsolatePreMap,
     );
     if (maps.isNotEmpty) {
       return maps;
@@ -243,6 +266,8 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
     int? limit,
     int? offset,
     final bool? useIsolate,
+    Map<String, dynamic>? isolateArgs,
+    void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   }) async {
     List<Map<String, Object?>> maps = await queryMap(
       filter: filter,
@@ -251,6 +276,8 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
       columns: columns ?? (t) => t.columns,
       orderBy: orderBy,
       useIsolate: useIsolate,
+      isolateArgs: isolateArgs,
+      onIsolatePreMap: onIsolatePreMap,
     );
     if (maps.isNotEmpty) {
       return maps;
@@ -297,11 +324,15 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
   Future<int> getCount({
     Filter Function(TMeta t)? filter,
     final bool? useIsolate,
+    Map<String, dynamic>? isolateArgs,
+    void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   }) async {
     List<Map<String, Object?>> result = await rawQuery(
       filter,
       'SELECT COUNT (*) FROM ${t.tableName}',
       useIsolate: useIsolate,
+      isolateArgs: isolateArgs,
+      onIsolatePreMap: onIsolatePreMap,
     );
     if (result.isNotEmpty) {
       final firstRow = result.first;
@@ -371,6 +402,7 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
     int? offset,
     final bool? useIsolate,
     Map<String, dynamic>? isolateArgs,
+    void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   }) async {
     List<Map<String, dynamic>> maps;
     final db = await dbContext.database;
@@ -416,6 +448,7 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
       t: mType.copyWith(),
       maps: maps,
       isolateArgs: isolateArgs,
+      onIsolatePreMap: onIsolatePreMap,
     );
     if (!spawnIsolate) {
       return entitiesFromMap(args).map<TEntity>((e) => e as TEntity).toList();
@@ -433,6 +466,8 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
     int? limit,
     int? offset,
     final bool? useIsolate,
+    Map<String, dynamic>? isolateArgs,
+    void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   }) async {
     List<Map<String, dynamic>> maps;
     final db = await dbContext.database;
@@ -482,6 +517,8 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
     Filter Function(TMeta t)? filter,
     String query, {
     final bool? useIsolate,
+    Map<String, dynamic>? isolateArgs,
+    void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   }) async {
     final db = await dbContext.database;
     if (filter == null) {
