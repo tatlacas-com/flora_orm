@@ -279,8 +279,8 @@ class ${className}Meta extends  EntityMeta<$className> {
               mixinCode.writeln('''
     List<$fieldType>? items;
     if (value != null) {
-      List<dynamic> map = value is List ? value : jsonDecode(value);
-      items = map.map<$fieldType>((e) => $map).toList();
+      List<dynamic>? map = value is List ? value : jsonDecode(value);
+      items = map?.map<$fieldType>((e) => $map).toList();
     }
     return copyWith(
       $fieldName: ${notNull ? 'items' : 'CopyWith(items)'},
