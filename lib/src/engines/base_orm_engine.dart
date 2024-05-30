@@ -27,9 +27,6 @@ List<IEntity> entitiesFromMap<TEntity extends IEntity>(Args args) {
   List<TEntity> entities = [];
   args.onIsolatePreMap?.call(args.isolateArgs);
   for (final item in args.maps) {
-    if (args.isolateArgs != null) {
-      item.addAll(args.isolateArgs!);
-    }
     entities.add(args.t.load(item) as TEntity);
   }
   return entities;
