@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:tatlacas_orm/engines/sqflite_in_memory_engine.dart';
-import 'package:tatlacas_orm/tatlacas_orm.dart';
+import 'package:flora_orm/engines/sqflite_in_memory_engine.dart';
+import 'package:flora_orm/flora_orm.dart';
 
 import '../dummy/test_entity.dart';
 import 'sql_storage_test_runs.dart';

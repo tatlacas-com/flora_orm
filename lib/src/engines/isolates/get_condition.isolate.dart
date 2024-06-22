@@ -1,4 +1,4 @@
-import 'package:tatlacas_orm/src/models/orm_condition.dart';
+import 'package:flora_orm/src/models/orm_condition.dart';
 
 String getCondition(OrmCondition condition) {
   switch (condition) {

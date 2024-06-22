@@ -1,11 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:sqflite_common/sqlite_api.dart';
-import 'package:tatlacas_orm/src/contexts/base_context.dart';
-import 'package:tatlacas_orm/src/engines/orm_engine.dart';
-import 'package:tatlacas_orm/src/models/entity.dart';
-import 'package:tatlacas_orm/src/models/column_definition.dart';
-import 'package:tatlacas_orm/src/models/orm_order.dart';
-import 'package:tatlacas_orm/src/models/filter.dart';
+import 'package:flora_orm/src/contexts/base_context.dart';
+import 'package:flora_orm/src/engines/orm_engine.dart';
+import 'package:flora_orm/src/models/entity.dart';
+import 'package:flora_orm/src/models/column_definition.dart';
+import 'package:flora_orm/src/models/orm_order.dart';
+import 'package:flora_orm/src/models/filter.dart';
 import 'package:uuid/uuid.dart';
 
 class Args<TEntity extends IEntity> {

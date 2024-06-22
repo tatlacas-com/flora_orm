@@ -1,5 +1,5 @@
-import 'package:tatlacas_orm/src/engines/base_orm_engine.dart';
-import '../../tatlacas_orm.dart';
+import 'package:flora_orm/src/engines/base_orm_engine.dart';
+import '../../flora_orm.dart';
 
 import '../contexts/sqflite_db_context.dart';
 

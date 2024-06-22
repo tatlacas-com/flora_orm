@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:meta/meta.dart';
-import 'package:tatlacas_orm/tatlacas_orm.dart';
-import 'package:tatlacas_orm/src/contexts/base_context.dart';
-import 'package:tatlacas_orm/src/engines/base_orm_engine.dart';
+import 'package:flora_orm/flora_orm.dart';
+import 'package:flora_orm/src/contexts/base_context.dart';
+import 'package:flora_orm/src/engines/base_orm_engine.dart';
 
 import '../dummy/test_entity.dart';
 

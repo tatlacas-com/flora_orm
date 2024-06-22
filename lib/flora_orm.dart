@@ -1,4 +1,4 @@
-library tatlacas_orm;
+library flora_orm;
 
 export 'src/contexts/db_context.dart';
 export 'src/engines/orm_engine.dart';

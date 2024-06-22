@@ -1,4 +1,4 @@
-import 'package:tatlacas_orm/tatlacas_orm.dart';
+import 'package:flora_orm/flora_orm.dart';
 
 class TestEntityMeta extends EntityMeta<TestEntity> {
   const TestEntityMeta();

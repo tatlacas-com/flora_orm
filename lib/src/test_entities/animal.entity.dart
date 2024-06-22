@@ -3,9 +3,9 @@ import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:tatlacas_orm/src/test_entities/copy_with.dart';
+import 'package:flora_orm/src/test_entities/copy_with.dart';
 
-import 'package:tatlacas_orm/tatlacas_orm.dart';
+import 'package:flora_orm/flora_orm.dart';
 
 part 'animal.entity.g.dart';
 

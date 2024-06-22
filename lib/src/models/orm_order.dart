@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:tatlacas_orm/tatlacas_orm.dart';
+import 'package:flora_orm/flora_orm.dart';
 
 class OrmOrder extends Equatable {
   const OrmOrder({

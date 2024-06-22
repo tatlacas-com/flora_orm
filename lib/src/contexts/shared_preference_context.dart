@@ -1,5 +1,5 @@
-import 'package:tatlacas_orm/tatlacas_orm.dart';
-import 'package:tatlacas_orm/src/contexts/base_context.dart';
+import 'package:flora_orm/flora_orm.dart';
+import 'package:flora_orm/src/contexts/base_context.dart';
 
 class SharedPreferenceContext<TEntity extends IEntity>
     extends BaseContext<TEntity> {

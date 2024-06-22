@@ -1,9 +1,9 @@
-import 'package:tatlacas_orm/src/engines/isolates/db_value.isolate.dart';
-import 'package:tatlacas_orm/src/engines/isolates/get_condition.isolate.dart';
-import 'package:tatlacas_orm/src/models/entity.dart';
-import 'package:tatlacas_orm/src/models/formatted_query.dart';
-import 'package:tatlacas_orm/src/models/orm_condition.dart';
-import 'package:tatlacas_orm/src/models/filter.dart';
+import 'package:flora_orm/src/engines/isolates/db_value.isolate.dart';
+import 'package:flora_orm/src/engines/isolates/get_condition.isolate.dart';
+import 'package:flora_orm/src/models/entity.dart';
+import 'package:flora_orm/src/models/formatted_query.dart';
+import 'package:flora_orm/src/models/orm_condition.dart';
+import 'package:flora_orm/src/models/filter.dart';
 
 FormattedQuery getWhereString<TEntity extends IEntity>(Filter filter) {
   StringBuffer stringBuffer = StringBuffer();

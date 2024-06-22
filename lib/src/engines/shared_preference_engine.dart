@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tatlacas_orm/tatlacas_orm.dart';
-import 'package:tatlacas_orm/src/engines/base_orm_engine.dart';
-import 'package:tatlacas_orm/src/contexts/shared_preference_context.dart';
+import 'package:flora_orm/flora_orm.dart';
+import 'package:flora_orm/src/engines/base_orm_engine.dart';
+import 'package:flora_orm/src/contexts/shared_preference_context.dart';
 import 'package:uuid/uuid.dart';
 
 class SharedPreferenceEngine<TEntity extends IEntity,

@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
-import 'package:tatlacas_orm/src/engines/isolates/get_where_string.isolate.dart';
+import 'package:flora_orm/src/engines/isolates/get_where_string.isolate.dart';
 
 import '../contexts/db_context.dart';
 import '../models/entity.dart';
