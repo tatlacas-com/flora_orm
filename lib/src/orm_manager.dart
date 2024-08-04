@@ -9,7 +9,7 @@ import 'package:flora_orm/flora_orm.dart';
 class OrmManager {
   OrmManager({
     DbInUse dbInUse = DbInUse.sqflite,
-    final bool isWeb = false,
+    required bool isWeb,
     required int dbVersion,
     required String dbName,
     required List<IEntity> tables,
