@@ -10,7 +10,7 @@ class Filter extends Equatable {
     ColumnDefinition? column, {
     OrmCondition condition = OrmCondition.equalTo,
     dynamic value,
-    dynamic value2,
+    dynamic secondaryValue,
     bool lb = false,
     bool rb = false,
     List<FilterCondition> filters = const [],
@@ -22,7 +22,7 @@ class Filter extends Equatable {
           column,
           condition: condition,
           value: value,
-          value2: value2,
+          secondaryValue: secondaryValue,
           lb: lb,
           rb: rb,
         )
@@ -35,7 +35,7 @@ class Filter extends Equatable {
   // ignore: prefer_const_constructors_in_immutables
   Filter._({this.filters = const []});
 
-  factory Filter.lb() {
+  factory Filter.startGroup() {
     return Filter._(
         filters: [const FilterCondition(leftBracket: true, isBracketOnly: true)]
             .toList());
@@ -46,7 +46,7 @@ class Filter extends Equatable {
     ColumnDefinition column, {
     OrmCondition condition = OrmCondition.equalTo,
     dynamic value,
-    dynamic value2,
+    dynamic secondaryValue,
     bool lb = false,
     bool rb = false,
     bool isBracketOnly = false,
@@ -57,7 +57,7 @@ class Filter extends Equatable {
       column: column,
       condition: condition,
       value: value,
-      value2: value2,
+      secondaryValue: secondaryValue,
       leftBracket: lb,
       rightBracket: rb,
       isBracketOnly: isBracketOnly,
@@ -66,14 +66,14 @@ class Filter extends Equatable {
     );
   }
 
-  Filter lb() {
+  Filter startGroup() {
     return Filter(null, filters: [
       ...filters,
       const FilterCondition(leftBracket: true, isBracketOnly: true)
     ]);
   }
 
-  Filter rb() {
+  Filter endGroup() {
     return Filter(null, filters: [
       ...filters,
       const FilterCondition(rightBracket: true, isBracketOnly: true)
@@ -83,6 +83,7 @@ class Filter extends Equatable {
   Filter and(ColumnDefinition column,
       {OrmCondition condition = OrmCondition.equalTo,
       dynamic value,
+      dynamic secondaryValue,
       bool lb = false,
       bool rb = false}) {
     return Filter(null, filters: [
@@ -91,6 +92,7 @@ class Filter extends Equatable {
         column,
         condition: condition,
         value: value,
+        secondaryValue: secondaryValue,
         lb: lb,
         rb: rb,
         and: true,
@@ -102,6 +104,7 @@ class Filter extends Equatable {
     ColumnDefinition column, {
     OrmCondition condition = OrmCondition.equalTo,
     dynamic value,
+    dynamic secondaryValue,
     bool lb = false,
     bool rb = false,
   }) {
@@ -111,23 +114,28 @@ class Filter extends Equatable {
         column,
         condition: condition,
         value: value,
+        secondaryValue: secondaryValue,
         lb: lb,
         rb: rb,
       )
     ]);
   }
 
-  Filter or(ColumnDefinition column,
-      {OrmCondition condition = OrmCondition.equalTo,
-      dynamic value,
-      bool lb = false,
-      bool rb = false}) {
+  Filter or(
+    ColumnDefinition column, {
+    OrmCondition condition = OrmCondition.equalTo,
+    dynamic value,
+    dynamic secondaryValue,
+    bool lb = false,
+    bool rb = false,
+  }) {
     return Filter(null, filters: [
       ...filters,
       _addFilter(
         column,
         condition: condition,
         value: value,
+        secondaryValue: secondaryValue,
         lb: lb,
         rb: rb,
         or: true,

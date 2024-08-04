@@ -44,7 +44,7 @@ abstract class OrmEngine<
 
   Future<List<TEntity>?> insertOrUpdateList(Iterable<TEntity> items);
 
-  Future<TEntity?> getEntity({
+  Future<TEntity?> firstWhereOrNull({
     List<ColumnDefinition>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     required Filter Function(TMeta t) filter,
@@ -53,7 +53,7 @@ abstract class OrmEngine<
     Map<String, dynamic>? isolateArgs,
     void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   });
-  Future<Map<String, dynamic>?> getEntityMap({
+  Future<Map<String, dynamic>?> firstWhereOrNullMap({
     List<ColumnDefinition>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     required Filter Function(TMeta t) filter,
@@ -121,7 +121,7 @@ abstract class OrmEngine<
     void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   });
 
-  Future<List<TEntity>> getEntities({
+  Future<List<TEntity>> where({
     List<ColumnDefinition>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     Filter Function(TMeta t)? filter,
@@ -129,7 +129,7 @@ abstract class OrmEngine<
     Map<String, dynamic>? isolateArgs,
     void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   });
-  Future<List<Map<String, dynamic>>> getEntityMaps({
+  Future<List<Map<String, dynamic>>> whereMap({
     List<ColumnDefinition>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     Filter Function(TMeta t)? filter,

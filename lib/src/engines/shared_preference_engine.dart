@@ -46,7 +46,7 @@ class SharedPreferenceEngine<TEntity extends IEntity,
   }
 
   @override
-  Future<TEntity?> getEntity({
+  Future<TEntity?> firstWhereOrNull({
     Iterable<ColumnDefinition>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     required Filter Function(TMeta t) filter,
@@ -112,8 +112,8 @@ class SharedPreferenceEngine<TEntity extends IEntity,
     if (query.isNotEmpty == true) {
       var createdAt = entity?.createdAt;
       if (entity == null) {
-        final res =
-            await getEntityMap(filter: filter, columns: (t) => [t.createdAt]);
+        final res = await firstWhereOrNullMap(
+            filter: filter, columns: (t) => [t.createdAt]);
         if (res?.containsKey(t.createdAt.name) == true) {
           createdAt = res![t.createdAt.name];
         }

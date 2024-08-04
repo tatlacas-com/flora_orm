@@ -119,7 +119,7 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
   }
 
   @override
-  Future<TEntity?> getEntity({
+  Future<TEntity?> firstWhereOrNull({
     Iterable<ColumnDefinition>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     required Filter Function(TMeta t) filter,
@@ -145,7 +145,7 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
   }
 
   @override
-  Future<Map<String, dynamic>?> getEntityMap({
+  Future<Map<String, dynamic>?> firstWhereOrNullMap({
     Iterable<ColumnDefinition>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     required Filter Function(TMeta t) filter,
@@ -229,7 +229,7 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
   }
 
   @override
-  Future<List<TEntity>> getEntities({
+  Future<List<TEntity>> where({
     Iterable<ColumnDefinition>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     Filter Function(TMeta t)? filter,
@@ -256,7 +256,7 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getEntityMaps({
+  Future<List<Map<String, dynamic>>> whereMap({
     Iterable<ColumnDefinition>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     Filter Function(TMeta t)? filter,
@@ -371,8 +371,8 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
     final formattedQuery = await whereString(filter, useIsolate);
     var createdAt = entity?.createdAt;
     if (entity == null) {
-      final res =
-          await getEntityMap(filter: filter, columns: (t) => [t.createdAt]);
+      final res = await firstWhereOrNullMap(
+          filter: filter, columns: (t) => [t.createdAt]);
       if (res?.containsKey(t.createdAt.name) == true) {
         createdAt = DateTime.parse(res![t.createdAt.name]);
       }

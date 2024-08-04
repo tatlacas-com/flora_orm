@@ -8,7 +8,7 @@ class FilterCondition extends Equatable {
     this.column,
     this.condition = OrmCondition.equalTo,
     this.value,
-    this.value2,
+    this.secondaryValue,
     this.leftBracket = false,
     this.rightBracket = false,
     this.isBracketOnly = false,
@@ -18,7 +18,7 @@ class FilterCondition extends Equatable {
   final ColumnDefinition? column;
   final OrmCondition condition;
   final dynamic value;
-  final dynamic value2;
+  final dynamic secondaryValue;
   final bool leftBracket;
   final bool rightBracket;
   final bool isBracketOnly;
@@ -30,7 +30,7 @@ class FilterCondition extends Equatable {
         column,
         condition,
         value,
-        value2,
+        secondaryValue,
         leftBracket,
         rightBracket,
         isBracketOnly,

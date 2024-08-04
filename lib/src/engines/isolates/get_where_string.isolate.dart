@@ -39,7 +39,7 @@ FormattedQuery getWhereString<TEntity extends IEntity>(Filter filter) {
     }
     if (element.condition == OrmCondition.between ||
         element.condition == OrmCondition.notBetween) {
-      whereArgs.add(element.value2);
+      whereArgs.add(element.secondaryValue);
     }
     if (element.rightBracket) stringBuffer.write(')');
   }

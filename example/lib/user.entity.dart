@@ -1,3 +1,4 @@
+import 'package:example/copy_with.dart';
 import 'package:flora_orm/flora_orm.dart';
 part 'user.entity.g.dart';
 

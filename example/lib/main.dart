@@ -1,3 +1,5 @@
+import 'package:example/user.entity.dart';
+import 'package:flora_orm/flora_orm.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -57,6 +59,17 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
+  final orm = OrmManager(
+    dbVersion: 1,
+    dbName: 'orm_db_test.db',
+    isWeb: false,
+    tables: <Entity>[
+      const UserEntity(),
+    ],
+  );
+
+  late final userRepo = orm.getStorage(const UserEntity());
+
   void _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
@@ -66,6 +79,15 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
       _counter++;
     });
+  }
+
+  @override
+  void initState() {
+    userRepo.firstWhereOrNull(
+      filter: (t) => Filter(t.id).startGroup(),
+    );
+
+    super.initState();
   }
 
   @override
