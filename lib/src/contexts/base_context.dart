@@ -83,7 +83,9 @@ abstract class BaseContext<TEntity extends IEntity> extends DbContext<TEntity> {
       var upgradeQueriesFound = false;
       List<String> allQueries = [];
       for (var element in tables) {
-        final queries = element.upgradeTable(oldVersion, newVersion);
+        final queries = element.recreateTableAt(newVersion)
+            ? element.recreateTable(newVersion)
+            : element.upgradeTable(oldVersion, newVersion);
         if (queries.isNotEmpty == true) {
           allQueries.addAll(queries);
           upgradeQueriesFound = true;

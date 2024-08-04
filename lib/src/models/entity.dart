@@ -28,6 +28,9 @@ abstract class IEntity {
 
   List<String> upgradeTable(int oldVersion, int newVersion);
 
+  bool recreateTableAt(int newVersion);
+  List<String> recreateTable(int newVersion);
+
   List<String> downgradeTable(int oldVersion, int newVersion);
 
   List<String> onUpgradeComplete(int oldVersion, int newVersion);
@@ -144,6 +147,7 @@ abstract class Entity<TEntity extends IEntity,
     return entity;
   }
 
+  @override
   List<String> recreateTable(int newVersion) {
     return [
       dropTable(meta.tableName),
@@ -252,6 +256,9 @@ abstract class Entity<TEntity extends IEntity,
   List<String> upgradeTable(int oldVersion, int newVersion) {
     return [];
   }
+
+  @override
+  bool recreateTableAt(int newVersion) => false;
 
   @override
   List<String> downgradeTable(int oldVersion, int newVersion) {
