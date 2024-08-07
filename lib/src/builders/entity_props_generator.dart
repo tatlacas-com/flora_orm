@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
@@ -6,6 +8,7 @@ import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:flora_orm/src/builders/annotations.dart';
 import 'package:flora_orm/src/models/entity.dart';
+import 'package:path/path.dart' as path;
 
 class _ExtraField {
   _ExtraField({
@@ -33,7 +36,7 @@ class PropertyFinder extends RecursiveElementVisitor<void> {
   }
 }
 
-class DbColumnGenerator extends GeneratorForAnnotation<OrmEntity> {
+class EntityPropsGenerator extends GeneratorForAnnotation<OrmEntity> {
   bool _hasDbAnnotation(FieldElement field) {
     return const TypeChecker.fromRuntime(OrmColumn)
             .hasAnnotationOfExact(field) ||
@@ -43,11 +46,11 @@ class DbColumnGenerator extends GeneratorForAnnotation<OrmEntity> {
   }
 
   @override
-  String generateForAnnotatedElement(
+  Future<String> generateForAnnotatedElement(
     Element element,
     ConstantReader annotation,
     BuildStep buildStep,
-  ) {
+  ) async {
     final classElement = element as ClassElement;
     final className = classElement.name;
 
@@ -126,7 +129,7 @@ class ${className}Meta extends  EntityMeta<$className> {
               e.name,
               _ExtraField(
                 type: e.type.getDisplayString(withNullability: false),
-                typeFull: e.type.getDisplayString(withNullability: true),
+                typeFull: e.type.getDisplayString(),
                 notNull: e.type.nullabilitySuffix == NullabilitySuffix.none,
               ),
             ),
@@ -139,8 +142,7 @@ class ${className}Meta extends  EntityMeta<$className> {
         final fieldName = field.name;
         var fieldType = field.type.getDisplayString(withNullability: false);
 
-        final fieldTypeFull =
-            field.type.getDisplayString(withNullability: true);
+        final fieldTypeFull = field.type.getDisplayString();
 
         bool premitiveType(fieldType) {
           return ['String', 'DateTime', 'int', 'bool', 'double']
@@ -488,8 +490,7 @@ class ${className}Meta extends  EntityMeta<$className> {
           .hasAnnotationOfExact(field)) {
         final fieldName = field.name;
         final fieldType = field.type.getDisplayString(withNullability: false);
-        final fieldTypeFull =
-            field.type.getDisplayString(withNullability: true);
+        final fieldTypeFull = field.type.getDisplayString();
         extraFields[fieldName] = _ExtraField(
           type: fieldType,
           notNull: false,
@@ -499,8 +500,7 @@ class ${className}Meta extends  EntityMeta<$className> {
           .hasAnnotationOfExact(field)) {
         final fieldName = field.name;
         final fieldType = field.type.getDisplayString(withNullability: false);
-        final fieldTypeFull =
-            field.type.getDisplayString(withNullability: true);
+        final fieldTypeFull = field.type.getDisplayString();
         extraFields[fieldName] = _ExtraField(
           type: fieldType,
           notNull: field.type.nullabilitySuffix == NullabilitySuffix.none,
@@ -564,7 +564,38 @@ class ${className}Meta extends  EntityMeta<$className> {
     mixinCode.writeln('}');
     metaCode.writeln('}');
     mixinCode.write(metaCode.toString());
+    await _generateMigrationsFile(buildStep, className);
     return mixinCode.toString();
+  }
+
+  Future<void> _generateMigrationsFile(
+      BuildStep buildStep, String className) async {
+    final mixinContent = '''
+part of '${buildStep.inputId.pathSegments.last}';
+
+mixin ${className}Migrations on Entity<$className, ${className}Meta> {
+  @override
+  bool recreateTableAt(int newVersion) {
+    return switch (newVersion) {
+      _ => false,
+    };
+  }
+
+  @override
+  List<ColumnDefinition> addColumnsAt(int newVersion) {
+    return switch (newVersion) {
+      _ => [],
+    };
+  }
+}''';
+
+    var inputId = buildStep.inputId;
+    var copy = inputId.changeExtension('.mg.dart');
+    final newFile = File(path.join(
+        path.current, copy.path.replaceAll('.mg.dart', '.migrations.dart')));
+    if (!(await newFile.exists())) {
+      await newFile.writeAsString(mixinContent);
+    }
   }
 
   // Helper function to convert the first letter of a string to uppercase

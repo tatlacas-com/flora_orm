@@ -87,6 +87,9 @@ class TestEntity extends Entity<TestEntity, TestEntityMeta> {
   final double? testDouble;
 
   @override
+  List<ColumnDefinition> addColumnsAt(int newVersion) => [];
+
+  @override
   TestEntity copyWith({
     String? id,
     DateTime? createdAt,
@@ -115,7 +118,7 @@ class TestEntity extends Entity<TestEntity, TestEntityMeta> {
   }
 
   @override
-  List<String> upgradeTable(int oldVersion, int newVersion) {
+  List<String> additionalUpgradeQueries(int oldVersion, int newVersion) {
     if (newVersion == 2) {
       return [
         dropTable(meta.tableName),

@@ -3,7 +3,7 @@
 part of 'user.entity.dart';
 
 // **************************************************************************
-// DbColumnGenerator
+// EntityPropsGenerator
 // **************************************************************************
 
 mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {

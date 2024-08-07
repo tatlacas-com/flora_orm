@@ -75,6 +75,30 @@ abstract class BaseContext<TEntity extends IEntity> extends DbContext<TEntity> {
     });
   }
 
+  List<String> _upgradeQueries(
+      IEntity element, int oldVersion, int newVersion) {
+    List<String> allQueries = [];
+    List<ColumnDefinition> columns = [];
+    while (oldVersion < newVersion) {
+      columns.addAll(element.addColumnsAt(oldVersion++));
+    }
+    columns.addAll(element.addColumnsAt(newVersion));
+    allQueries.addAll(columns.map(
+      (column) => element.addColumn(column),
+    ));
+    allQueries.addAll(element.additionalUpgradeQueries(oldVersion, newVersion));
+    return allQueries;
+  }
+
+  bool _recreateOn(IEntity element, int oldVersion, int newVersion) {
+    while (oldVersion < newVersion) {
+      if (element.recreateTableAt(oldVersion++)) {
+        return true;
+      }
+    }
+    return element.recreateTableAt(newVersion);
+  }
+
   FutureOr<void> onDbUpgrade(
       Database db, int oldVersion, int newVersion) async {
     // Run the CREATE TABLE statement on the database.
@@ -83,9 +107,9 @@ abstract class BaseContext<TEntity extends IEntity> extends DbContext<TEntity> {
       var upgradeQueriesFound = false;
       List<String> allQueries = [];
       for (var element in tables) {
-        final queries = element.recreateTableAt(newVersion)
+        final queries = _recreateOn(element, oldVersion, newVersion)
             ? element.recreateTable(newVersion)
-            : element.upgradeTable(oldVersion, newVersion);
+            : _upgradeQueries(element, oldVersion, newVersion);
         if (queries.isNotEmpty == true) {
           allQueries.addAll(queries);
           upgradeQueriesFound = true;

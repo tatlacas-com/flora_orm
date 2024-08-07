@@ -2,7 +2,8 @@ library tatlacas_sqflite_storage.builder;
 
 import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
-import 'package:flora_orm/src/builders/db_column_generator.dart';
+import 'package:flora_orm/src/builders/entity_props_generator.dart';
 
-Builder dbColumnsBuilder(BuilderOptions options) =>
-    SharedPartBuilder([DbColumnGenerator()], 'db_columns');
+Builder entityPropsBuilder(BuilderOptions options) =>
+    SharedPartBuilder([EntityPropsGenerator()], 'entityPropsBuilder',
+        additionalOutputExtensions: ['mg.dart']);

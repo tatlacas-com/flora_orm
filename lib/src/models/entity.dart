@@ -26,9 +26,14 @@ abstract class IEntity {
 
   EntityMeta get meta;
 
-  List<String> upgradeTable(int oldVersion, int newVersion);
+  List<String> additionalUpgradeQueries(int oldVersion, int newVersion);
 
   bool recreateTableAt(int newVersion);
+
+  String addColumn(ColumnDefinition column);
+
+  List<ColumnDefinition> addColumnsAt(int newVersion);
+
   List<String> recreateTable(int newVersion);
 
   List<String> downgradeTable(int oldVersion, int newVersion);
@@ -156,6 +161,9 @@ abstract class Entity<TEntity extends IEntity,
   }
 
   @override
+  List<ColumnDefinition> addColumnsAt(int newVersion);
+
+  @override
   String createTable(int version) {
     int indx = 1;
     StringBuffer stringBuffer = StringBuffer();
@@ -199,7 +207,7 @@ abstract class Entity<TEntity extends IEntity,
     return map;
   }
 
-  @protected
+  @override
   String addColumn(ColumnDefinition column) {
     var str = StringBuffer();
     columnDefinition(column, str);
@@ -253,7 +261,7 @@ abstract class Entity<TEntity extends IEntity,
   }
 
   @override
-  List<String> upgradeTable(int oldVersion, int newVersion) {
+  List<String> additionalUpgradeQueries(int oldVersion, int newVersion) {
     return [];
   }
 
