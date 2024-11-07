@@ -84,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     userRepo.firstWhereOrNull(
-      filter: (t) => Filter(t.id).startGroup(),
+      where: (t) => Filter(t.id).startGroup(),
     );
 
     super.initState();

@@ -49,7 +49,7 @@ class SharedPreferenceEngine<TEntity extends IEntity,
   Future<TEntity?> firstWhereOrNull({
     Iterable<ColumnDefinition>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
-    required Filter Function(TMeta t) filter,
+    required Filter Function(TMeta t) where,
     int? offset,
     final bool? useIsolate,
     Map<String, dynamic>? isolateArgs,
@@ -82,12 +82,12 @@ class SharedPreferenceEngine<TEntity extends IEntity,
 
   @override
   Future<int> delete({
-    final Filter Function(TMeta t)? filter,
+    final Filter Function(TMeta t)? where,
     final bool? useIsolate,
   }) async {
-    final item = filter == null
+    final item = where == null
         ? null
-        : filter(t)
+        : where(t)
             .filters
             .where((element) => element.column?.name == 'id')
             .toList();
@@ -100,12 +100,12 @@ class SharedPreferenceEngine<TEntity extends IEntity,
 
   @override
   Future<int> update({
-    required Filter Function(TMeta t) filter,
+    required Filter Function(TMeta t) where,
     TEntity? entity,
     Map<ColumnDefinition, dynamic> Function(TMeta t)? columnValues,
     final bool? useIsolate,
   }) async {
-    var query = filter(t)
+    var query = where(t)
         .filters
         .where((element) => element.column?.name == 'id')
         .toList();
@@ -113,7 +113,7 @@ class SharedPreferenceEngine<TEntity extends IEntity,
       var createdAt = entity?.createdAt;
       if (entity == null) {
         final res = await firstWhereOrNullMap(
-            filter: filter, columns: (t) => [t.createdAt]);
+            where: where, columns: (t) => [t.createdAt]);
         if (res?.containsKey(t.createdAt.name) == true) {
           createdAt = res![t.createdAt.name];
         }
@@ -131,7 +131,7 @@ class SharedPreferenceEngine<TEntity extends IEntity,
 
   @override
   Future<List<TEntity>> query({
-    Filter Function(TMeta t)? filter,
+    Filter Function(TMeta t)? where,
     Iterable<ColumnDefinition>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? limit,

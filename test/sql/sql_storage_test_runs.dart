@@ -61,7 +61,7 @@ void run(
     expect(insertedEntity, isNotNull);
     fxn() async => await storage.firstWhereOrNull(
           columns: (t) => [],
-          filter: (t) => Filter(
+          where: (t) => Filter(
             t.id,
             value: insertedEntity!.id,
           )
@@ -96,7 +96,7 @@ void run(
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var json = await storage.firstWhereOrNull(
-      filter: (t) => Filter(
+      where: (t) => Filter(
         entity.meta.id,
         value: insertedEntity!.id,
       )
@@ -133,7 +133,7 @@ void run(
     expect(insertedEntity, isNotNull);
     var json = await storage.firstWhereOrNull(
       columns: (t) => [t.testInt],
-      filter: (t) => Filter(
+      where: (t) => Filter(
         entity.meta.id,
         value: insertedEntity!.id,
       )
@@ -175,7 +175,7 @@ void run(
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter(
+      where: (t) => Filter(
         entity.meta.id,
         condition: OrmCondition.notEqualTo,
         value: '12',
@@ -200,7 +200,7 @@ void run(
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter(
+      where: (t) => Filter(
         t.testInt,
         condition: OrmCondition.isNull,
       ).and(
@@ -227,7 +227,7 @@ void run(
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter(
+      where: (t) => Filter(
         t.testString,
         condition: OrmCondition.notNull,
       ),
@@ -252,7 +252,7 @@ void run(
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter(
+      where: (t) => Filter(
         t.testInt,
         condition: OrmCondition.lessThan,
         value: -14,
@@ -278,7 +278,7 @@ void run(
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter(
+      where: (t) => Filter(
         t.testInt,
         condition: OrmCondition.greaterThan,
         value: 19999,
@@ -304,7 +304,7 @@ void run(
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter(
+      where: (t) => Filter(
         t.testInt,
         condition: OrmCondition.greaterThanOrEqual,
         value: 100,
@@ -330,7 +330,7 @@ void run(
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter(
+      where: (t) => Filter(
         t.testInt,
         condition: OrmCondition.greaterThanOrEqual,
         value: -10,
@@ -356,7 +356,7 @@ void run(
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter(
+      where: (t) => Filter(
         t.testInt,
         condition: OrmCondition.between,
         value: 1000,
@@ -383,7 +383,7 @@ void run(
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter(
+      where: (t) => Filter(
         t.testInt,
         condition: OrmCondition.notBetween,
         value: -500,
@@ -410,7 +410,7 @@ void run(
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter(
+      where: (t) => Filter(
         t.testInt,
         condition: OrmCondition.isIn,
         value: const [11001],
@@ -436,7 +436,7 @@ void run(
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter(
+      where: (t) => Filter(
         t.testInt,
         condition: OrmCondition.notIn,
         value: const [11001, 11005],
@@ -462,7 +462,7 @@ void run(
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter(
+      where: (t) => Filter(
         t.testString,
         condition: OrmCondition.like,
         value: '%Like%',
@@ -488,7 +488,7 @@ void run(
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter(
+      where: (t) => Filter(
         t.testString,
         condition: OrmCondition.notLike,
         value: '%Dummy%',
@@ -515,7 +515,7 @@ void run(
           direction: OrderDirection.desc,
         )
       ],
-      filter: (t) => Filter.startGroup()
+      where: (t) => Filter.startGroup()
           .filter(
             t.testString,
             condition: OrmCondition.like,
@@ -687,7 +687,7 @@ void run(
     entity = (insertedEntity as TestEntity).copyWith(testString: 'Updated a');
     var total = await storage.update(
       entity: entity,
-      filter: (t) => Filter(
+      where: (t) => Filter(
         entity.meta.id,
         value: entity.id,
       ),
@@ -705,14 +705,14 @@ void run(
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var total = await storage.update(
-        filter: (t) => Filter(
+        where: (t) => Filter(
               entity.meta.id,
               value: insertedEntity!.id,
             ),
         columnValues: (t) => {t.testString: 'Updated ax1'});
     expect(total, 1);
     var json = await storage.firstWhereOrNull(
-        filter: (t) => Filter(entity.meta.id, value: insertedEntity?.id));
+        where: (t) => Filter(entity.meta.id, value: insertedEntity?.id));
     insertedEntity = insertedEntity?.copyWith(testString: 'Updated ax1');
     entity = json!;
     expect(entity, insertedEntity);
@@ -792,7 +792,7 @@ void run(
     expect(insertedEntity, isNotNull);
     expect(insertedEntity!.length, 2);
     var total = await storage.getCount(
-      filter: (t) => Filter(
+      where: (t) => Filter(
         entity.meta.id,
         value: insertedEntity[0].id,
       ).or(
@@ -821,7 +821,7 @@ void run(
     expect(insertedEntity, isNotNull);
     expect(insertedEntity!.length, 2);
     var total = await storage.delete(
-      filter: (t) => Filter(
+      where: (t) => Filter(
         entity.meta.id,
         value: insertedEntity[0].id,
       ).or(
@@ -851,7 +851,7 @@ void run(
     expect(insertedEntity1, isNotNull);
     var sum = await storage.getSum<int>(
       column: (t) => t.testInt,
-      filter: (t) => Filter(
+      where: (t) => Filter(
         entity.meta.id,
         value: insertedEntity!.id,
       ).or(
@@ -888,7 +888,7 @@ void run(
         t.testInt,
         t.testDouble,
       ],
-      filter: (t) => Filter(
+      where: (t) => Filter(
         entity.meta.id,
         value: insertedEntity!.id,
       ).or(
@@ -918,7 +918,7 @@ void run(
     expect(insertedEntity1, isNotNull);
     var json = await storage.getSum<double>(
       column: (t) => t.testDouble,
-      filter: (t) => Filter(
+      where: (t) => Filter(
         entity.meta.id,
         value: insertedEntity!.id,
       ).or(
