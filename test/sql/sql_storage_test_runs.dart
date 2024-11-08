@@ -1,10 +1,9 @@
+import 'package:flora_orm/src/bloc/test.entity.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:meta/meta.dart';
 import 'package:flora_orm/flora_orm.dart';
 import 'package:flora_orm/src/contexts/base_context.dart';
 import 'package:flora_orm/src/engines/base_orm_engine.dart';
-
-import '../dummy/test_entity.dart';
 
 @isTest
 void run(
@@ -44,7 +43,7 @@ void run(
         testString: 'Testing 12345');
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
-    entity = insertedEntity!.copyWith(testString: 'Updated string');
+    entity = insertedEntity!.copyWith(testString: CopyWith('Updated string'));
     var updated = await storage.insertOrUpdate(entity);
     expect(updated, isNotNull);
     expect(updated, entity);
@@ -67,19 +66,19 @@ void run(
           )
               .and(
                 t.testInt,
-                value: t.testInt,
+                value: entity.testInt,
               )
               .and(
                 t.testBool,
-                value: t.testBool,
+                value: entity.testBool,
               )
               .and(
                 t.testDouble,
-                value: t.testDouble,
+                value: entity.testDouble,
               )
               .and(
                 t.testDateTime,
-                value: t.testDateTime,
+                value: entity.testDateTime,
               ),
         );
     expect(
@@ -88,11 +87,12 @@ void run(
 
   test('getEntity() should return expected entity', () async {
     var entity = TestEntity(
-        testBool: true,
-        testDateTime: DateTime.now(),
-        testDouble: 1.0,
-        testInt: 11,
-        testString: 'Testing 123456');
+      testBool: true,
+      testDateTime: DateTime.now(),
+      testDouble: 1.0,
+      testInt: 11,
+      testString: 'Testing 123456',
+    );
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var json = await storage.firstWhereOrNull(
@@ -102,19 +102,19 @@ void run(
       )
           .and(
             t.testInt,
-            value: t.testInt,
+            value: entity.testInt,
           )
           .and(
             t.testBool,
-            value: t.testBool,
+            value: entity.testBool,
           )
           .and(
             t.testDouble,
-            value: t.testDouble,
+            value: entity.testDouble,
           )
           .and(
             t.testDateTime,
-            value: t.testDateTime,
+            value: entity.testDateTime,
           ),
     );
     expect(json, isNotNull);
@@ -139,19 +139,19 @@ void run(
       )
           .and(
             t.testInt,
-            value: t.testInt,
+            value: entity.testInt,
           )
           .and(
             t.testBool,
-            value: t.testBool,
+            value: entity.testBool,
           )
           .and(
             t.testDouble,
-            value: t.testDouble,
+            value: entity.testDouble,
           )
           .and(
             t.testDateTime,
-            value: t.testDateTime,
+            value: entity.testDateTime,
           ),
     );
     expect(json, isNotNull);
@@ -529,12 +529,12 @@ void run(
           .or(
             t.testString,
             value: 'Loveable',
-            lb: true,
+            openGroup: true,
           )
           .and(
             t.testInt,
             value: 11002,
-            rb: true,
+            closeGroup: true,
           ),
     );
     expect(json, isNotNull);
@@ -684,7 +684,8 @@ void run(
         testString: 'Testing a');
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
-    entity = (insertedEntity as TestEntity).copyWith(testString: 'Updated a');
+    entity = (insertedEntity as TestEntity)
+        .copyWith(testString: CopyWith('Updated a'));
     var total = await storage.update(
       entity: entity,
       where: (t) => Filter(
@@ -713,7 +714,8 @@ void run(
     expect(total, 1);
     var json = await storage.firstWhereOrNull(
         where: (t) => Filter(entity.meta.id, value: insertedEntity?.id));
-    insertedEntity = insertedEntity?.copyWith(testString: 'Updated ax1');
+    insertedEntity =
+        insertedEntity?.copyWith(testString: CopyWith('Updated ax1'));
     entity = json!;
     expect(entity, insertedEntity);
   });
@@ -760,8 +762,8 @@ void run(
         await storage.insertList(<TestEntity>[entity, entity1]);
     expect(insertedEntity, isNotNull);
     expect(insertedEntity!.length, 2);
-    entity = (insertedEntity[0]).copyWith(testString: 'Updated a');
-    entity1 = (insertedEntity[1]).copyWith(testString: 'Updated b');
+    entity = (insertedEntity[0]).copyWith(testString: CopyWith('Updated a'));
+    entity1 = (insertedEntity[1]).copyWith(testString: CopyWith('Updated b'));
     insertedEntity =
         await storage.insertOrUpdateList(<TestEntity>[entity, entity1]);
     expect(insertedEntity, isNotNull);

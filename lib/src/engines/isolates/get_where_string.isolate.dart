@@ -9,9 +9,9 @@ FormattedQuery getWhereString<TEntity extends IEntity>(Filter filter) {
   StringBuffer stringBuffer = StringBuffer();
   final whereArgs = <dynamic>[];
   for (var element in filter.filters) {
-    if (element.isBracketOnly) {
-      if (element.leftBracket) stringBuffer.write('(');
-      if (element.rightBracket) stringBuffer.write(')');
+    if (element.isForGrouping) {
+      if (element.openGroup) stringBuffer.write('(');
+      if (element.closeGroup) stringBuffer.write(')');
       continue;
     }
     if (element.and) {
@@ -19,7 +19,7 @@ FormattedQuery getWhereString<TEntity extends IEntity>(Filter filter) {
     } else if (element.or) {
       stringBuffer.write(' OR ');
     }
-    if (element.leftBracket) stringBuffer.write('(');
+    if (element.openGroup) stringBuffer.write('(');
 
     stringBuffer.write(element.column!.name);
     stringBuffer.write(getCondition(element.condition));
@@ -41,7 +41,7 @@ FormattedQuery getWhereString<TEntity extends IEntity>(Filter filter) {
         element.condition == OrmCondition.notBetween) {
       whereArgs.add(element.secondaryValue);
     }
-    if (element.rightBracket) stringBuffer.write(')');
+    if (element.closeGroup) stringBuffer.write(')');
   }
   return FormattedQuery(filter: stringBuffer.toString(), whereArgs: whereArgs);
 }

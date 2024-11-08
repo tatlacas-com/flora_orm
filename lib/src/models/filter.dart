@@ -5,14 +5,14 @@ import 'orm_condition.dart';
 import 'filter_condition.dart';
 
 class Filter extends Equatable {
-  /// [lb] adds left bracket, [rb] adds right bracket
+  /// [openGroup] adds left bracket, [closeGroup] adds right bracket
   Filter(
     ColumnDefinition? column, {
     OrmCondition condition = OrmCondition.equalTo,
     dynamic value,
     dynamic secondaryValue,
-    bool lb = false,
-    bool rb = false,
+    bool openGroup = false,
+    bool closeGroup = false,
     List<FilterCondition> filters = const [],
   }) {
     if (column != null) {
@@ -23,8 +23,8 @@ class Filter extends Equatable {
           condition: condition,
           value: value,
           secondaryValue: secondaryValue,
-          lb: lb,
-          rb: rb,
+          openGroup: openGroup,
+          closeGroup: closeGroup,
         )
       ];
     } else {
@@ -37,7 +37,7 @@ class Filter extends Equatable {
 
   factory Filter.startGroup() {
     return Filter._(
-        filters: [const FilterCondition(leftBracket: true, isBracketOnly: true)]
+        filters: [const FilterCondition(openGroup: true, isForGrouping: true)]
             .toList());
   }
   late final List<FilterCondition> filters;
@@ -47,9 +47,9 @@ class Filter extends Equatable {
     OrmCondition condition = OrmCondition.equalTo,
     dynamic value,
     dynamic secondaryValue,
-    bool lb = false,
-    bool rb = false,
-    bool isBracketOnly = false,
+    bool openGroup = false,
+    bool closeGroup = false,
+    bool isForGrouping = false,
     bool and = false,
     bool or = false,
   }) {
@@ -58,9 +58,9 @@ class Filter extends Equatable {
       condition: condition,
       value: value,
       secondaryValue: secondaryValue,
-      leftBracket: lb,
-      rightBracket: rb,
-      isBracketOnly: isBracketOnly,
+      openGroup: openGroup,
+      closeGroup: closeGroup,
+      isForGrouping: isForGrouping,
       and: and,
       or: or,
     );
@@ -69,14 +69,14 @@ class Filter extends Equatable {
   Filter startGroup() {
     return Filter(null, filters: [
       ...filters,
-      const FilterCondition(leftBracket: true, isBracketOnly: true)
+      const FilterCondition(openGroup: true, isForGrouping: true)
     ]);
   }
 
   Filter endGroup() {
     return Filter(null, filters: [
       ...filters,
-      const FilterCondition(rightBracket: true, isBracketOnly: true)
+      const FilterCondition(closeGroup: true, isForGrouping: true)
     ]);
   }
 
@@ -84,8 +84,8 @@ class Filter extends Equatable {
       {OrmCondition condition = OrmCondition.equalTo,
       dynamic value,
       dynamic secondaryValue,
-      bool lb = false,
-      bool rb = false}) {
+      bool openGroup = false,
+      bool closeGroup = false}) {
     return Filter(null, filters: [
       ...filters,
       _addFilter(
@@ -93,8 +93,8 @@ class Filter extends Equatable {
         condition: condition,
         value: value,
         secondaryValue: secondaryValue,
-        lb: lb,
-        rb: rb,
+        openGroup: openGroup,
+        closeGroup: closeGroup,
         and: true,
       )
     ]);
@@ -105,8 +105,8 @@ class Filter extends Equatable {
     OrmCondition condition = OrmCondition.equalTo,
     dynamic value,
     dynamic secondaryValue,
-    bool lb = false,
-    bool rb = false,
+    bool openGroup = false,
+    bool closeGroup = false,
   }) {
     return Filter(null, filters: [
       ...filters,
@@ -115,8 +115,8 @@ class Filter extends Equatable {
         condition: condition,
         value: value,
         secondaryValue: secondaryValue,
-        lb: lb,
-        rb: rb,
+        openGroup: openGroup,
+        closeGroup: closeGroup,
       )
     ]);
   }
@@ -126,8 +126,8 @@ class Filter extends Equatable {
     OrmCondition condition = OrmCondition.equalTo,
     dynamic value,
     dynamic secondaryValue,
-    bool lb = false,
-    bool rb = false,
+    bool openGroup = false,
+    bool closeGroup = false,
   }) {
     return Filter(null, filters: [
       ...filters,
@@ -136,8 +136,8 @@ class Filter extends Equatable {
         condition: condition,
         value: value,
         secondaryValue: secondaryValue,
-        lb: lb,
-        rb: rb,
+        openGroup: openGroup,
+        closeGroup: closeGroup,
         or: true,
       )
     ]);

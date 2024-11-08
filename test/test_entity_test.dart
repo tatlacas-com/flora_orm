@@ -1,6 +1,5 @@
+import 'package:flora_orm/src/bloc/test.entity.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'dummy/test_entity.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

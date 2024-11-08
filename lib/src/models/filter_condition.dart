@@ -9,9 +9,9 @@ class FilterCondition extends Equatable {
     this.condition = OrmCondition.equalTo,
     this.value,
     this.secondaryValue,
-    this.leftBracket = false,
-    this.rightBracket = false,
-    this.isBracketOnly = false,
+    this.openGroup = false,
+    this.closeGroup = false,
+    this.isForGrouping = false,
     this.and = false,
     this.or = false,
   });
@@ -19,9 +19,9 @@ class FilterCondition extends Equatable {
   final OrmCondition condition;
   final dynamic value;
   final dynamic secondaryValue;
-  final bool leftBracket;
-  final bool rightBracket;
-  final bool isBracketOnly;
+  final bool openGroup;
+  final bool closeGroup;
+  final bool isForGrouping;
   final bool and;
   final bool or;
 
@@ -31,9 +31,9 @@ class FilterCondition extends Equatable {
         condition,
         value,
         secondaryValue,
-        leftBracket,
-        rightBracket,
-        isBracketOnly,
+        openGroup,
+        closeGroup,
+        isForGrouping,
         and,
         or,
       ];

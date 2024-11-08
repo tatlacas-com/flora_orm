@@ -62,7 +62,6 @@ class _MyHomePageState extends State<MyHomePage> {
   final orm = OrmManager(
     dbVersion: 1,
     dbName: 'orm_db_test.db',
-    isWeb: false,
     tables: <Entity>[
       const UserEntity(),
     ],

@@ -1,3 +1,4 @@
+import 'package:flora_orm/src/bloc/test.entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -6,7 +7,6 @@ import 'package:sqflite/sqlite_api.dart';
 import 'package:flora_orm/engines/sqflite_common_engine.dart';
 import 'package:flora_orm/src/open_options.dart';
 
-import '../dummy/test_entity.dart';
 import 'sql_storage_test_runs.dart';
 
 clearDb(Database database) {}
