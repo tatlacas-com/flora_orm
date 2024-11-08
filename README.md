@@ -2,8 +2,7 @@
 
 [![pub package](https://img.shields.io/pub/v/flora_orm.svg)](https://pub.dev/packages/flora_orm)
 
-ORM for [Flutter](https://flutter.io).
-Supports iOS, Android and Web.
+Database ORM (Object-Relational Mapping) for [Flutter](https://flutter.io).
 
 The ORM supports:
 * [shared_preferences](https://pub.dev/packages/shared_preferences) - All platforms support
