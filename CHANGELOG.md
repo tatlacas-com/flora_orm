@@ -1,4 +1,9 @@
 
+## 1.0.7
+
+* Update README.md
+* Updated example project
+
 ## 1.0.6
 
 * Update README.md
