@@ -7,8 +7,8 @@ Database ORM (Object-Relational Mapping) for [Flutter](https://flutter.io).
 The ORM supports:
 * [shared_preferences](https://pub.dev/packages/shared_preferences) - All platforms support
 * [sqflite](https://pub.dev/packages/sqflite) - iOS/Android/MacOS support
-* [sqflite_common_ffi on disk](https://pub.dev/packages/sqflite_common_ffi) - iOS/Android/MacOS/Linux/Windows support
-* [sqflite_common_ffiin memory](https://pub.dev/packages/sqflite_common_ffi) - iOS/Android/MacOS/Linux/Windows support
+* [sqflite_common_ffi - on disk](https://pub.dev/packages/sqflite_common_ffi) - iOS/Android/MacOS/Linux/Windows support
+* [sqflite_common_ffi - in memory](https://pub.dev/packages/sqflite_common_ffi) - iOS/Android/MacOS/Linux/Windows support
 
 ## Getting Started
 
@@ -104,7 +104,7 @@ class UserEntity extends Entity<UserEntity, UserEntityMeta>
 enum OAuthProvider { google, apple, facebook }
 ```
 
-Once you have created or updated your entity files, open terminal and directory run the following from the root:
+Once you have created or updated your entity files, open terminal and run the following from the root directory of your project:
 ```bash
 dart run build_runner build
 ```
@@ -113,7 +113,7 @@ dart run build_runner build
 You need an instance of `OrmManager` to interact with the storage.  
 Create an instance of `OrmManager` as early as possible.  
   
-We recommend registering it as singleton during app start-up using [get_it](https://pub.dev/packages/get_it) or any DI you prefer.
+We recommend registering it as a singleton during app start-up using [get_it](https://pub.dev/packages/get_it) or any DI you prefer.
 
 For example, in your `void main()` function before `runApp()`,  you can have the following:
 
@@ -122,6 +122,8 @@ final ormManager = OrmManager(
      /// update this version number whenever you update your entities
      /// such as adding new properties/fields.
       dbVersion: 1,
+      /// dbEngine defaults to DbEngine.sqflite so you can remove this line if
+      // you want to use the default engine
       dbEngine: DbEngine.sqflite,
       dbName: 'your_db_name_here.db',
       tables: <Entity>[
@@ -135,11 +137,11 @@ To keep your code clean, we recommend you have the above code in a seperate file
 
 The `dbEngine` value defaults to `DbEngine.sqflite`, and may be one of the following:
 
-```yaml
-  inMemory: 
-  sqfliteCommon:
-  sqflite:
-  sharedPreferences: 
+```dart
+  inMemory,
+  sqfliteCommon,
+  sqflite,
+  sharedPreferences,
 ```
 However, not all engines are available on all platforms. Here is a breakdown of each platform and supported engines:
 
@@ -153,13 +155,13 @@ web: sharedPreferences (defaults to sharedPreferences)
 ```
 If you provide a `dbEngine` value not supported by a platform, then the default for that platform is used.
 
-Once your `OrmManager` is set, you can use it from anywhere in your code. If you are using [get_it](https://pub.dev/packages/get_it), you can get your `storage` instance as:
+Once your `OrmManager` is set, you can use it from anywhere in your code. If you are using [get_it](https://pub.dev/packages/get_it) for example, you can get your `storage` instance as:
 
 ```dart
 final orm = GetIt.I<OrmManager>();
 final storage = orm.getStorage(/* Instance of your Entity here */);
 ```
-For example, for `UserEntity`:
+For example, to get `storage` for `UserEntity`:
 
 ```dart
 final orm = GetIt.I<OrmManager>();
@@ -195,7 +197,7 @@ final entities = await storage.insertList([
                                 ...,
                                 ]);
 ```
-An equivalent for insertOrUpdate exists:
+An equivalent for insertOrUpdate for more that one record exists:
 ```dart
 final entities = await storage.insertOrUpdateList([
                                 UserEntity(id: 'user1',   
@@ -219,25 +221,25 @@ final entities = await storage.where(...);
 
 ### Update
 
-You can use the insertOrUpdate options as explained before for inserting record  
-if it doesn't exist. But, if all you want is to update, then:
+You can use the insertOrUpdate options as explained before, which will insert records  
+if they do not exist. But, if all you want is to strictly update existing records, then:
 
 
 ```dart
-final entities = await storage.update(where: ...);
+final updatedCount = await storage.update(where: ...);
 ```
 
 ### Delete
 
 
 ```dart
-final entities = await storage.delete(where: ...);
+final deletedCount = await storage.delete(where: ...);
 ```
 
 ### The `Filter` function
 
 Most of the queries will need a `where` parameter which is a function that must return a `Filter`.  
-The function has a parameter `t` which is meta description your properties of `ColumnDefinition`s.  
+The function has a parameter `t` which is meta description of your properties as `ColumnDefinition`s.  
 
 Here are some examples:
 
@@ -286,7 +288,9 @@ final users = await storage.where(
 You can have complex filters that meet your needs.  
 Use utility functions such as `startGroup()`, `endGroup()`, `filter()` `and()`, and `or()`.  
 
-The above functions also take `openGroup` and `closeGroup` to simplify the grouping so that you may not need `startGroup()` and `endGroup()` However, we recommend using `startGroup()` and `endGroup()` since they are easy to read and understand their effects.  
+`filter()` `and()`, and `or() also have parameters `openGroup` and `closeGroup` to simplify the grouping so that you may not need `startGroup()` and `endGroup()`. However, we recommend using `startGroup()` and `endGroup()` since they are easy to read and understand their effects.  
+
+Think of grouping as opening and closing brackets, and putting the operations in-between the `openGroup`...`closeGroup` into those brackets.
 
 In the example below, the last `or()` and `and()` filters will be grouped into `(...)`.
   
@@ -316,10 +320,10 @@ final users = await storage.where(
           ),
     );
 ```
-`startGroup()` must usually be followed by `filter()` before chaining additional filters. Remember to `endGroup()`.
+`startGroup()` must usually be followed by `filter()` before chaining additional filters. Remember to `endGroup()`/`closeGroup()`.
 ### Migrations
 
-If you add columns, increment  `OrmManager`'s `dbVersion` then add the migrations for that version on the respective `{entity_name}.entity.migrations.dart` files.  
+If you add columns, increment  `OrmManager`'s `dbVersion` then add the migrations on the respective `{entity_name}.entity.migrations.dart` files.  
 
 The simplest way to migrate is either to drop and recreate the entity table (losing all data in that table), or specifying the added columns:  
 
