@@ -6,8 +6,9 @@ Database ORM (Object-Relational Mapping) for [Flutter](https://flutter.io).
 
 The ORM supports:
 * [shared_preferences](https://pub.dev/packages/shared_preferences) - All platforms support
-* [sqflite](https://pub.dev/packages/sqflite) - iOS, Android and MacOS support
-* [sqflite_common_ffi](https://pub.dev/packages/sqflite_common_ffi) - Linux/Windows/DartVM support
+* [sqflite](https://pub.dev/packages/sqflite) - iOS/Android/MacOS support
+* [sqflite_common_ffi on disk](https://pub.dev/packages/sqflite_common_ffi) - iOS/Android/MacOS/Linux/Windows support
+* [sqflite_common_ffiin memory](https://pub.dev/packages/sqflite_common_ffi) - iOS/Android/MacOS/Linux/Windows support
 
 ## Getting Started
 
@@ -40,11 +41,11 @@ import 'package:flora_orm/flora_orm.dart';
 
 ### Initializing
 
-To use `flora_orm`, you need to create entity classes that meets the following:
+To use `flora_orm`, you need to create entity classes that satisfy the following:
 
-* Recommended naming conversion is `{entity_name}.entity.dart`. For example `user.entity.dart`.
-* You must add 2 `parts` to the top of the entity file: `{entity_name}.entity.dart` and `{entity_name}.entity.migrations.dart`.
-* You must annotate the class as `@entity` (or `@OrmEntity()` for granular control) 
+* Naming conversion is `{entity_name}.entity.dart`. For example `user.entity.dart` _(recommended)_.
+* You **must** add 2 `part`s to the top of the entity file: `{entity_name}.entity.g.dart` and `{entity_name}.entity.migrations.dart`.
+* You **must** annotate the class with `@entity` (or `@OrmEntity()` for granular control).
 * Your entity class **must** extend `Entity<{YourEntityName}, {YourEntityName}Meta> with _{YourEntityName}Mixin, {YourEntityName}Migrations`.
 
 #### Example Entity
@@ -57,9 +58,9 @@ part 'user.entity.migrations.dart';
 
 @OrmEntity(tableName: 'user')
 class UserEntity extends Entity<UserEntity, UserEntityMeta>
-    with _UserEntityMixin, UserEntityMigrations{
+    with _UserEntityMixin, UserEntityMigrations {
 
-  const AppUserEntity({
+  const UserEntity({
     super.id,
     super.createdAt,
     super.updatedAt,
@@ -93,17 +94,17 @@ class UserEntity extends Entity<UserEntity, UserEntityMeta>
   
   @override
   @OrmColumn(isEnum: true)
-  final AppOAuthProvider? provider;
+  final OAuthProvider? provider;
 
   @override
   @column
   final String? photoURL;
 }
 
-enum AppOAuthProvider { google, apple, facebook }
+enum OAuthProvider { google, apple, facebook }
 ```
 
-Once you have created or updated your entity files, open terminal and from the root directory run:
+Once you have created or updated your entity files, open terminal and directory run the following from the root:
 ```bash
 dart run build_runner build
 ```
@@ -121,6 +122,7 @@ final ormManager = OrmManager(
      /// update this version number whenever you update your entities
      /// such as adding new properties/fields.
       dbVersion: 1,
+      dbEngine: DbEngine.sqflite,
       dbName: 'your_db_name_here.db',
       tables: <Entity>[
         /// instatiate all your entities that must be saved in db here
@@ -129,12 +131,39 @@ final ormManager = OrmManager(
     );
 GetIt.I.registerSingleton(ormManager);
 ```
-To keep your code clean, we recommend you have the above code in a seperate file. For example in `src/orm.init.dart`
+To keep your code clean, we recommend you have the above code in a seperate file. For example in `src/orm.init.dart`  
 
-Once your `OrmManager` is set, you can use it from anywhere in your code. If you are using [get_it](https://pub.dev/packages/get_it), you can get your storage instance as:
+The `dbEngine` value defaults to `DbEngine.sqflite`, and may be one of the following:
+
+```yaml
+  inMemory: 
+  sqfliteCommon:
+  sqflite:
+  sharedPreferences: 
+```
+However, not all engines are available on all platforms. Here is a breakdown of each platform and supported engines:
+
+```yaml
+Andoid: all (we recommend sqflite)
+iOS: all (we recommend sqflite)
+macOS: all (we recommend sqflite)
+Linux: inMemory, sqfliteCommon, sharedPreferences (defaults to sqfliteCommon)
+Windows: inMemory, sqfliteCommon, sharedPreferences (defaults to sqfliteCommon)
+web: sharedPreferences (defaults to sharedPreferences)
+```
+If you provide a `dbEngine` value not supported by a platform, then the default for that platform is used.
+
+Once your `OrmManager` is set, you can use it from anywhere in your code. If you are using [get_it](https://pub.dev/packages/get_it), you can get your `storage` instance as:
 
 ```dart
-final storage = GetIt.I<OrmManager>().getStorage(const UserEntity())
+final orm = GetIt.I<OrmManager>();
+final storage = orm.getStorage(/* Instance of your Entity here */);
+```
+For example, for `UserEntity`:
+
+```dart
+final orm = GetIt.I<OrmManager>();
+final storage = orm.getStorage(const UserEntity())
 ```
 
 ### CRUD functions
@@ -149,7 +178,7 @@ final entity = await storage.insert(
 ```
 We recommend using [uuid](https://pub.dev/packages/uuid) for generating ids.  
   
-You can insert or update instead, which will update record if it exists:
+You can `insertOrUpdate` instead, which will update record if it exists:
 ```dart
 final entity = await storage.insertOrUpdate(
                                 UserEntity(id: 'user1',   
@@ -208,12 +237,13 @@ final entities = await storage.delete(where: ...);
 ### The `Filter` function
 
 Most of the queries will need a `where` parameter which is a function that must return a `Filter`.  
-The function has a parameter `t` which is meta description of columns.  
-Here is some examples of the filter:
+The function has a parameter `t` which is meta description your properties of `ColumnDefinition`s.  
 
-#### Get User with id = 'user1'
+Here are some examples:
+
+#### Get `UserEntity` with `id = 'user1'`
 ```dart
-final user = await _repo.firstWhereOrNull(
+final user = await storage.firstWhereOrNull(
       where: (t) => Filter(
         t.id,
         value: 'user1',
@@ -221,31 +251,31 @@ final user = await _repo.firstWhereOrNull(
     );
 ```
 
-#### Delete all Users with id NOT NULL
+#### Delete all `UserEntity`s with `uid NOT NULL`
 ```dart
-await _repo.delete(
+await storage.delete(
       where: (t) => Filter(
         t.uid,
         condition: OrmCondition.notNull,
       ),
     );
 ```
-#### Get all Users with rating >= 20
+#### Get all `UserEntity`s with `rating >= 20`
 ```dart
-final users = await _repo.where(
+final users = await storage.where(
       where: (t) => Filter(
         t.rating,
-        condition: greaterThanOrEqual,
+        condition: OrmCondition.greaterThanOrEqual,
         value: 20,
       ),
     );
 ```
-#### Get all Users with rating between 10 and 100
+#### Get all `UserEntity`s with `rating between 10 and 100`
 ```dart
-final users = await _repo.where(
+final users = await storage.where(
       where: (t) => Filter(
         t.rating,
-        condition: between,
+        condition: OrmCondition.between,
         value: 10,
         secondaryValue: 100,
       ),
@@ -254,15 +284,15 @@ final users = await _repo.where(
 #### Chaining and grouping filters
 
 You can have complex filters that meet your needs.  
-Use utility functions such as `startGroup()`, `endGroup()`, `filter()` `and()`, `and or()`.  
+Use utility functions such as `startGroup()`, `endGroup()`, `filter()` `and()`, and `or()`.  
 
-The above functions functions also take `openGroup` and `closeGroup` to simplify the grouping so that you may not need `startGroup()` and `endGroup()`, but using `startGroup()` and `endGroup()` is advisable since they are easy to understand their effects.  
+The above functions also take `openGroup` and `closeGroup` to simplify the grouping so that you may not need `startGroup()` and `endGroup()` However, we recommend using `startGroup()` and `endGroup()` since they are easy to read and understand their effects.  
 
 In the example below, the last `or()` and `and()` filters will be grouped into `(...)`.
   
 Example:
 ```dart
-final users = await _repo.where(
+final users = await storage.where(
       where: (t) => Filter.startGroup()
           .filter(
             t.displayName,
@@ -286,14 +316,14 @@ final users = await _repo.where(
           ),
     );
 ```
-
+`startGroup()` must usually be followed by `filter()` before chaining additional filters. Remember to `endGroup()`.
 ### Migrations
 
 If you add columns, increment  `OrmManager`'s `dbVersion` then add the migrations for that version on the respective `{entity_name}.entity.migrations.dart` files.  
 
-The simplest way is either to drop and recreate the entity, or specify the added columns:  
+The simplest way to migrate is either to drop and recreate the entity table (losing all data in that table), or specifying the added columns:  
 
-Example UserEntity migration (this file is auto-generated the first time):
+Example `UserEntity` migration: _(the file itself is auto-generated the first time you run `dart run build_runner build`)_:
 
 ```dart
 mixin UserEntityMigrations on Entity<UserEntity, UserEntityMeta> {
@@ -309,8 +339,8 @@ mixin UserEntityMigrations on Entity<UserEntity, UserEntityMeta> {
   @override
   List<ColumnDefinition> addColumnsAt(int newVersion) {
     return switch (newVersion) {
-        /// Here we are saying we added column property 
-        /// provider on version 2.
+        /// Here we are saying we added property 
+        /// named provider on version 2.
         /// All [@column] properties in your entity class 
         /// are available in [meta] object as [ColumnDefinition]s
       2 => [meta.provider],
@@ -320,7 +350,7 @@ mixin UserEntityMigrations on Entity<UserEntity, UserEntityMeta> {
 }
 ```
 
-In `migrations.dart` You can also override `downgradeTable()` and `additionalUpgradeQueries()`.  
+In `{entity_name}.entity.migrations.dart` You can also override `downgradeTable()` and `additionalUpgradeQueries()`, returning queries that must be run during that operation.  
 
 You can also override `onUpgradeComplete` and `onDowngradeComplete` to return custom queries that will be run after completion of upgrade/downgrade.  
 
@@ -339,5 +369,5 @@ dart run build_runner build
 * double
 * DateTime
 * enums (needs `@OrmColumn(isEnum: true)` to be specified)
-* Lists of above types
+* Lists of above types (e.g `List<String>`)
 

@@ -9,37 +9,37 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 
 class OrmManager {
   OrmManager({
-    DbInUse dbInUse = DbInUse.sqflite,
+    DbEngine dbInUse = DbEngine.sqflite,
     required int dbVersion,
     required String dbName,
     required List<IEntity> tables,
   }) {
     if (kIsWeb && !dbInUse.suppportsWeb) {
-      dbInUse = DbInUse.sharedPreferences;
+      dbInUse = DbEngine.sharedPreferences;
     } else if (Platform.isWindows && !dbInUse.suppportsWindows) {
-      dbInUse = DbInUse.sqfliteCommon;
+      dbInUse = DbEngine.sqfliteCommon;
     } else if (Platform.isLinux && !dbInUse.suppportsLinux) {
-      dbInUse = DbInUse.sqfliteCommon;
+      dbInUse = DbEngine.sqfliteCommon;
     } else if (Platform.isMacOS && !dbInUse.suppportsLinux) {
-      dbInUse = DbInUse.sqfliteCommon;
+      dbInUse = DbEngine.sqfliteCommon;
     }
     dbContext = switch (dbInUse) {
-      DbInUse.inMemory => SqfliteInMemoryDbContext(
+      DbEngine.inMemory => SqfliteInMemoryDbContext(
           dbVersion: dbVersion,
           dbName: dbName,
           tables: tables,
         ),
-      DbInUse.sqfliteCommon => SqfliteCommonDbContext(
+      DbEngine.sqfliteCommon => SqfliteCommonDbContext(
           dbVersion: dbVersion,
           dbName: dbName,
           tables: tables,
         ),
-      DbInUse.sqflite => SqfliteDbContext(
+      DbEngine.sqflite => SqfliteDbContext(
           dbVersion: dbVersion,
           dbName: dbName,
           tables: tables,
         ),
-      DbInUse.sharedPreferences => SharedPreferenceContext(
+      DbEngine.sharedPreferences => SharedPreferenceContext(
           dbName: dbName,
           dbVersion: dbVersion,
           tables: tables,

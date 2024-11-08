@@ -1,4 +1,4 @@
-enum DbInUse {
+enum DbEngine {
   inMemory,
   sqfliteCommon,
   sqflite,
