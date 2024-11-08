@@ -42,9 +42,9 @@ import 'package:flora_orm/flora_orm.dart';
 
 To use `flora_orm`, you need to create entity classes that meets the following:
 
-* Recommended naming conversion is `{entity_name}.entity.dart`. For example `user.entity.dart'.
-* You must add 2 parts to the top of the entity file, `{entity_name}.entity.dart` and `{entity_name}.entity.migrations.dart`.
-* You must annotate the class as `@entity` (or `OrmEntity` for granular control) 
+* Recommended naming conversion is `{entity_name}.entity.dart`. For example `user.entity.dart`.
+* You must add 2 `parts` to the top of the entity file: `{entity_name}.entity.dart` and `{entity_name}.entity.migrations.dart`.
+* You must annotate the class as `@entity` (or `@OrmEntity()` for granular control) 
 * Your entity class **must** extend `Entity<{YourEntityName}, {YourEntityName}Meta> with _{YourEntityName}Mixin, {YourEntityName}Migrations`.
 
 #### Example Entity
@@ -99,6 +99,13 @@ class UserEntity extends Entity<UserEntity, UserEntityMeta>
   @column
   final String? photoURL;
 }
+
+enum AppOAuthProvider { google, apple, facebook }
+```
+
+Once you have created or updated your entity files, open terminal and from the root directory run:
+```bash
+dart run build_runner build
 ```
 #### OrmManager
 
@@ -107,12 +114,13 @@ Create an instance of `OrmManager` as early as possible.
   
 We recommend registering it as singleton during app start-up using [get_it](https://pub.dev/packages/get_it) or any DI you prefer.
 
-For example, in your `void main()` function before `runApp()`,  you could have [get_it](https://pub.dev/packages/get_it) you can have the following:
+For example, in your `void main()` function before `runApp()`,  you can have the following:
 
 ```dart
 final ormManager = OrmManager(
-      dbVersion: 1, /// update this version number whenever you update your entities
-                    /// such as adding new properties/fields.
+     /// update this version number whenever you update your entities
+     /// such as adding new properties/fields.
+      dbVersion: 1,
       dbName: 'your_db_name_here.db',
       tables: <Entity>[
         /// instatiate all your entities that must be saved in db here
@@ -278,3 +286,58 @@ final users = await _repo.where(
           ),
     );
 ```
+
+### Migrations
+
+If you add columns, increment  `OrmManager`'s `dbVersion` then add the migrations for that version on the respective `{entity_name}.entity.migrations.dart` files.  
+
+The simplest way is either to drop and recreate the entity, or specify the added columns:  
+
+Example UserEntity migration (this file is auto-generated the first time):
+
+```dart
+mixin UserEntityMigrations on Entity<UserEntity, UserEntityMeta> {
+  @override
+  bool recreateTableAt(int newVersion) {
+    return switch (newVersion) {
+        /// when dbVersion = 3, drop and recreate table
+        3 => true,
+      _ => false,
+    };
+  }
+
+  @override
+  List<ColumnDefinition> addColumnsAt(int newVersion) {
+    return switch (newVersion) {
+        /// Here we are saying we added column property 
+        /// provider on version 2.
+        /// All [@column] properties in your entity class 
+        /// are available in [meta] object as [ColumnDefinition]s
+      2 => [meta.provider],
+      _ => [],
+    };
+  }
+}
+```
+
+In `migrations.dart` You can also override `downgradeTable()` and `additionalUpgradeQueries()`.  
+
+You can also override `onUpgradeComplete` and `onDowngradeComplete` to return custom queries that will be run after completion of upgrade/downgrade.  
+
+There is also `onCreateComplete` which you can return queries that will be run the first time the database is created.
+
+As a reminder, when you update your entity files, run:
+```bash
+dart run build_runner build
+```
+
+### Supported data types
+
+* String
+* bool
+* int
+* double
+* DateTime
+* enums (needs `@OrmColumn(isEnum: true)` to be specified)
+* Lists of above types
+
