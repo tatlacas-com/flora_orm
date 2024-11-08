@@ -43,13 +43,9 @@ class _MyHomePageState extends State<MyHomePage> {
   );
 
   /// Get a storage instance of the Entity type you want to use.
-  /// **IMPORTANT remember to specify type ([UserEntityOrm] fot this example) to make your life easier when using storage object
+  /// **IMPORTANT remember to specify type ([UserEntityOrm] for this example)
+  /// to make your life easier when using storage object
   late final UserEntityOrm storage = orm.getStorage(const UserEntity());
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   Future<UserEntity> _insertUser() async {
     await storage.insertOrUpdate(

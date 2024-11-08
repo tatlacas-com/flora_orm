@@ -167,7 +167,8 @@ For example, to get `storage` for `UserEntity`:
 final orm = GetIt.I<OrmManager>();
 final UserEntityOrm storage = orm.getStorage(const UserEntity())
 ```
-IMPORTANT: You **NEED** to specify type (e.g `UserEntityOrm` above) for you to get [ColumnDefition]s on your [Filter]s later. The type class is auto-generated when you run `dart run build_runner build`
+**IMPORTANT**: You **NEED** to specify type (e.g `UserEntityOrm` above) for you to get `ColumnDefition`s on your `Filter`s later. The type class is auto-generated when you run `dart run build_runner build`
+
 ### CRUD functions
 
 #### Create
@@ -253,7 +254,7 @@ final user = await storage.firstWhereOrNull(
     );
 ```
 
-#### Delete all `UserEntity`s with `uid NOT NULL`
+#### Delete all `UserEntity`s with `uid != null`
 ```dart
 await storage.delete(
       where: (t) => Filter(
