@@ -17,6 +17,8 @@ topics:
   - sql
   - database
   - orm
+  - storage
+  - persistence
 
 environment: 
   sdk: '>=3.1.3 <4.0.0'
