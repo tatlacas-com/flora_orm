@@ -1,7 +1,7 @@
-import '../../flora_orm.dart';
+import 'package:flora_orm/engines/sqflite_in_memory_engine.dart';
+import 'package:flora_orm/flora_orm.dart';
 
 import 'base_orm_engine.dart';
-import '../contexts/sqflite_in_memory_db_context.dart';
 
 class SqfliteInMemoryEngine<TEntity extends IEntity,
         TMeta extends EntityMeta<TEntity>>

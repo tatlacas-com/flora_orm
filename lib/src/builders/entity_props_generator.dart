@@ -3,12 +3,18 @@ import 'dart:io';
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
+import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/dart/element/visitor.dart';
 import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:flora_orm/src/builders/annotations.dart';
 import 'package:flora_orm/src/models/entity.dart';
 import 'package:path/path.dart' as path;
+
+extension DartTypeExtension on DartType {
+  String get cleanDisplayString =>
+      getDisplayString().replaceFirst(RegExp(r'[?*]'), '');
+}
 
 class _ExtraField {
   _ExtraField({
@@ -128,7 +134,7 @@ class ${className}Meta extends  EntityMeta<$className> {
             (e) => MapEntry(
               e.name,
               _ExtraField(
-                type: e.type.getDisplayString(withNullability: false),
+                type: e.type.cleanDisplayString,
                 typeFull: e.type.getDisplayString(),
                 notNull: e.type.nullabilitySuffix == NullabilitySuffix.none,
               ),
@@ -140,7 +146,7 @@ class ${className}Meta extends  EntityMeta<$className> {
       if (const TypeChecker.fromRuntime(OrmColumn)
           .hasAnnotationOfExact(field)) {
         final fieldName = field.name;
-        var fieldType = field.type.getDisplayString(withNullability: false);
+        var fieldType = field.type.cleanDisplayString;
 
         final fieldTypeFull = field.type.getDisplayString();
 
@@ -250,8 +256,7 @@ class ${className}Meta extends  EntityMeta<$className> {
             aliasNotNull =
                 aliasProperty.type.nullabilitySuffix == NullabilitySuffix.none;
             if (aliasProperty.type.isDartCoreList) {
-              jsonEncodedType =
-                  aliasProperty.type.getDisplayString(withNullability: false);
+              jsonEncodedType = aliasProperty.type.cleanDisplayString;
             }
             mixinCode.writeln('''
   $jsonEncodedType${aliasNotNull ? '' : '?'} get $alias;
@@ -276,7 +281,10 @@ class ${className}Meta extends  EntityMeta<$className> {
                       ? 'DateTime.parse(e as String)'
                       : 'e as $fieldType')
                   : (isEnum
-                      ? '$fieldType.values.firstWhereOrNull((element) => element.name == e as String)'
+                      ? '''<$fieldType?>[...$fieldType.values].firstWhere(
+          (element) => element?.name == value as String,
+          orElse: () => null)'''
+                      // ? '$fieldType.values.firstWhereOrNull((element) => element.name == e as String)'
                       : fnName);
               mixinCode.writeln('''
     List<$fieldType>? items;
@@ -298,7 +306,9 @@ class ${className}Meta extends  EntityMeta<$className> {
     $fieldType? item;
     if (value != null) {
       ${isEnum ? '' : 'Map<String, dynamic> map = value is Map<String, dynamic> ? value : jsonDecode(value);'}
-      item = ${isEnum ? '$fieldType.values.firstWhereOrNull((element) => element.name == value as String)' : fnName} ;
+      item = ${isEnum ? '''<$fieldType?>[...$fieldType.values].firstWhere(
+          (element) => element?.name == value as String,
+          orElse: () => null)''' : fnName} ;
     }
     return copyWith(
       $fieldName: ${notNull ? 'item' : 'CopyWith(item)'},
@@ -389,8 +399,7 @@ class ${className}Meta extends  EntityMeta<$className> {
               classElement.accept(finder);
               final property = finder.foundProperty!;
               isDartCoreList = property.type.isDartCoreList;
-              jsonEncodedType =
-                  property.type.getDisplayString(withNullability: false);
+              jsonEncodedType = property.type.cleanDisplayString;
             }
             final isNotNull = isPremitiveType ? aliasNotNull : notNull;
 
@@ -489,7 +498,7 @@ class ${className}Meta extends  EntityMeta<$className> {
       } else if (const TypeChecker.fromRuntime(NullableProp)
           .hasAnnotationOfExact(field)) {
         final fieldName = field.name;
-        final fieldType = field.type.getDisplayString(withNullability: false);
+        final fieldType = field.type.cleanDisplayString;
         final fieldTypeFull = field.type.getDisplayString();
         extraFields[fieldName] = _ExtraField(
           type: fieldType,
@@ -499,7 +508,7 @@ class ${className}Meta extends  EntityMeta<$className> {
       } else if (const TypeChecker.fromRuntime(CopyableProp)
           .hasAnnotationOfExact(field)) {
         final fieldName = field.name;
-        final fieldType = field.type.getDisplayString(withNullability: false);
+        final fieldType = field.type.cleanDisplayString;
         final fieldTypeFull = field.type.getDisplayString();
         extraFields[fieldName] = _ExtraField(
           type: fieldType,

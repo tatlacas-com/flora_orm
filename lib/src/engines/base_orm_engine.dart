@@ -511,17 +511,17 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
   @override
   @protected
   Future<List<Map<String, Object?>>> rawQuery(
-    Filter Function(TMeta t)? filter,
+    Filter Function(TMeta t)? where,
     String query, {
     final bool? useIsolate,
     Map<String, dynamic>? isolateArgs,
     void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   }) async {
     final db = await dbContext.database;
-    if (filter == null) {
+    if (where == null) {
       return await db.rawQuery(query);
     } else {
-      final formattedQuery = await whereString(filter, useIsolate);
+      final formattedQuery = await whereString(where, useIsolate);
       return await db.rawQuery(
           '$query WHERE ${formattedQuery.filter}', formattedQuery.whereArgs);
     }

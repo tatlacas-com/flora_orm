@@ -1,4 +1,4 @@
-library flora_orm;
+library;
 
 export 'src/contexts/db_context.dart';
 export 'src/engines/orm_engine.dart';

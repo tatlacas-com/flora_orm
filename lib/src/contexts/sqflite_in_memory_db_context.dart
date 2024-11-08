@@ -1,5 +1,5 @@
+import 'package:flora_orm/flora_orm.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import '../../flora_orm.dart';
 
 import 'base_context.dart';
 import '../open_options.dart';

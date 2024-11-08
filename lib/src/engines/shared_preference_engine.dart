@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flora_orm/flora_orm.dart';
@@ -145,7 +143,7 @@ class SharedPreferenceEngine<TEntity extends IEntity,
 
   @override
   Future<List<Map<String, Object?>>> rawQuery(
-    Filter Function(TMeta t)? filter,
+    Filter Function(TMeta t)? where,
     String query, {
     final bool? useIsolate,
     Map<String, dynamic>? isolateArgs,

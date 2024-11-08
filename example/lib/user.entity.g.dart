@@ -12,14 +12,28 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
   @override
   UserEntityMeta get meta => _meta;
 
+  UserEntity readTestEnum(Map<String, dynamic> json, value) {
+    TestEnum? item;
+    if (value != null) {
+      item = <TestEnum?>[...TestEnum.values].firstWhere(
+          (element) => element?.name == value as String,
+          orElse: () => null);
+    }
+    return copyWith(
+      testEnum: CopyWith(item),
+    );
+  }
+
   String? get firstName;
   String? get lastName;
+  TestEnum? get testEnum;
 
   @override
   List<Object?> get props => [
         ...super.props,
         firstName,
         lastName,
+        testEnum,
       ];
   @override
   UserEntity copyWith({
@@ -28,6 +42,7 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
     DateTime? updatedAt,
     CopyWith<String?>? firstName,
     CopyWith<String?>? lastName,
+    CopyWith<TestEnum?>? testEnum,
     Map<String, dynamic>? json,
   }) {
     return UserEntity(
@@ -36,6 +51,7 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
       updatedAt: updatedAt ?? this.updatedAt,
       firstName: firstName != null ? firstName.value : this.firstName,
       lastName: lastName != null ? lastName.value : this.lastName,
+      testEnum: testEnum != null ? testEnum.value : this.testEnum,
     );
   }
 }
@@ -91,6 +107,22 @@ class UserEntityMeta extends EntityMeta<UserEntity> {
             entity.copyWith(lastName: CopyWith(value), json: json),
       );
 
+  ColumnDefinition<UserEntity, String> get testEnum =>
+      ColumnDefinition<UserEntity, String>(
+        'testEnum',
+        write: (entity) {
+          if (entity.testEnum == null) {
+            return null;
+          }
+          final map = entity.testEnum?.name;
+
+          return map;
+        },
+        read: (json, entity, value) {
+          return entity.readTestEnum(json, value);
+        },
+      );
+
   @override
   Iterable<ColumnDefinition<UserEntity, dynamic>> get columns => [
         id,
@@ -98,5 +130,6 @@ class UserEntityMeta extends EntityMeta<UserEntity> {
         updatedAt,
         firstName,
         lastName,
+        testEnum,
       ];
 }

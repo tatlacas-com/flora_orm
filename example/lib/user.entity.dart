@@ -1,3 +1,4 @@
+import 'package:example/test_enum.dart';
 import 'package:flora_orm/flora_orm.dart';
 part 'user.entity.g.dart';
 part 'user.entity.migrations.dart';
@@ -11,6 +12,9 @@ class UserEntity extends Entity<UserEntity, UserEntityMeta>
   @override
   @column
   final String? lastName;
+  @override
+  @OrmColumn(isEnum: true)
+  final TestEnum? testEnum;
 
   const UserEntity({
     super.id,
@@ -18,5 +22,6 @@ class UserEntity extends Entity<UserEntity, UserEntityMeta>
     super.updatedAt,
     this.firstName,
     this.lastName,
+    this.testEnum,
   });
 }
