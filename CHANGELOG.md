@@ -1,4 +1,7 @@
 
+## 1.0.8
+
+* Fix backward compatibility issues
 ## 1.0.7
 
 * Update README.md
