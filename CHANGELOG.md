@@ -1,4 +1,8 @@
 
+## 2.0.5
+
+* Update README.md
+
 ## 2.0.4
 
 * bug fixes

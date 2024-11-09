@@ -377,5 +377,25 @@ dart run build_runner build
 * double
 * DateTime
 * enums (needs `@OrmColumn(isEnum: true)` to be specified)
+* Custom classes (Objects) - they need to have factory `fromMap(map)` and function `toMap()`
 * Lists of above types (e.g `List<String>`)
+
+All entity classes will already have toMap implemented. You need to define the factory `fromMap(map)` if you want to have the class as a column in another entity.   
+For convenience, you can call the `load()` function that will do the rest.
+
+Example factory for `UserEntity`:
+
+```dart
+@OrmEntity(tableName: 'user')
+class UserEntity extends Entity<UserEntit... {
+  
+  /// default constructor here
+
+  factory UserEntity.fromMap(map) {
+    return const UserEntity().load(map);
+  }
+
+  /// rest of the class here
+}
+```
 
