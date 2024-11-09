@@ -108,7 +108,7 @@ Once you have created or updated your entity files, open terminal and run the fo
 ```bash
 dart run build_runner build
 ```
-#### OrmManager
+## OrmManager
 
 You need an instance of `OrmManager` to interact with the storage.  
 Create an instance of `OrmManager` as early as possible.  
@@ -169,9 +169,9 @@ final UserEntityOrm storage = orm.getStorage(const UserEntity())
 ```
 **IMPORTANT**: You **NEED** to specify type (e.g `UserEntityOrm` above) for you to get `ColumnDefition`s on your `Filter`s later. The type class is auto-generated when you run `dart run build_runner build`
 
-### CRUD functions
+## CRUD operations
 
-#### Create
+### C~~RUD~~ - Create
 Will throw error if record with same `id` already exists:
 ```dart
 final entity = await storage.insert(
@@ -207,7 +207,7 @@ final entities = await storage.insertOrUpdateList([
                                 ]);
 ```
 
-### Read
+### ~~C~~R~~UD~~ - Read
 Get single record:
 
 ```dart
@@ -220,7 +220,7 @@ More than one record:
 final entities = await storage.where(...);
 ```
 
-### Update
+### ~~CR~~U~~D~~ - Update
 
 You can use the insertOrUpdate options as explained before, which will insert records  
 if they do not exist. But, if all you want is to strictly update existing records, then:
@@ -230,21 +230,21 @@ if they do not exist. But, if all you want is to strictly update existing record
 final updatedCount = await storage.update(where: ...);
 ```
 
-### Delete
+### ~~CRU~~D - Delete
 
 
 ```dart
 final deletedCount = await storage.delete(where: ...);
 ```
 
-### The `Filter` function
+## The `Filter` function
 
 Most of the queries will need a `where` parameter which is a function that must return a `Filter`.  
 The function has a parameter `t` which is meta description of your properties as `ColumnDefinition`s.  
 
 Here are some examples:
 
-#### Get `UserEntity` with `id = 'user1'`
+##### Get `UserEntity` with `id = 'user1'`
 ```dart
 final user = await storage.firstWhereOrNull(
       where: (t) => Filter(
@@ -254,7 +254,7 @@ final user = await storage.firstWhereOrNull(
     );
 ```
 
-#### Delete all `UserEntity`s with `uid != null`
+##### Delete all `UserEntity`s with `uid != null`
 ```dart
 await storage.delete(
       where: (t) => Filter(
@@ -263,7 +263,7 @@ await storage.delete(
       ),
     );
 ```
-#### Get all `UserEntity`s with `rating >= 20`
+##### Get all `UserEntity`s with `rating >= 20`
 ```dart
 final users = await storage.where(
       where: (t) => Filter(
@@ -273,7 +273,7 @@ final users = await storage.where(
       ),
     );
 ```
-#### Get all `UserEntity`s with `rating between 10 and 100`
+##### Get all `UserEntity`s with `rating between 10 and 100`
 ```dart
 final users = await storage.where(
       where: (t) => Filter(
@@ -284,7 +284,7 @@ final users = await storage.where(
       ),
     );
 ```
-#### Chaining and grouping filters
+### Chaining and grouping filters
 
 You can have complex filters that meet your needs.  
 Use utility functions such as `startGroup()`, `endGroup()`, `filter()` `and()`, and `or()`.  
@@ -322,9 +322,12 @@ final users = await storage.where(
     );
 ```
 `startGroup()` must usually be followed by `filter()` before chaining additional filters. Remember to `endGroup()`/`closeGroup()`.
-### Migrations
 
-If you add columns, increment  `OrmManager`'s `dbVersion` then add the migrations on the respective `{entity_name}.entity.migrations.dart` files.  
+## Migrations - Changes to Entity classes and Database updates
+
+If you update any of your `Entity` classes you need to run `dart run build_runner build` again.  
+
+If you add/remove `@column` or any annotated item in your `Entity`  classes then **increment**  `OrmManager`'s `dbVersion` and add the migrations on the respective `{entity_name}.entity.migrations.dart` files.  
 
 The simplest way to migrate is either to drop and recreate the entity table (losing all data in that table), or specifying the added columns:  
 
@@ -366,7 +369,7 @@ As a reminder, when you update your entity files, run:
 dart run build_runner build
 ```
 
-### Supported data types
+## Supported data types
 
 * String
 * bool
