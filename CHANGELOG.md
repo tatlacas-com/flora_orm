@@ -1,4 +1,8 @@
 
+## 2.0.1
+
+* Compatible with dependency constraint lower bounds
+
 ## 2.0.0
 
 * Fix constraints lower bounds
