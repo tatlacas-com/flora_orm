@@ -79,8 +79,8 @@ abstract class BaseContext<TEntity extends IEntity> extends DbContext<TEntity> {
       IEntity element, int oldVersion, int newVersion) {
     List<String> allQueries = [];
     List<ColumnDefinition> columns = [];
-    while (oldVersion < newVersion) {
-      columns.addAll(element.addColumnsAt(oldVersion++));
+    while (++oldVersion < newVersion) {
+      columns.addAll(element.addColumnsAt(oldVersion));
     }
     columns.addAll(element.addColumnsAt(newVersion));
     allQueries.addAll(columns.map(
@@ -91,8 +91,8 @@ abstract class BaseContext<TEntity extends IEntity> extends DbContext<TEntity> {
   }
 
   bool _recreateOn(IEntity element, int oldVersion, int newVersion) {
-    while (oldVersion < newVersion) {
-      if (element.recreateTableAt(oldVersion++)) {
+    while (++oldVersion < newVersion) {
+      if (element.recreateTableAt(oldVersion)) {
         return true;
       }
     }
@@ -100,8 +100,8 @@ abstract class BaseContext<TEntity extends IEntity> extends DbContext<TEntity> {
   }
 
   bool _createOn(IEntity element, int oldVersion, int newVersion) {
-    while (oldVersion < newVersion) {
-      if (element.createTableAt(oldVersion++)) {
+    while (++oldVersion < newVersion) {
+      if (element.createTableAt(oldVersion)) {
         return true;
       }
     }
