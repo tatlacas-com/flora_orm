@@ -38,14 +38,14 @@ class _MyHomePageState extends State<MyHomePage> {
     dbName: 'orm_db_test.db',
     tables: <Entity>[
       /// You must register all entities you intend to save here
-      const UserEntity(),
+      UserEntity(),
     ],
   );
 
   /// Get a storage instance of the Entity type you want to use.
   /// **IMPORTANT remember to specify type ([UserEntityOrm] for this example)
   /// to make your life easier when using storage object
-  late final UserEntityOrm storage = orm.getStorage(const UserEntity());
+  late final UserEntityOrm storage = orm.getStorage(UserEntity());
 
   Future<UserEntity> _insertUser() async {
     await storage.insertOrUpdate(

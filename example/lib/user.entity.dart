@@ -16,12 +16,18 @@ class UserEntity extends Entity<UserEntity, UserEntityMeta>
   @OrmColumn(isEnum: true)
   final TestEnum? testEnum;
 
-  const UserEntity({
+  UserEntity({
     super.id,
     super.createdAt,
     super.updatedAt,
     this.firstName,
     this.lastName,
     this.testEnum,
-  });
+    this.test2,
+  }) {
+    test = '';
+  }
+
+  late final String? test;
+  final String? test2;
 }

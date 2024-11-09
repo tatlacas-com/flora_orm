@@ -129,7 +129,15 @@ class ${className}Meta extends  EntityMeta<$className> {
     final Map<String, _ExtraField> extraFields = {};
     extraFields.addEntries(
       fields
-          .where((field) => field.isFinal && !_hasDbAnnotation(field))
+          .where((field) =>
+              field.isFinal &&
+              !field.isConst &&
+              !field.isLate &&
+              !field.hasImplicitType &&
+              !field.isPrivate &&
+              !field.hasInitializer &&
+              !field.isStatic &&
+              !_hasDbAnnotation(field))
           .map(
             (e) => MapEntry(
               e.name,
@@ -193,10 +201,7 @@ class ${className}Meta extends  EntityMeta<$className> {
               dbColumnAnnotation.getField('name')?.toStringValue() ?? fieldName;
           final jsonEncoded = !isPremitiveType;
           final String? alias =
-              dbColumnAnnotation.getField('alias')?.toStringValue() ??
-                  (jsonEncoded && isPremitiveType
-                      ? fieldName.replaceAll('Json', '')
-                      : null);
+              dbColumnAnnotation.getField('alias')?.toStringValue();
 
           final String? writeFn =
               dbColumnAnnotation.getField('writeFn')?.toStringValue();
@@ -440,33 +445,26 @@ class ${className}Meta extends  EntityMeta<$className> {
     ''');
           }
           if (jsonEncoded) {
-            if (jsonEncoded) {
-              if (alias != null) {
-                if (aliasNotNull) {
-                  copyWithPropsList.writeln('$jsonEncodedType? $alias,');
-                  copyWithList.writeln('$alias: $alias ?? this.$alias,');
-                } else {
-                  copyWithPropsList
-                      .writeln('CopyWith<$jsonEncodedType?>? $alias,');
-                  copyWithList.writeln(
-                      '$alias: $alias != null ? $alias.value : this.$alias,');
-                }
-                if (extraFields.containsKey(alias)) {
-                  extraFields.remove(alias);
-                }
+            if (alias != null) {
+              if (aliasNotNull) {
+                copyWithPropsList.writeln('$jsonEncodedType? $alias,');
+                copyWithList.writeln('$alias: $alias ?? this.$alias,');
+              } else {
+                copyWithPropsList
+                    .writeln('CopyWith<$jsonEncodedType?>? $alias,');
+                copyWithList.writeln(
+                    '$alias: $alias != null ? $alias.value : this.$alias,');
               }
-              metaCode.writeln('''
+              if (extraFields.containsKey(alias)) {
+                extraFields.remove(alias);
+              }
+            }
+            metaCode.writeln('''
           read: (json, entity, value){
             return entity.read$fieldNameCamel(json, value);
           },
         );
     ''');
-            } else {
-              metaCode.writeln('''
-          read: (json, entity, value) => entity.read$fieldNameCamel(json, value),
-        );
-    ''');
-            }
           } else if (notNull) {
             metaCode.writeln('''
           read: (json, entity, value) => entity.copyWith($fieldName: value, json: json),
@@ -481,7 +479,6 @@ class ${className}Meta extends  EntityMeta<$className> {
           final prefix = isList ? 'List<' : '';
           final suffix = isList ? '>' : '';
           if (notNull) {
-            if (isList) {}
             copyWithPropsList.writeln('$prefix$fieldType$suffix? $fieldName,');
             copyWithList.writeln('$fieldName: $fieldName ?? this.$fieldName,');
           } else {
