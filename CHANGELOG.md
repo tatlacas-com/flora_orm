@@ -1,7 +1,12 @@
 
+## 1.0.9
+
+* Remove deprecated code
+
 ## 1.0.8
 
 * Fix backward compatibility issues
+
 ## 1.0.7
 
 * Update README.md
