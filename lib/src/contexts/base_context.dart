@@ -99,6 +99,15 @@ abstract class BaseContext<TEntity extends IEntity> extends DbContext<TEntity> {
     return element.recreateTableAt(newVersion);
   }
 
+  bool _createOn(IEntity element, int oldVersion, int newVersion) {
+    while (oldVersion < newVersion) {
+      if (element.createTableAt(oldVersion++)) {
+        return true;
+      }
+    }
+    return element.createTableAt(newVersion);
+  }
+
   FutureOr<void> onDbUpgrade(
       Database db, int oldVersion, int newVersion) async {
     // Run the CREATE TABLE statement on the database.
@@ -109,7 +118,9 @@ abstract class BaseContext<TEntity extends IEntity> extends DbContext<TEntity> {
       for (var element in tables) {
         final queries = _recreateOn(element, oldVersion, newVersion)
             ? element.recreateTable(newVersion)
-            : _upgradeQueries(element, oldVersion, newVersion);
+            : _createOn(element, oldVersion, newVersion)
+                ? [element.createTable(newVersion)]
+                : _upgradeQueries(element, oldVersion, newVersion);
         if (queries.isNotEmpty == true) {
           allQueries.addAll(queries);
           upgradeQueriesFound = true;

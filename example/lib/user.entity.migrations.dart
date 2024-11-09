@@ -2,6 +2,13 @@ part of 'user.entity.dart';
 
 mixin UserEntityMigrations on Entity<UserEntity, UserEntityMeta> {
   @override
+  bool createTableAt(int newVersion) {
+    return switch (newVersion) {
+      _ => false,
+    };
+  }
+
+  @override
   bool recreateTableAt(int newVersion) {
     return switch (newVersion) {
       _ => false,

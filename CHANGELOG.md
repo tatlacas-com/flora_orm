@@ -1,4 +1,9 @@
 
+## 2.0.3
+
+* enforce delete require either `where` or `all = true`
+* add createTableAt
+
 ## 2.0.2
 
 * 

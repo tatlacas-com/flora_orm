@@ -82,7 +82,11 @@ class SharedPreferenceEngine<TEntity extends IEntity,
   Future<int> delete({
     final Filter Function(TMeta t)? where,
     final bool? useIsolate,
+    final bool? all,
   }) async {
+    assert(all == true || where != null,
+        'Either provide where query or specify all = true to delete all.');
+
     final item = where == null
         ? null
         : where(t)

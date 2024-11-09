@@ -289,7 +289,7 @@ final users = await storage.where(
 You can have complex filters that meet your needs.  
 Use utility functions such as `startGroup()`, `endGroup()`, `filter()` `and()`, and `or()`.  
 
-`filter()` `and()`, and `or() also have parameters `openGroup` and `closeGroup` to simplify the grouping so that you may not need `startGroup()` and `endGroup()`. However, we recommend using `startGroup()` and `endGroup()` since they are easy to read and understand their effects.  
+`filter()` `and()`, and `or()` also have parameters `openGroup` and `closeGroup` to simplify the grouping so that you may not need `startGroup()` and `endGroup()`. However, we recommend using `startGroup()` and `endGroup()` since they are easy to read and understand their effects.  
 
 Think of grouping as opening and closing brackets, and putting the operations in-between the `openGroup`...`closeGroup` into those brackets.
 
@@ -321,13 +321,13 @@ final users = await storage.where(
           ),
     );
 ```
-`startGroup()` must usually be followed by `filter()` before chaining additional filters. Remember to `endGroup()`/`closeGroup()`.
+`startGroup()` must usually be followed by `filter()` before chaining additional filters. Remember to `endGroup()`/`closeGroup`.
 
 ## Migrations - Changes to Entity classes and Database updates
 
-If you update any of your `Entity` classes you need to run `dart run build_runner build` again.  
+If you update any of your `Entity` classes, you need to run `dart run build_runner build` again.  
 
-If you add/remove `@column` or any annotated item in your `Entity`  classes then **increment**  `OrmManager`'s `dbVersion` and add the migrations on the respective `{entity_name}.entity.migrations.dart` files.  
+If you add/remove `@column` or any annotated item in your `Entity`  classes then **increment**  `OrmManager`'s `dbVersion` and add the migrations in the respective `{entity_name}.entity.migrations.dart` files.  
 
 The simplest way to migrate is either to drop and recreate the entity table (losing all data in that table), or specifying the added columns:  
 
@@ -348,7 +348,7 @@ mixin UserEntityMigrations on Entity<UserEntity, UserEntityMeta> {
   List<ColumnDefinition> addColumnsAt(int newVersion) {
     return switch (newVersion) {
         /// Here we are saying we added property 
-        /// named provider on version 2.
+        /// named provider when we set dbVersion = 2.
         /// All [@column] properties in your entity class 
         /// are available in [meta] object as [ColumnDefinition]s
       2 => [meta.provider],

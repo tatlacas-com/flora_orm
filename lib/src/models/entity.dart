@@ -30,6 +30,8 @@ abstract class IEntity {
 
   bool recreateTableAt(int newVersion);
 
+  bool createTableAt(int newVersion);
+
   String addColumn(ColumnDefinition column);
 
   List<ColumnDefinition> addColumnsAt(int newVersion);
@@ -153,6 +155,7 @@ abstract class Entity<TEntity extends IEntity,
   }
 
   @override
+  @nonVirtual
   List<String> recreateTable(int newVersion) {
     return [
       dropTable(meta.tableName),
@@ -164,6 +167,7 @@ abstract class Entity<TEntity extends IEntity,
   List<ColumnDefinition> addColumnsAt(int newVersion);
 
   @override
+  @nonVirtual
   String createTable(int version) {
     int indx = 1;
     StringBuffer stringBuffer = StringBuffer();
@@ -193,6 +197,8 @@ abstract class Entity<TEntity extends IEntity,
   ''';
   }
 
+  @protected
+  @nonVirtual
   String dropTable(String tableName) {
     return 'DROP TABLE IF EXISTS $tableName';
   }
@@ -267,6 +273,9 @@ abstract class Entity<TEntity extends IEntity,
 
   @override
   bool recreateTableAt(int newVersion) => false;
+
+  @override
+  bool createTableAt(int newVersion) => false;
 
   @override
   List<String> downgradeTable(int oldVersion, int newVersion) {

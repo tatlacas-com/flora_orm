@@ -88,6 +88,7 @@ abstract class OrmEngine<
 
   Future<int> delete({
     Filter Function(TMeta t)? where,
+    final bool? all,
     final bool? useIsolate,
   });
 

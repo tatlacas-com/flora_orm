@@ -583,13 +583,20 @@ class ${className}Meta extends  EntityMeta<$className> {
 part of '${buildStep.inputId.pathSegments.last}';
 
 mixin ${className}Migrations on Entity<$className, ${className}Meta> {
+  
+  @override
+  bool createTableAt(int newVersion) {
+    return switch (newVersion) {
+      _ => false,
+    };
+  }
+
   @override
   bool recreateTableAt(int newVersion) {
     return switch (newVersion) {
       _ => false,
     };
   }
-
   @override
   List<ColumnDefinition> addColumnsAt(int newVersion) {
     return switch (newVersion) {

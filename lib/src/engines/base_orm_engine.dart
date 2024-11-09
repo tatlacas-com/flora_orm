@@ -344,7 +344,10 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
   Future<int> delete({
     final Filter Function(TMeta t)? where,
     final bool? useIsolate,
+    final bool? all,
   }) async {
+    assert(all == true || where != null,
+        'Either provide where query or specify all = true to delete all.');
     final db = await dbContext.database;
     final formattedQuery = where != null
         ? await whereString(
