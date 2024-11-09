@@ -13,7 +13,7 @@ import 'package:path/path.dart' as path;
 
 extension DartTypeExtension on DartType {
   String get cleanDisplayString =>
-      getDisplayString(withNullability: true).replaceFirst(RegExp(r'[?*]'), '');
+      getDisplayString().replaceFirst(RegExp(r'[?*]'), '');
 }
 
 class _ExtraField {
@@ -135,7 +135,7 @@ class ${className}Meta extends  EntityMeta<$className> {
               e.name,
               _ExtraField(
                 type: e.type.cleanDisplayString,
-                typeFull: e.type.getDisplayString(withNullability: true),
+                typeFull: e.type.getDisplayString(),
                 notNull: e.type.nullabilitySuffix == NullabilitySuffix.none,
               ),
             ),
@@ -148,8 +148,7 @@ class ${className}Meta extends  EntityMeta<$className> {
         final fieldName = field.name;
         var fieldType = field.type.cleanDisplayString;
 
-        final fieldTypeFull =
-            field.type.getDisplayString(withNullability: true);
+        final fieldTypeFull = field.type.getDisplayString();
 
         bool premitiveType(fieldType) {
           return ['String', 'DateTime', 'int', 'bool', 'double']
@@ -500,8 +499,7 @@ class ${className}Meta extends  EntityMeta<$className> {
           .hasAnnotationOfExact(field)) {
         final fieldName = field.name;
         final fieldType = field.type.cleanDisplayString;
-        final fieldTypeFull =
-            field.type.getDisplayString(withNullability: true);
+        final fieldTypeFull = field.type.getDisplayString();
         extraFields[fieldName] = _ExtraField(
           type: fieldType,
           notNull: false,
@@ -511,8 +509,7 @@ class ${className}Meta extends  EntityMeta<$className> {
           .hasAnnotationOfExact(field)) {
         final fieldName = field.name;
         final fieldType = field.type.cleanDisplayString;
-        final fieldTypeFull =
-            field.type.getDisplayString(withNullability: true);
+        final fieldTypeFull = field.type.getDisplayString();
         extraFields[fieldName] = _ExtraField(
           type: fieldType,
           notNull: field.type.nullabilitySuffix == NullabilitySuffix.none,

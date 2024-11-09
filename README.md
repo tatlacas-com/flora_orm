@@ -222,7 +222,7 @@ final entities = await storage.where(...);
 
 ### ~~CR~~U~~D~~ - Update
 
-You can use the insertOrUpdate options as explained before, which will insert records  
+You can  use the insertOrUpdate options as explained before, which will insert records  
 if they do not exist. But, if all you want is to strictly update existing records, then:
 
 
