@@ -1,4 +1,8 @@
 
+## 2.0.0
+
+* Fix constraints lower bounds
+
 ## 1.0.9
 
 * Remove deprecated code
