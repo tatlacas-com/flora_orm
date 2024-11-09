@@ -27,6 +27,7 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
   String? get firstName;
   String? get lastName;
   TestEnum? get testEnum;
+  String? get test2;
 
   @override
   List<Object?> get props => [
@@ -34,6 +35,7 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
         firstName,
         lastName,
         testEnum,
+        test2,
       ];
   @override
   UserEntity copyWith({
@@ -43,6 +45,7 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
     CopyWith<String?>? firstName,
     CopyWith<String?>? lastName,
     CopyWith<TestEnum?>? testEnum,
+    CopyWith<String?>? test2,
     Map<String, dynamic>? json,
   }) {
     return UserEntity(
@@ -52,6 +55,7 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
       firstName: firstName != null ? firstName.value : this.firstName,
       lastName: lastName != null ? lastName.value : this.lastName,
       testEnum: testEnum != null ? testEnum.value : this.testEnum,
+      test2: test2 != null ? test2.value : this.test2,
     );
   }
 }

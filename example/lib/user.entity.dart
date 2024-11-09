@@ -29,5 +29,6 @@ class UserEntity extends Entity<UserEntity, UserEntityMeta>
   }
 
   late final String? test;
+  @override
   final String? test2;
 }
