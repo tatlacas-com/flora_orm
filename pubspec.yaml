@@ -25,7 +25,7 @@ environment:
   flutter: '>=3.16.0'
 
 dependencies: 
-  analyzer: ^6.2.0
+  analyzer: ^6.7.0
   build: ^2.4.1
   build_config: ^1.1.1
   equatable: ^2.0.3
