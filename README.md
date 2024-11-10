@@ -41,12 +41,17 @@ import 'package:flora_orm/flora_orm.dart';
 
 ### Initializing
 
-To use `flora_orm`, you need to create entity classes that satisfy the following:
+To use `flora_orm`, you need to create entity classes.  
+
+For VS Code users, we have a snippet for you. See [more infomation on how to add and use the snippet](https://github.com/tatlacas-com/flora_orm/tree/main/doc/vscode_snippet.md).
+
+Your entity class must satisfy the following:
 
 * Naming conversion is `{entity_name}.entity.dart`. For example `user.entity.dart` _(recommended)_.
 * You **must** add 2 `part`s to the top of the entity file: `{entity_name}.entity.g.dart` and `{entity_name}.entity.migrations.dart`.
 * You **must** annotate the class with `@entity` (or `@OrmEntity()` for granular control).
 * Your entity class **must** extend `Entity<{YourEntityName}, {YourEntityName}Meta> with _{YourEntityName}Mixin, {YourEntityName}Migrations`.
+
 
 #### Example Entity
 
