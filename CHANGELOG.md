@@ -1,4 +1,9 @@
 
+## 2.0.7
+
+* Use isolates for inserList, insertOrUpdateList 
+* use transactions for delete
+
 ## 2.0.6
 
 * Update documentation

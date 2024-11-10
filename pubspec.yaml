@@ -2,7 +2,7 @@ name: flora_orm
 repository: https://github.com/tatlacas-com/flora_orm/tree/main
 issue_tracker: https://github.com/tatlacas-com/flora_orm/issues
 description: Flutter plugin for ORM in front of storage like sqflite and shared_preferences
-version: 2.0.6
+version: 2.0.7
 
 # This package supports all platforms listed below.
 platforms:

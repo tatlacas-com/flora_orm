@@ -4,7 +4,7 @@ mixin TestEntityMigrations on Entity<TestEntity, TestEntityMeta> {
   @override
   bool recreateTableAt(int newVersion) {
     return switch (newVersion) {
-      2 => true,
+      4 => true,
       _ => false,
     };
   }

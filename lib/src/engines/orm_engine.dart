@@ -35,14 +35,20 @@ abstract class OrmEngine<
     final bool? useIsolate,
   });
 
-  Future<List<TEntity>?> insertList(Iterable<TEntity> items);
+  Future<List<TEntity>?> insertList(
+    Iterable<TEntity> items, {
+    final bool? useIsolate,
+  });
 
   Future<TEntity?> insertOrUpdate(
     TEntity item, {
     final bool? useIsolate,
   });
 
-  Future<List<TEntity>?> insertOrUpdateList(Iterable<TEntity> items);
+  Future<List<TEntity>?> insertOrUpdateList(
+    Iterable<TEntity> items, {
+    final bool? useIsolate,
+  });
 
   Future<TEntity?> firstWhereOrNull({
     List<ColumnDefinition>? Function(TMeta t)? columns,

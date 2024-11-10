@@ -57,7 +57,10 @@ class SharedPreferenceEngine<TEntity extends IEntity,
   }
 
   @override
-  Future<List<TEntity>?> insertList(Iterable<TEntity> items) async {
+  Future<List<TEntity>?> insertList(
+    Iterable<TEntity> items, {
+    final bool? useIsolate,
+  }) async {
     return [];
   }
 
@@ -74,7 +77,10 @@ class SharedPreferenceEngine<TEntity extends IEntity,
   }
 
   @override
-  Future<List<TEntity>?> insertOrUpdateList(Iterable<TEntity> items) async {
+  Future<List<TEntity>?> insertOrUpdateList(
+    Iterable<TEntity> items, {
+    final bool? useIsolate,
+  }) async {
     return [];
   }
 

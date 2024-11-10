@@ -38,6 +38,17 @@ InsertPrep<IEntity> wInsertOrUpdate(IEntity item) {
   return InsertPrep(entity: item, map: item.toDb());
 }
 
+List<InsertPrep<TEntity>> wInsertOrUpdateList<TEntity extends IEntity>(
+    Iterable<TEntity> items) {
+  List<InsertPrep<TEntity>> resultItems = [];
+  for (var item in items) {
+    if (item.id == null) item = item.copyWith(id: const Uuid().v4()) as TEntity;
+    item = item.updateDates() as TEntity;
+    resultItems.add(InsertPrep(entity: item, map: item.toDb()));
+  }
+  return resultItems;
+}
+
 class InsertPrep<TEntity extends IEntity> {
   InsertPrep({required this.entity, required this.map});
   final TEntity entity;
@@ -69,32 +80,32 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
     TEntity item, {
     final bool? useIsolate,
   }) async {
-    final db = await dbContext.database;
-    final spawnIsolate = useIsolate ?? useIsolateDefault;
-    final response = !spawnIsolate
-        ? wInsertOrUpdate(item)
-        : await compute(wInsertOrUpdate, item);
-    final updated = await db.insert(
-        response.entity.meta.tableName, response.map,
-        conflictAlgorithm: ConflictAlgorithm.abort);
-    return updated > 0 ? response.entity as TEntity? : null;
+    final result = await insertList([item], useIsolate: useIsolate);
+    if (result?.isNotEmpty == true) {
+      return result?.first;
+    }
+    return null;
   }
 
   @override
-  Future<List<TEntity>?> insertList(Iterable<TEntity> items) async {
+  Future<List<TEntity>?> insertList(
+    Iterable<TEntity> items, {
+    final bool? useIsolate,
+  }) async {
     final db = await dbContext.database;
     List<TEntity>? result;
     List<TEntity> updatedItems = <TEntity>[];
+    final spawnIsolate = useIsolate ?? useIsolateDefault;
+    final response = !spawnIsolate
+        ? wInsertOrUpdateList(items)
+        : await compute(wInsertOrUpdateList, items);
+
     await db.transaction((txn) async {
       var batch = txn.batch();
-      for (var element in items) {
-        if (element.id == null) {
-          element = element.copyWith(id: const Uuid().v4()) as TEntity;
-        }
-        element = element.updateDates() as TEntity;
-        batch.insert(element.meta.tableName, element.toMap(),
+      for (var element in response) {
+        batch.insert(element.entity.meta.tableName, element.map,
             conflictAlgorithm: ConflictAlgorithm.abort);
-        updatedItems.add(element);
+        updatedItems.add(element.entity as TEntity);
       }
       result = await _finishBatch(batch, updatedItems);
     });
@@ -106,16 +117,36 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
     TEntity item, {
     final bool? useIsolate,
   }) async {
-    final db = await dbContext.database;
-    final spawnIsolate = useIsolate ?? useIsolateDefault;
+    final result = await insertOrUpdateList([item], useIsolate: useIsolate);
+    if (result?.isNotEmpty == true) {
+      return result?.first;
+    }
+    return null;
+  }
 
+  @override
+  Future<List<TEntity>?> insertOrUpdateList(
+    Iterable<TEntity> items, {
+    final bool? useIsolate,
+  }) async {
+    final db = await dbContext.database;
+    List<TEntity>? result;
+    List<TEntity> updatedItems = <TEntity>[];
+
+    final spawnIsolate = useIsolate ?? useIsolateDefault;
     final response = !spawnIsolate
-        ? wInsertOrUpdate(item)
-        : await compute(wInsertOrUpdate, item);
-    final updated = await db.insert(
-        response.entity.meta.tableName, response.map,
-        conflictAlgorithm: ConflictAlgorithm.replace);
-    return updated > 0 ? response.entity as TEntity? : null;
+        ? wInsertOrUpdateList(items)
+        : await compute(wInsertOrUpdateList, items);
+    await db.transaction((txn) async {
+      var batch = txn.batch();
+      for (var element in response) {
+        updatedItems.add(element.entity as TEntity);
+        batch.insert(element.entity.meta.tableName, element.map,
+            conflictAlgorithm: ConflictAlgorithm.replace);
+      }
+      result = await _finishBatch(batch, updatedItems);
+    });
+    return result;
   }
 
   @override
@@ -282,27 +313,6 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
     return [];
   }
 
-  @override
-  Future<List<TEntity>?> insertOrUpdateList(Iterable<TEntity> items) async {
-    final db = await dbContext.database;
-    List<TEntity>? result;
-    List<TEntity> updatedItems = <TEntity>[];
-    await db.transaction((txn) async {
-      var batch = txn.batch();
-      for (var element in items) {
-        if (element.id == null) {
-          element = element.copyWith(id: const Uuid().v4()) as TEntity;
-        }
-        element = element.updateDates() as TEntity;
-        updatedItems.add(element);
-        batch.insert(element.meta.tableName, element.toMap(),
-            conflictAlgorithm: ConflictAlgorithm.replace);
-      }
-      result = await _finishBatch(batch, updatedItems);
-    });
-    return result;
-  }
-
   Future<List<TEntity>> _finishBatch(
       Batch batch, Iterable<TEntity> items) async {
     var result = await batch.commit(noResult: false, continueOnError: true);
@@ -355,11 +365,23 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
             useIsolate,
           )
         : null;
-    return await db.delete(
-      t.tableName,
-      where: formattedQuery?.filter,
-      whereArgs: formattedQuery?.whereArgs,
-    );
+    return await db.transaction<int>((txn) async {
+      var batch = txn.batch();
+      batch.delete(
+        t.tableName,
+        where: formattedQuery?.filter,
+        whereArgs: formattedQuery?.whereArgs,
+      );
+      var result = await batch.commit(noResult: false, continueOnError: true);
+      if (result.isEmpty) {
+        return 0;
+      }
+      final res = result[0];
+      if (res is int) {
+        return res;
+      }
+      return 0;
+    });
   }
 
   @override

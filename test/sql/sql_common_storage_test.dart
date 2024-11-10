@@ -25,7 +25,7 @@ void main() {
     });
     var dbContext = SqfliteCommonDbContext<TestEntity>(
       dbVersion: 1,
-      dbName: 'common_storage_db',
+      dbName: 'common_storage.db',
       tables: [const TestEntity()],
     );
     var storage = SqfliteCommonEngine<TestEntity, TestEntityMeta>(
