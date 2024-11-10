@@ -145,11 +145,11 @@ To keep your code clean, we recommend you have the above code in a seperate file
 
 **IMPORTANT**: After adding entity classes (and updating existing entities), don't forget to:
 
-1. Run:
+1. Run from terminal:
 ```bash
 dart run build_runner build
 ```
-2. Update `dbVersion` in `OrmManager`.
+2. Update `dbVersion` in `OrmManager`  - if you changed columns or added new Entity classes.
 3. **REGISTER** the new entity in `OrmManager`'s `tables: []`.
 
 The `dbEngine` value defaults to `DbEngine.sqflite`, and may be one of the following:
@@ -383,11 +383,11 @@ There is also `onCreateComplete` which you can return queries that will be run t
 
 **IMPORTANT**: As a reminder, after adding entity class (and updating existing entities), don't forget to:
 
-1. run:
+1. Run from terminal:
 ```bash
 dart run build_runner build
 ```
-2. update `dbVersion` in `OrmManager`.
+2. Update `dbVersion` in `OrmManager` - if you changed columns or added new Entity classes.
 3. **REGISTER** the new entity in `OrmManager`'s `tables: []`.
 
 ## Supported data types

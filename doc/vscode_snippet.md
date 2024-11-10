@@ -1,6 +1,6 @@
 # VSCode Snippets
 
-### Generate boilerplate code for entity
+### Generate boilerplate code for Entity classes
 
 In VSCode click on __Settings__ icon then __Snippets__. Create new snippet then paste the following:
 
@@ -32,7 +32,7 @@ In VSCode click on __Settings__ icon then __Snippets__. Create new snippet then 
 
 Now you can create your entity files as follows:
 * Create file in format `{entity}.entity.dart` for example `notification.entity.dart`
-* Start typing the word `entity` and press tab. This will put something like the following boilerplate code in your file:
+* Start typing then word `entity` and press tab. This will put something like the following boilerplate code in your file:
 
 ```dart
 import 'package:flora_orm/flora_orm.dart';
@@ -52,13 +52,13 @@ class NotificationEntity
 }
 ```
 
-You can the begin adding your properties and annotate them as `@column`.   
+You can the begin adding your properties such as `@column`s.   
 
-**IMPORTANT**: After adding entity class (and updating existing entities), don't forget to:
+**IMPORTANT**: After adding Entity classes (and updating existing entities), don't forget to:
 
-1. run:
+1. Run from terminal:
 ```bash
 dart run build_runner build
 ```
-2. update `dbVersion` in `OrmManager`.
+2. Update `dbVersion` in `OrmManager` - if you changed columns or added new Entity classes.
 3. **REGISTER** the new entity in `OrmManager`'s `tables: []`.

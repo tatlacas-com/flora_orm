@@ -1,4 +1,8 @@
 
+## 2.0.6
+
+* Update documentation
+
 ## 2.0.5
 
 * Update README.md
