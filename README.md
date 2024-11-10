@@ -43,7 +43,8 @@ import 'package:flora_orm/flora_orm.dart';
 
 To use `flora_orm`, you need to create entity classes.  
 
-For VS Code users, we have a snippet for you. See [more infomation on how to add and use the snippet](https://github.com/tatlacas-com/flora_orm/tree/main/doc/vscode_snippet.md).
+For VS Code users, we have a snippet for you so that you don't have to type the boilerplate code.  
+See [more infomation on how to add and use the snippet](https://github.com/tatlacas-com/flora_orm/tree/main/doc/vscode_snippet.md).
 
 Your entity class must satisfy the following:
 
