@@ -344,7 +344,7 @@ final users = await storage.where(
 
 If you update any of your `Entity` classes, you need to run `dart run build_runner build` again.  
 
-If you add/remove `@column` or any annotated item in your `Entity`  classes then **increment**  `OrmManager`'s `dbVersion` and add the migrations in the respective `{entity_name}.entity.migrations.dart` files.  
+If you add/remove `@column` or any annotated item in your `Entity`  classes then **increment**  `OrmManager`'s `dbVersion`, **register** new Entity classes in `OrmManager`'s `tables: []`, and add the migrations in the respective `{entity_name}.entity.migrations.dart` files.  
 
 The simplest way to migrate is either to drop and recreate the entity table (losing all data in that table), or specifying the added columns:  
 
@@ -381,7 +381,7 @@ You can also override `onUpgradeComplete` and `onDowngradeComplete` to return cu
 
 There is also `onCreateComplete` which you can return queries that will be run the first time the database is created.
 
-**IMPORTANT**: As a reminder, after adding entity class (and updating existing entities), don't forget to:
+**IMPORTANT**: As a reminder, after adding Entity classes (and edited existing Entity classes), don't forget to:
 
 1. Run from terminal:
 ```bash
