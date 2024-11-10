@@ -1,4 +1,8 @@
 
+## 2.0.8
+
+*
+
 ## 2.0.7
 
 * Use isolates for inserList, insertOrUpdateList 
