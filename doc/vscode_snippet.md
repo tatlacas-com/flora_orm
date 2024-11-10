@@ -52,7 +52,7 @@ class NotificationEntity
 }
 ```
 
-You can the begin adding your properties such as `@column`s.   
+You can then begin adding your properties such as `@column`s.   
 
 **IMPORTANT**: After adding Entity classes (and updating existing entities), don't forget to:
 
