@@ -101,12 +101,13 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
         : await compute(wInsertOrUpdateList, items);
 
     await db.transaction((txn) async {
+      var batch = txn.batch();
       for (var element in response) {
-        txn.batch().insert(element.entity.meta.tableName, element.map,
+        batch.insert(element.entity.meta.tableName, element.map,
             conflictAlgorithm: ConflictAlgorithm.abort);
         updatedItems.add(element.entity as TEntity);
       }
-      result = await _finishBatch(txn.batch(), updatedItems);
+      result = await _finishBatch(batch, updatedItems);
     });
     return result;
   }
@@ -137,12 +138,13 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
         ? wInsertOrUpdateList(items)
         : await compute(wInsertOrUpdateList, items);
     await db.transaction((txn) async {
+      var batch = txn.batch();
       for (var element in response) {
         updatedItems.add(element.entity as TEntity);
-        txn.batch().insert(element.entity.meta.tableName, element.map,
+        batch.insert(element.entity.meta.tableName, element.map,
             conflictAlgorithm: ConflictAlgorithm.replace);
       }
-      result = await _finishBatch(txn.batch(), updatedItems);
+      result = await _finishBatch(batch, updatedItems);
     });
     return result;
   }
@@ -364,13 +366,13 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
           )
         : null;
     return await db.transaction<int>((txn) async {
-      txn.batch().delete(
-            t.tableName,
-            where: formattedQuery?.filter,
-            whereArgs: formattedQuery?.whereArgs,
-          );
-      var result =
-          await txn.batch().commit(noResult: false, continueOnError: true);
+      var batch = txn.batch();
+      batch.delete(
+        t.tableName,
+        where: formattedQuery?.filter,
+        whereArgs: formattedQuery?.whereArgs,
+      );
+      var result = await batch.commit(noResult: false, continueOnError: true);
       if (result.isEmpty) {
         return 0;
       }
