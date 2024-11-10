@@ -52,4 +52,13 @@ class NotificationEntity
 }
 ```
 
-You can the begin adding your properties and annotate them as `@column`. Don't forget to run to update dbVersion in OrmManager and run `dart run build_runner build` once you are done.
+You can the begin adding your properties and annotate them as `@column`.   
+
+**IMPORTANT**: After adding entity class (and updating existing entities), don't forget to:
+
+1. run:
+```bash
+dart run build_runner build
+```
+2. update `dbVersion` in `OrmManager`.
+3. **REGISTER** the new entity in `OrmManager`'s `tables: []`.

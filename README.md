@@ -114,9 +114,11 @@ Once you have created or updated your entity files, open terminal and run the fo
 ```bash
 dart run build_runner build
 ```
+
 ## OrmManager
 
 You need an instance of `OrmManager` to interact with the storage.  
+
 Create an instance of `OrmManager` as early as possible.  
   
 We recommend registering it as a singleton during app start-up using [get_it](https://pub.dev/packages/get_it) or any DI you prefer.
@@ -140,6 +142,15 @@ final ormManager = OrmManager(
 GetIt.I.registerSingleton(ormManager);
 ```
 To keep your code clean, we recommend you have the above code in a seperate file. For example in `src/orm.init.dart`  
+
+**IMPORTANT**: After adding entity classes (and updating existing entities), don't forget to:
+
+1. Run:
+```bash
+dart run build_runner build
+```
+2. Update `dbVersion` in `OrmManager`.
+3. **REGISTER** the new entity in `OrmManager`'s `tables: []`.
 
 The `dbEngine` value defaults to `DbEngine.sqflite`, and may be one of the following:
 
@@ -370,10 +381,14 @@ You can also override `onUpgradeComplete` and `onDowngradeComplete` to return cu
 
 There is also `onCreateComplete` which you can return queries that will be run the first time the database is created.
 
-As a reminder, when you update your entity files, run:
+**IMPORTANT**: As a reminder, after adding entity class (and updating existing entities), don't forget to:
+
+1. run:
 ```bash
 dart run build_runner build
 ```
+2. update `dbVersion` in `OrmManager`.
+3. **REGISTER** the new entity in `OrmManager`'s `tables: []`.
 
 ## Supported data types
 
