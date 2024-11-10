@@ -36,11 +36,11 @@ class SharedPreferenceEngine<TEntity extends IEntity,
     TEntity item, {
     final bool? useIsolate,
   }) async {
-    if (item.id == null) item = item.copyWith(id: const Uuid().v4()) as TEntity;
-    item = item.updateDates() as TEntity;
-    final json = jsonEncode(item.toMap());
-    await write(key: item.id!, value: json);
-    return item;
+    final result = await insertList([item], useIsolate: useIsolate);
+    if (result?.isNotEmpty == true) {
+      return result?.first;
+    }
+    return null;
   }
 
   @override
@@ -61,7 +61,15 @@ class SharedPreferenceEngine<TEntity extends IEntity,
     Iterable<TEntity> items, {
     final bool? useIsolate,
   }) async {
-    return [];
+    List<TEntity> result = [];
+    for (var item in items) {
+      if (item.id == null) {
+        item = item.copyWith(id: const Uuid().v4()) as TEntity;
+      }
+      item = await _saveItem(item, true);
+      result.add(item);
+    }
+    return result;
   }
 
   @override
@@ -69,11 +77,11 @@ class SharedPreferenceEngine<TEntity extends IEntity,
     TEntity item, {
     final bool? useIsolate,
   }) async {
-    if (item.id == null) item = item.copyWith(id: const Uuid().v4()) as TEntity;
-    item = item.updateDates() as TEntity;
-    final json = jsonEncode(item.toMap());
-    await write(key: item.id!, value: json);
-    return item;
+    final result = await insertOrUpdateList([item], useIsolate: useIsolate);
+    if (result?.isNotEmpty == true) {
+      return result?.first;
+    }
+    return null;
   }
 
   @override
@@ -81,7 +89,28 @@ class SharedPreferenceEngine<TEntity extends IEntity,
     Iterable<TEntity> items, {
     final bool? useIsolate,
   }) async {
-    return [];
+    List<TEntity> result = [];
+    for (var item in items) {
+      if (item.id == null) {
+        item = item.copyWith(id: const Uuid().v4()) as TEntity;
+      }
+      item = await _saveItem(item);
+      result.add(item);
+    }
+    return result;
+  }
+
+  Future<TEntity> _saveItem(TEntity item, [bool checkExisting = false]) async {
+    if (checkExisting) {
+      final curr = await read(key: item.id!);
+      if (curr != null) {
+        throw Exception('Already exists');
+      }
+    }
+    item = item.updateDates() as TEntity;
+    final json = jsonEncode(item.toMap());
+    await write(key: item.id!, value: json);
+    return item;
   }
 
   @override
