@@ -51,4 +51,9 @@ class SqfliteCommonDbContext<TEntity extends IEntity>
       ),
     );
   }
+
+  @override
+  Future<int> getVersion() async {
+    return (await database).getVersion();
+  }
 }

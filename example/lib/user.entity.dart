@@ -6,16 +6,6 @@ part 'user.entity.migrations.dart';
 @OrmEntity(tableName: 'user')
 class UserEntity extends Entity<UserEntity, UserEntityMeta>
     with _UserEntityMixin, UserEntityMigrations {
-  @override
-  @column
-  final String? firstName;
-  @override
-  @column
-  final String? lastName;
-  @override
-  @OrmColumn(isEnum: true)
-  final TestEnum? testEnum;
-
   UserEntity({
     super.id,
     super.createdAt,
@@ -27,6 +17,16 @@ class UserEntity extends Entity<UserEntity, UserEntityMeta>
   }) {
     test = '';
   }
+
+  @override
+  @column
+  final String? firstName;
+  @override
+  @column
+  final String? lastName;
+  @override
+  @OrmColumn(isEnum: true)
+  final TestEnum? testEnum;
 
   late final String? test;
   @override

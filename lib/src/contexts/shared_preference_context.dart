@@ -22,12 +22,17 @@ class SharedPreferenceContext<TEntity extends IEntity>
   }
 
   @override
-  Future<String> getDbPath() async {
-    return '';
+  Future<String> getDbPath() {
+    throw UnimplementedError();
   }
 
   @override
   Future<String> getDbFullName() async {
-    return dbName;
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<int> getVersion() async {
+    return dbVersion;
   }
 }

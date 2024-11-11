@@ -1,29 +1,32 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:io';
+
+import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'package:flora_orm/engines/shared_preference_engine.dart';
 import 'package:flora_orm/engines/sqflite_common_engine.dart';
 import 'package:flora_orm/engines/sqflite_in_memory_engine.dart';
 import 'package:flora_orm/engines/sqflite_storage.dart';
 import 'package:flora_orm/flora_orm.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
-class OrmManager {
+class OrmManager extends Equatable {
   OrmManager({
-    DbEngine dbInUse = DbEngine.sqflite,
+    DbEngine engine = DbEngine.sqflite,
     required int dbVersion,
     required String dbName,
     required List<IEntity> tables,
-  }) {
-    if (kIsWeb && !dbInUse.suppportsWeb) {
-      dbInUse = DbEngine.sharedPreferences;
-    } else if (Platform.isWindows && !dbInUse.suppportsWindows) {
-      dbInUse = DbEngine.sqfliteCommon;
-    } else if (Platform.isLinux && !dbInUse.suppportsLinux) {
-      dbInUse = DbEngine.sqfliteCommon;
-    } else if (Platform.isMacOS && !dbInUse.suppportsLinux) {
-      dbInUse = DbEngine.sqfliteCommon;
+  }) : _engine = engine {
+    if (kIsWeb && !engine.suppportsWeb) {
+      engine = DbEngine.sharedPreferences;
+    } else if (Platform.isWindows && !engine.suppportsWindows) {
+      engine = DbEngine.sqfliteCommon;
+    } else if (Platform.isLinux && !engine.suppportsLinux) {
+      engine = DbEngine.sqfliteCommon;
+    } else if (Platform.isMacOS && !engine.suppportsLinux) {
+      engine = DbEngine.sqfliteCommon;
     }
-    dbContext = switch (dbInUse) {
+    dbContext = switch (engine) {
       DbEngine.inMemory => SqfliteInMemoryDbContext(
           dbVersion: dbVersion,
           dbName: dbName,
@@ -47,6 +50,7 @@ class OrmManager {
     };
   }
   late final DbContext dbContext;
+  final DbEngine _engine;
 
   OrmEngine<TEntity, TMeta, DbContext<TEntity>>
       getStorage<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>>(
@@ -63,5 +67,22 @@ class OrmManager {
           dbContext: dbContext,
         )
     } as OrmEngine<TEntity, TMeta, DbContext<TEntity>>;
+  }
+
+  @override
+  List<Object?> get props => [];
+
+  OrmManager copyWith({
+    DbEngine? engine,
+    int? dbVersion,
+    String? dbName,
+    List<IEntity>? tables,
+  }) {
+    return OrmManager(
+      engine: engine ?? _engine,
+      dbName: dbName ?? dbContext.dbName,
+      dbVersion: dbVersion ?? dbContext.dbVersion,
+      tables: tables ?? dbContext.tables,
+    );
   }
 }

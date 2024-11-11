@@ -2,13 +2,9 @@ import 'package:flora_orm/src/bloc/test.entity.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:meta/meta.dart';
 import 'package:flora_orm/flora_orm.dart';
-import 'package:flora_orm/src/contexts/base_context.dart';
-import 'package:flora_orm/src/engines/base_orm_engine.dart';
 
 @isTest
-void run(
-    BaseOrmEngine<TestEntity, TestEntityMeta, BaseContext<TestEntity>>
-        storage) {
+void run(TestEntityOrm storage) {
   test('insert(entity) should insert entity', () async {
     final entity = TestEntity(
         testBool: true,
@@ -16,6 +12,7 @@ void run(
         testDouble: 1.0,
         testInt: 10,
         testString: 'Testing 123');
+
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
   });
@@ -28,6 +25,7 @@ void run(
         testDouble: 1.0,
         testInt: 10,
         testString: 'Testing 1234');
+
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     entity = entity.copyWith(id: insertedEntity!.id);
@@ -41,6 +39,7 @@ void run(
         testDouble: 1.0,
         testInt: 10,
         testString: 'Testing 12345');
+
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     entity = insertedEntity!.copyWith(testString: CopyWith('Updated string'));
@@ -56,6 +55,7 @@ void run(
         testDouble: 1.0,
         testInt: 11,
         testString: 'Testing 123456');
+
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     fxn() async => await storage.firstWhereOrNull(
@@ -93,6 +93,7 @@ void run(
       testInt: 11,
       testString: 'Testing 123456',
     );
+
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var json = await storage.firstWhereOrNull(
@@ -129,6 +130,7 @@ void run(
         testDouble: 1.0,
         testInt: 11,
         testString: 'Testing 123456');
+
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var json = await storage.firstWhereOrNull(
@@ -166,6 +168,7 @@ void run(
         testDouble: 1.0,
         testInt: 11,
         testString: 'Testing 123456');
+
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var json = await storage.firstWhereOrNull(
@@ -191,6 +194,7 @@ void run(
         testBool: true,
         testDateTime: DateTime.now(),
         testString: 'Testing 123456');
+
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var json = await storage.firstWhereOrNull(
@@ -218,6 +222,7 @@ void run(
         testBool: true,
         testDateTime: DateTime.now(),
         testString: 'Testing 123456');
+
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var json = await storage.firstWhereOrNull(
@@ -243,6 +248,7 @@ void run(
         testDateTime: DateTime.now(),
         testInt: -15,
         testString: 'Testing 123456');
+
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var json = await storage.firstWhereOrNull(
@@ -269,6 +275,7 @@ void run(
         testDateTime: DateTime.now(),
         testInt: 20000,
         testString: 'Testing 123456');
+
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var json = await storage.firstWhereOrNull(
@@ -295,6 +302,7 @@ void run(
         testDateTime: DateTime.now(),
         testInt: 100,
         testString: 'Testing 123456');
+
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var json = await storage.firstWhereOrNull(
@@ -321,6 +329,7 @@ void run(
         testDateTime: DateTime.now(),
         testInt: -10,
         testString: 'Testing 123456');
+
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var json = await storage.firstWhereOrNull(
@@ -347,6 +356,7 @@ void run(
         testDateTime: DateTime.now(),
         testInt: 1001,
         testString: 'Testing 123456');
+
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var json = await storage.firstWhereOrNull(
@@ -374,6 +384,7 @@ void run(
         testDateTime: DateTime.now(),
         testInt: 2020,
         testString: 'Testing 123456');
+
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var json = await storage.firstWhereOrNull(
@@ -401,6 +412,7 @@ void run(
         testDateTime: DateTime.now(),
         testInt: 11001,
         testString: 'Testing 123456');
+
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var json = await storage.firstWhereOrNull(
@@ -427,6 +439,7 @@ void run(
         testDateTime: DateTime.now(),
         testInt: 11002,
         testString: 'Testing 123456');
+
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var json = await storage.firstWhereOrNull(
@@ -453,6 +466,7 @@ void run(
         testDateTime: DateTime.now(),
         testInt: 11002,
         testString: 'Likeable');
+
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var json = await storage.firstWhereOrNull(
@@ -479,6 +493,7 @@ void run(
         testDateTime: DateTime.now(),
         testInt: 11002,
         testString: 'Loveable');
+
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var json = await storage.firstWhereOrNull(
@@ -506,6 +521,7 @@ void run(
         testDateTime: DateTime.now(),
         testInt: 11002,
         testString: 'Loveable');
+
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var json = await storage.firstWhereOrNull(
@@ -549,6 +565,7 @@ void run(
         testDouble: 1.0,
         testInt: 11,
         testString: 'Testing a');
+
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var entity1 = TestEntity(
@@ -557,6 +574,7 @@ void run(
         testDouble: 1.0,
         testInt: 12,
         testString: 'Testing b');
+
     var insertedEntity1 = await storage.insert(entity1);
     expect(insertedEntity1, isNotNull);
     var json = await storage.where(
@@ -597,6 +615,7 @@ void run(
         testDouble: 1.0,
         testInt: 11,
         testString: 'Testing a');
+
     var insertedEntity = await storage.insert(entity);
     var json = await storage.where(
       orderBy: (t) => [OrmOrder(column: entity.meta.createdAt)],
@@ -616,6 +635,7 @@ void run(
         testDouble: 1.0,
         testInt: 11,
         testString: 'Testing a');
+
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var entity1 = TestEntity(
@@ -624,6 +644,7 @@ void run(
         testDouble: 1.0,
         testInt: 12,
         testString: 'Testing b');
+
     var insertedEntity1 = await storage.insert(entity1);
     expect(insertedEntity1, isNotNull);
     var json = await storage.where(
@@ -682,6 +703,7 @@ void run(
         testDouble: 1.0,
         testInt: 11,
         testString: 'Testing a');
+
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     entity = (insertedEntity as TestEntity)
@@ -703,6 +725,7 @@ void run(
         testDouble: 1.0,
         testInt: 11,
         testString: 'Testing a');
+
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var total = await storage.update(
@@ -841,6 +864,7 @@ void run(
         testDouble: 1.0,
         testInt: 5,
         testString: 'Testing a');
+
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var entity1 = TestEntity(
@@ -849,6 +873,7 @@ void run(
         testDouble: 1.0,
         testInt: 13,
         testString: 'Testing b');
+
     var insertedEntity1 = await storage.insert(entity1);
     expect(insertedEntity1, isNotNull);
     var sum = await storage.getSum<int>(
@@ -875,6 +900,7 @@ void run(
         testDouble: 2.0,
         testInt: 5,
         testString: 'Testing a');
+
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var entity1 = TestEntity(
@@ -883,6 +909,7 @@ void run(
         testDouble: 3.0,
         testInt: 20,
         testString: 'Testing b');
+
     var insertedEntity1 = await storage.insert(entity1);
     expect(insertedEntity1, isNotNull);
     var json = await storage.getSumProduct<double>(
@@ -908,6 +935,7 @@ void run(
         testDouble: 1.1,
         testInt: 5,
         testString: 'Testing a');
+
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var entity1 = TestEntity(
@@ -916,6 +944,7 @@ void run(
         testDouble: 2.3,
         testInt: 13,
         testString: 'Testing b');
+
     var insertedEntity1 = await storage.insert(entity1);
     expect(insertedEntity1, isNotNull);
     var json = await storage.getSum<double>(

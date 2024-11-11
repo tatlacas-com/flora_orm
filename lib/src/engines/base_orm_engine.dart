@@ -63,18 +63,6 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
   @override
   BaseContext get dbContext => super.dbContext as BaseContext;
 
-  /// Try to convert anything (int, String) to an int.
-  int? parseInt(Object? object) {
-    if (object is int) {
-      return object;
-    } else if (object is String) {
-      try {
-        return int.parse(object);
-      } catch (_) {}
-    }
-    return null;
-  }
-
   @override
   Future<TEntity?> insert(
     TEntity item, {

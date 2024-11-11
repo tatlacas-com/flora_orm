@@ -14,5 +14,7 @@ abstract class DbContext<TEntity extends IEntity> {
 
   Future<String> getDbFullName();
 
+  Future<int> getVersion();
+
   Future close();
 }

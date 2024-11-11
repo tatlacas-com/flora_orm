@@ -33,4 +33,9 @@ class SqfliteDbContext<TEntity extends IEntity> extends BaseContext<TEntity> {
       version: dbVersion,
     );
   }
+
+  @override
+  Future<int> getVersion() async {
+    return (await database).getVersion();
+  }
 }

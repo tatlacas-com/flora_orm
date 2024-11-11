@@ -51,4 +51,9 @@ class SqfliteInMemoryDbContext<TEntity extends IEntity>
   Future<String> getDbPath() {
     throw UnimplementedError();
   }
+
+  @override
+  Future<int> getVersion() async {
+    return (await database).getVersion();
+  }
 }
