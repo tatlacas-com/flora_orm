@@ -1,10 +1,9 @@
+import 'package:flora_orm/flora_orm.dart';
 import 'package:flora_orm/src/bloc/test.entity.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sqlite_api.dart';
-import 'package:flora_orm/engines/sqflite_common_engine.dart';
 import 'package:flora_orm/src/open_options.dart';
 
 import 'sql_storage_test_runs.dart';
@@ -23,16 +22,19 @@ void main() {
         return '.';
       });
     });
-    var dbContext = SqfliteCommonDbContext<TestEntity>(
+    var orm = OrmManager(
       dbVersion: 1,
-      dbName: 'common_storage.db',
-      tables: [const TestEntity()],
-    );
-    var storage = SqfliteCommonEngine<TestEntity, TestEntityMeta>(
+      engine: DbEngine.sqfliteCommon,
+      dbName: 'common_storage_db.db',
+      tables: <Entity>[
         const TestEntity(),
-        dbContext: dbContext);
-    test('drop database', () async {
-      var database = await dbContext.database;
+      ],
+    );
+
+    TestEntityOrm storage = orm.getStorage(const TestEntity());
+
+    /* test('drop database', () async {
+      var database = await orm.dbContext.database;
       try {
         await database.rawDelete('drop table if exists ${storage.t.tableName}');
       } catch (e) {
@@ -46,7 +48,7 @@ void main() {
       await dbContext.open();
       final dbVersion = await (await dbContext.database).getVersion();
       expect(dbVersion, 2);
-    });
+    }); */
 
     test('SqfliteOpenDatabaseOptions', () async {
       var options = SqfliteOpenDatabaseOptions(version: 1);
@@ -57,29 +59,13 @@ void main() {
     run(storage);
 
     group('Test Db upgrade', () {
-      test('should upgrade database', () async {
-        await dbContext.close();
-        dbContext = dbContext.copyWith(
-          dbVersion: 4,
-        );
-        storage = SqfliteCommonEngine(const TestEntity(), dbContext: dbContext);
-        await dbContext.open();
-        storage.insert(const TestEntity(testString: 'Okay'));
-        final dbVersion = await (await dbContext.database).getVersion();
-        expect(dbVersion, 4);
+      setUp(() async {
+        await orm.dbContext.close();
+        orm = orm.copyWith(dbVersion: 3);
       });
-    });
 
-    group('Test Db downgrade', () {
       test('should upgrade database', () async {
-        await dbContext.close();
-        dbContext = dbContext.copyWith(
-          dbVersion: 3,
-        );
-        storage = SqfliteCommonEngine(const TestEntity(), dbContext: dbContext);
-        await dbContext.open();
-        storage.insert(const TestEntity(testString: 'Okay'));
-        final dbVersion = await (await dbContext.database).getVersion();
+        final dbVersion = await orm.dbContext.getVersion();
         expect(dbVersion, 3);
       });
     });

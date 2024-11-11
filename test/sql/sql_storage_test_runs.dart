@@ -85,6 +85,28 @@ void run(TestEntityOrm storage) {
         () async => await fxn(), throwsA(const TypeMatcher<ArgumentError>()));
   });
 
+  test('getEntity() should return entity with given id', () async {
+    var entity = TestEntity(
+      testBool: true,
+      testDateTime: DateTime.now(),
+      testDouble: 1.0,
+      testInt: 11,
+      testString: 'Testing xxx',
+    );
+
+    var insertedEntity = await storage.insert(entity);
+    expect(insertedEntity, isNotNull);
+    var json = await storage.firstWhereOrNull(
+      where: (t) => Filter(
+        entity.meta.id,
+        value: insertedEntity!.id,
+      ),
+    );
+    expect(json, isNotNull);
+    entity = json!;
+    expect(insertedEntity, entity);
+  });
+
   test('getEntity() should return expected entity', () async {
     var entity = TestEntity(
       testBool: true,
@@ -122,6 +144,7 @@ void run(TestEntityOrm storage) {
     entity = json!;
     expect(insertedEntity, entity);
   });
+
   test('getEntity() with columns should return expected entity values',
       () async {
     var entity = TestEntity(
@@ -169,7 +192,7 @@ void run(TestEntityOrm storage) {
         testInt: 11,
         testString: 'Testing 123456');
 
-    var insertedEntity = await storage.insert(entity);
+    final insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var json = await storage.firstWhereOrNull(
       orderBy: (t) => [
@@ -218,7 +241,7 @@ void run(TestEntityOrm storage) {
   });
 
   test('getEntity(NotNull) should return expected entity', () async {
-    var entity = TestEntity(
+    final entity = TestEntity(
         testBool: true,
         testDateTime: DateTime.now(),
         testString: 'Testing 123456');
@@ -238,8 +261,7 @@ void run(TestEntityOrm storage) {
       ),
     );
     expect(json, isNotNull);
-    entity = json!;
-    expect(insertedEntity, entity);
+    expect(insertedEntity, json);
   });
 
   test('getEntity(LessThan) should return expected entity', () async {
@@ -608,6 +630,7 @@ void run(TestEntityOrm storage) {
     expect(json, isNotNull);
     expect(json.length, 0);
   });
+
   test('getEntities() should return items', () async {
     var entity = TestEntity(
         testBool: true,

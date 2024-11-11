@@ -12,11 +12,15 @@ class MockSharedPreferenceEngine<TEntity extends IEntity,
   MockSharedPreferenceEngine(super.t, {required super.dbContext});
 
   @override
+  Future<SharedPreferences> get prefs => SharedPreferences.getInstance();
+  @override
   Future<void> write(
       {required String key,
-      required String? value,
+      required Map<String, dynamic> value,
       Map<String, dynamic>? additionalData}) async {
-    _mockValues[key] = value ?? '';
+    Map<String, dynamic> items = await getItems() ?? {};
+    items[key] = value;
+    _mockValues[t.tableName] = jsonEncode(items);
     SharedPreferences.setMockInitialValues(_mockValues);
   }
 }

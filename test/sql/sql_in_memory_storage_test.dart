@@ -16,13 +16,14 @@ void main() {
       ],
     );
 
-    TestEntityOrm storage = orm.getStorage(const TestEntity());
-
+    group('Test Engine', () {
+      TestEntityOrm storage = orm.getStorage(const TestEntity());
+      run(storage);
+    });
     group('Test Db upgrade', () {
       setUp(() async {
         await orm.dbContext.close();
         orm = orm.copyWith(dbVersion: 2);
-        storage = orm.getStorage(const TestEntity());
       });
 
       test('should upgrade database', () async {
@@ -30,13 +31,11 @@ void main() {
         expect(dbVersion, 2);
       });
     });
-    run(storage);
 
     group('Test Db upgrade', () {
       setUp(() async {
         await orm.dbContext.close();
         orm = orm.copyWith(dbVersion: 3);
-        storage = orm.getStorage(const TestEntity());
       });
 
       test('should upgrade database', () async {

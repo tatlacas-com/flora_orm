@@ -1,3 +1,5 @@
+import 'package:collection/collection.dart';
+import 'package:flora_orm/src/models/orm.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flora_orm/flora_orm.dart';
@@ -14,21 +16,38 @@ class SharedPreferenceEngine<TEntity extends IEntity,
   final Future<SharedPreferences> prefs = SharedPreferences.getInstance();
 
   @protected
-  Future<String?> read({required String key}) async {
-    return (await prefs).getString(key);
+  Future<Map<String, dynamic>?> getItems() async {
+    final items = (await prefs).getString(t.tableName);
+    if (items == null) {
+      return null;
+    }
+    return jsonDecode(items) as Map<String, dynamic>;
+  }
+
+  @protected
+  Future<Map<String, dynamic>?> read({required String key}) async {
+    final json = await getItems();
+    if (json == null) {
+      return null;
+    }
+    return json[key] as Map<String, dynamic>?;
   }
 
   @protected
   Future<void> write(
       {required String key,
-      required String? value,
+      required Map<String, dynamic> value,
       Map<String, dynamic>? additionalData}) async {
-    await (await prefs).setString(key, value ?? '');
+    Map<String, dynamic> items = await getItems() ?? {};
+    items[key] = value;
+    await (await prefs).setString(t.tableName, jsonEncode(items));
   }
 
   @protected
   Future<void> deletePref({required String key}) async {
-    await (await prefs).remove(key);
+    Map<String, dynamic> items = await getItems() ?? {};
+    items.remove(key);
+    await (await prefs).setString(t.tableName, jsonEncode(items));
   }
 
   @override
@@ -53,7 +72,108 @@ class SharedPreferenceEngine<TEntity extends IEntity,
     Map<String, dynamic>? isolateArgs,
     void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   }) async {
+    Map<String, dynamic> records = await getItems() ?? {};
+    final filters = where(t).filters;
+    final res = records.entries.firstWhereOrNull(
+      (element) {
+        return _where(element, filters);
+      },
+    );
+    if (res != null) {
+      return mType.load(res.value as Map<String, dynamic>) as TEntity;
+    }
     return null;
+  }
+
+  bool _where(
+      MapEntry<String, dynamic> element, List<FilterCondition> filters) {
+    var included = false;
+    List<bool> includedList = [];
+    List<String> operators = [];
+    final value = element.value as Map<String, dynamic>;
+    for (final filter in filters) {
+      final column = filter.column?.name ?? '';
+      switch (filter.condition) {
+        case OrmCondition.equalTo:
+          included = value[column] == filter.value;
+          break;
+        case OrmCondition.notEqualTo:
+          included = value[column] != filter.value;
+          break;
+        case OrmCondition.lessThan:
+          included = (value[column] as num? ?? double.infinity) < filter.value;
+          break;
+        case OrmCondition.greaterThan:
+          included = (value[column] as num? ?? double.infinity) > filter.value;
+          break;
+        case OrmCondition.lessThanOrEqual:
+          included = (value[column] as num? ?? double.infinity) <= filter.value;
+          break;
+        case OrmCondition.greaterThanOrEqual:
+          included = (value[column] as num? ?? double.infinity) >= filter.value;
+          break;
+        case OrmCondition.between:
+          final val = (value[column] as num? ?? double.infinity);
+          included = val >= filter.value && val <= filter.secondaryValue;
+          break;
+        case OrmCondition.isNull:
+          included = value[column] == null;
+          break;
+        case OrmCondition.notNull:
+          included = value[column] != null;
+          break;
+        case OrmCondition.isIn:
+          included = (filter.value as List).contains(value[column]);
+          break;
+        case OrmCondition.like:
+          included = _like(filter, value, column);
+          break;
+        case OrmCondition.notLike:
+          included = !_like(filter, value, column);
+          break;
+        case OrmCondition.notIn:
+          included = !(filter.value as List).contains(value[column]);
+          break;
+        case OrmCondition.notBetween:
+          final val = (value[column] as num? ?? double.infinity);
+          included = !(val >= filter.value && val <= filter.secondaryValue);
+          break;
+      }
+      includedList.add(included);
+      if (filter.and) {
+        operators.add('and');
+      } else if (filter.or) {
+        operators.add('or');
+      }
+    }
+    if (includedList.length > 1) {
+      bool finalResult = includedList.first;
+      for (int i = 1; i < includedList.length; i++) {
+        if (operators[i - 1] == 'and') {
+          finalResult = finalResult && includedList[i];
+        } else if (operators[i - 1] == 'or') {
+          finalResult = finalResult || includedList[i];
+        }
+      }
+      return finalResult;
+    }
+    return included;
+  }
+
+  bool _like(
+      FilterCondition filter, Map<String, dynamic> value, String column) {
+    final query = filter.value as String;
+    final queryVal = query.replaceAll('%', '');
+    final val = (value[column] as String? ?? '');
+    if (query.startsWith('%') && query.endsWith('%')) {
+      return val.contains(queryVal);
+    } else if (query.startsWith('%')) {
+      return val.endsWith(queryVal);
+    } else if (query.endsWith('%')) {
+      return val.startsWith(queryVal);
+    } else {
+      return val.contains(queryVal);
+    }
   }
 
   @override
@@ -108,8 +228,7 @@ class SharedPreferenceEngine<TEntity extends IEntity,
       }
     }
     item = item.updateDates() as TEntity;
-    final json = jsonEncode(item.toMap());
-    await write(key: item.id!, value: json);
+    await write(key: item.id!, value: item.toMap());
     return item;
   }
 
@@ -122,17 +241,23 @@ class SharedPreferenceEngine<TEntity extends IEntity,
     assert(all == true || where != null,
         'Either provide where query or specify all = true to delete all.');
 
-    final item = where == null
-        ? null
-        : where(t)
-            .filters
-            .where((element) => element.column?.name == 'id')
-            .toList();
-    if (item != null && item.isNotEmpty == true) {
-      await (await prefs).remove(item[0].value);
-      return 1;
+    Map<String, dynamic> items = await getItems() ?? {};
+    if (where == null) {
+      return items.length;
     }
-    return 0;
+    final filters = where(t).filters;
+    final res = items.entries
+        .where(
+          (element) {
+            return _where(element, filters);
+          },
+        )
+        .map((e) => e.key)
+        .toList();
+
+    items.removeWhere((key, value) => res.contains(key));
+    await (await prefs).setString(t.tableName, jsonEncode(items));
+    return res.length;
   }
 
   @override
@@ -159,8 +284,7 @@ class SharedPreferenceEngine<TEntity extends IEntity,
       final update = columnValues != null
           ? entity.toStorageJson(columnValues: columnValues(t))
           : entity.toMap();
-      final json = jsonEncode(update);
-      await write(key: query[0].value, value: json);
+      await write(key: query[0].value, value: update);
       return 1;
     }
     return 0;
@@ -177,7 +301,25 @@ class SharedPreferenceEngine<TEntity extends IEntity,
     Map<String, dynamic>? isolateArgs,
     void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   }) async {
-    return [];
+    Map<String, dynamic> records = await getItems() ?? {};
+    if (where == null) {
+      return records.entries
+          .map(
+            (e) => mType.load(e.value) as TEntity,
+          )
+          .toList();
+    }
+    final filters = where(t).filters;
+    final res = records.entries.where(
+      (element) {
+        return _where(element, filters);
+      },
+    );
+    return res
+        .map(
+          (e) => mType.load(e.value) as TEntity,
+        )
+        .toList();
   }
 
   @override
@@ -188,6 +330,6 @@ class SharedPreferenceEngine<TEntity extends IEntity,
     Map<String, dynamic>? isolateArgs,
     void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   }) async {
-    return [];
+    throw UnsupportedError('not supported');
   }
 }
