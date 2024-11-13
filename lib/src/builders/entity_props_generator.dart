@@ -101,6 +101,16 @@ class ${className}Meta extends  EntityMeta<$className> {
       );
 
   @override
+  ColumnDefinition<$className, String> get collectionId => 
+  ColumnDefinition<$className, String>(
+        'id',
+        primaryKey: true,
+        write: (entity) => entity.collectionId,
+        read: (json, entity, value) =>
+            entity.copyWith(collectionId: value, json: json),
+      );
+
+  @override
   ColumnDefinition<$className, DateTime> get createdAt =>
       ColumnDefinition<$className, DateTime>(
         'createdAt',
@@ -543,6 +553,7 @@ class ${className}Meta extends  EntityMeta<$className> {
       @override
       Iterable<ColumnDefinition<$className, dynamic>> get columns => [
       id,
+      collectionId,
       createdAt,
       updatedAt,
       ''');
@@ -555,6 +566,7 @@ class ${className}Meta extends  EntityMeta<$className> {
       @override
       $className copyWith({
         String? id,
+        String? collectionId,
         DateTime? createdAt,
         DateTime? updatedAt,
         $copyWithPropsList
@@ -562,6 +574,7 @@ class ${className}Meta extends  EntityMeta<$className> {
       }){
         return $className(
           id: id ?? this.id,
+          collectionId: collectionId ?? this.collectionId,
           createdAt: createdAt ?? this.createdAt,
           updatedAt: updatedAt ?? this.updatedAt,
           $copyWithList
@@ -584,6 +597,10 @@ mixin ${className}Migrations on Entity<$className, ${className}Meta> {
   @override
   bool createTableAt(int newVersion) {
     return switch (newVersion) {
+    /// replace dbVersion with the version number this entity was introduced.
+    /// remember to update dbVersion to this version in your OrmManager instance 
+    // TODO(dev): replace _dbVersion with number
+      _dbVersion => true,
       _ => false,
     };
   }

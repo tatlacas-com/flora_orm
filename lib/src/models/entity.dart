@@ -8,10 +8,12 @@ import 'column_definition_extension.dart';
 abstract class IEntity {
   const IEntity({
     this.id,
+    this.collectionId,
     this.createdAt,
     this.updatedAt,
   });
   final String? id;
+  final String? collectionId;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -19,6 +21,7 @@ abstract class IEntity {
 
   IEntity copyWith({
     String? id,
+    String? collectionId,
     DateTime? createdAt,
     DateTime? updatedAt,
     Map<String, dynamic>? json,
@@ -64,6 +67,7 @@ abstract class EntityMeta<TEntity extends IEntity> {
 
   Iterable<ColumnDefinition<TEntity, dynamic>> get columns;
   ColumnDefinition<IEntity, String> get id;
+  ColumnDefinition<IEntity, String> get collectionId;
 
   ColumnDefinition<IEntity, DateTime> get createdAt;
 
@@ -74,11 +78,14 @@ abstract class Entity<TEntity extends IEntity,
     TMeta extends EntityMeta<TEntity>> extends Equatable implements IEntity {
   const Entity({
     this.id,
+    this.collectionId,
     this.createdAt,
     this.updatedAt,
   });
   @override
   final String? id;
+  @override
+  final String? collectionId;
   @override
   final DateTime? createdAt;
   @override
@@ -90,6 +97,7 @@ abstract class Entity<TEntity extends IEntity,
   @override
   List<Object?> get props => [
         id,
+        collectionId,
       ];
 
   @override
@@ -103,6 +111,7 @@ abstract class Entity<TEntity extends IEntity,
   @override
   TEntity copyWith({
     String? id,
+    String? collectionId,
     DateTime? createdAt,
     DateTime? updatedAt,
     Map<String, dynamic>? json,

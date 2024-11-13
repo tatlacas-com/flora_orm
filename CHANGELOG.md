@@ -1,7 +1,12 @@
 
+## 2.0.11
+
+* add collectionId to Entity for grouping entities
+
 ## 2.0.10
 
-*
+* 
+
 ## 2.0.9
 
 *

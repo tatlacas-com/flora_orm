@@ -20,6 +20,7 @@ In VSCode click on __Settings__ icon then __Snippets__. Create new snippet then 
 		"",
 		"  const ${TM_FILENAME_BASE/^(.*)\\.entity$/${1:/pascalcase}/}Entity({",
 		"    super.id,",
+		"    super.collectionId,",
 		"    super.createdAt,",
 		"    super.updatedAt,",
 		"  });",
@@ -46,6 +47,7 @@ class NotificationEntity
     with _NotificationEntityMixin, NotificationEntityMigrations {
   const NotificationEntity({
     super.id,
+    super.collectionId,
     super.createdAt,
     super.updatedAt,
   });

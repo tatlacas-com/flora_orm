@@ -34,6 +34,7 @@ mixin _TestEntityMixin on Entity<TestEntity, TestEntityMeta> {
   @override
   TestEntity copyWith({
     String? id,
+    String? collectionId,
     DateTime? createdAt,
     DateTime? updatedAt,
     CopyWith<String?>? testString,
@@ -47,6 +48,7 @@ mixin _TestEntityMixin on Entity<TestEntity, TestEntityMeta> {
   }) {
     return TestEntity(
       id: id ?? this.id,
+      collectionId: collectionId ?? this.collectionId,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       testString: testString != null ? testString.value : this.testString,
@@ -78,6 +80,16 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
         primaryKey: true,
         write: (entity) => entity.id,
         read: (json, entity, value) => entity.copyWith(id: value, json: json),
+      );
+
+  @override
+  ColumnDefinition<TestEntity, String> get collectionId =>
+      ColumnDefinition<TestEntity, String>(
+        'id',
+        primaryKey: true,
+        write: (entity) => entity.collectionId,
+        read: (json, entity, value) =>
+            entity.copyWith(collectionId: value, json: json),
       );
 
   @override
@@ -157,6 +169,7 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
   @override
   Iterable<ColumnDefinition<TestEntity, dynamic>> get columns => [
         id,
+        collectionId,
         createdAt,
         updatedAt,
         testString,

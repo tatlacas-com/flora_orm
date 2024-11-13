@@ -8,6 +8,7 @@ class UserEntity extends Entity<UserEntity, UserEntityMeta>
     with _UserEntityMixin, UserEntityMigrations {
   UserEntity({
     super.id,
+    super.collectionId,
     super.createdAt,
     super.updatedAt,
     this.firstName,

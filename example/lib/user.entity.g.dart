@@ -40,6 +40,7 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
   @override
   UserEntity copyWith({
     String? id,
+    String? collectionId,
     DateTime? createdAt,
     DateTime? updatedAt,
     CopyWith<String?>? firstName,
@@ -50,6 +51,7 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
   }) {
     return UserEntity(
       id: id ?? this.id,
+      collectionId: collectionId ?? this.collectionId,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       firstName: firstName != null ? firstName.value : this.firstName,
@@ -75,6 +77,16 @@ class UserEntityMeta extends EntityMeta<UserEntity> {
         primaryKey: true,
         write: (entity) => entity.id,
         read: (json, entity, value) => entity.copyWith(id: value, json: json),
+      );
+
+  @override
+  ColumnDefinition<UserEntity, String> get collectionId =>
+      ColumnDefinition<UserEntity, String>(
+        'id',
+        primaryKey: true,
+        write: (entity) => entity.collectionId,
+        read: (json, entity, value) =>
+            entity.copyWith(collectionId: value, json: json),
       );
 
   @override
@@ -130,6 +142,7 @@ class UserEntityMeta extends EntityMeta<UserEntity> {
   @override
   Iterable<ColumnDefinition<UserEntity, dynamic>> get columns => [
         id,
+        collectionId,
         createdAt,
         updatedAt,
         firstName,

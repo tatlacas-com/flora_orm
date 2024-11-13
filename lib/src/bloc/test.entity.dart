@@ -8,6 +8,7 @@ class TestEntity extends Entity<TestEntity, TestEntityMeta>
     with _TestEntityMixin, TestEntityMigrations {
   const TestEntity({
     super.id,
+    super.collectionId,
     super.createdAt,
     super.updatedAt,
     this.testString,
