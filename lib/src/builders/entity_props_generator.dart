@@ -104,7 +104,6 @@ class ${className}Meta extends  EntityMeta<$className> {
   ColumnDefinition<$className, String> get collectionId => 
   ColumnDefinition<$className, String>(
         'collectionId',
-        primaryKey: true,
         write: (entity) => entity.collectionId,
         read: (json, entity, value) =>
             entity.copyWith(collectionId: value, json: json),
