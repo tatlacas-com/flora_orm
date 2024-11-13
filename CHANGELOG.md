@@ -1,4 +1,8 @@
 
+## 2.0.12
+
+* Bug fix column name for collectionId
+
 ## 2.0.11
 
 * add collectionId to Entity for grouping entities

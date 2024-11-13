@@ -103,7 +103,7 @@ class ${className}Meta extends  EntityMeta<$className> {
   @override
   ColumnDefinition<$className, String> get collectionId => 
   ColumnDefinition<$className, String>(
-        'id',
+        'collectionId',
         primaryKey: true,
         write: (entity) => entity.collectionId,
         read: (json, entity, value) =>
