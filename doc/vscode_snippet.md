@@ -51,7 +51,7 @@ class NotificationEntity
   });
 }
 ```
-
+after boilerplate code is inserted, run `dart run build_runner build` to generate files and resolve errors.  
 You can then begin adding your properties such as `@column`s.   
 
 **IMPORTANT**: After adding Entity classes (and updating existing entities), don't forget to:
