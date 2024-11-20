@@ -24,9 +24,22 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
     );
   }
 
+  UserEntity readReactionsCounts(Map<String, dynamic> json, value) {
+    Map<String, int>? item;
+    if (value != null) {
+      Map<String, dynamic> map =
+          value is Map<String, dynamic> ? value : jsonDecode(value);
+      item = map as Map<String, int>;
+    }
+    return copyWith(
+      reactionsCounts: item,
+    );
+  }
+
   String? get firstName;
   String? get lastName;
   TestEnum? get testEnum;
+  Map<String, int> get reactionsCounts;
   String? get test2;
 
   @override
@@ -35,6 +48,7 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
         firstName,
         lastName,
         testEnum,
+        reactionsCounts,
         test2,
       ];
   @override
@@ -46,6 +60,7 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
     CopyWith<String?>? firstName,
     CopyWith<String?>? lastName,
     CopyWith<TestEnum?>? testEnum,
+    Map<String, int>? reactionsCounts,
     CopyWith<String?>? test2,
     Map<String, dynamic>? json,
   }) {
@@ -57,6 +72,7 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
       firstName: firstName != null ? firstName.value : this.firstName,
       lastName: lastName != null ? lastName.value : this.lastName,
       testEnum: testEnum != null ? testEnum.value : this.testEnum,
+      reactionsCounts: reactionsCounts ?? this.reactionsCounts,
       test2: test2 != null ? test2.value : this.test2,
     );
   }
@@ -82,8 +98,7 @@ class UserEntityMeta extends EntityMeta<UserEntity> {
   @override
   ColumnDefinition<UserEntity, String> get collectionId =>
       ColumnDefinition<UserEntity, String>(
-        'id',
-        primaryKey: true,
+        'collectionId',
         write: (entity) => entity.collectionId,
         read: (json, entity, value) =>
             entity.copyWith(collectionId: value, json: json),
@@ -139,6 +154,20 @@ class UserEntityMeta extends EntityMeta<UserEntity> {
         },
       );
 
+  ColumnDefinition<UserEntity, String> get reactionsCounts =>
+      ColumnDefinition<UserEntity, String>(
+        'reactionsCounts',
+        notNull: true,
+        write: (entity) {
+          final map = entity.reactionsCounts;
+
+          return jsonEncode(map);
+        },
+        read: (json, entity, value) {
+          return entity.readReactionsCounts(json, value);
+        },
+      );
+
   @override
   Iterable<ColumnDefinition<UserEntity, dynamic>> get columns => [
         id,
@@ -148,5 +177,6 @@ class UserEntityMeta extends EntityMeta<UserEntity> {
         firstName,
         lastName,
         testEnum,
+        reactionsCounts,
       ];
 }

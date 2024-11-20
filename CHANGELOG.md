@@ -1,4 +1,12 @@
 
+## 2.0.16
+
+* Bug fixes
+
+## 2.0.15
+
+* Add support for Map columns
+
 ## 2.0.14
 
 * Bug fix column name for collectionId

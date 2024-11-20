@@ -312,9 +312,14 @@ class ${className}Meta extends  EntityMeta<$className> {
   }
  ''');
             } else {
-              final fnName = readFn != null
-                  ? '$readFn(json, map)'
-                  : '$fieldType.fromMap(map)';
+              late final String fnName;
+              if (readFn != null) {
+                fnName = '$readFn(json, map)';
+              } else if (field.type.isDartCoreMap) {
+                fnName = 'map.cast()';
+              } else {
+                fnName = '$fieldType.fromMap(map)';
+              }
 
               mixinCode.writeln('''
     $fieldType? item;
@@ -426,11 +431,17 @@ class ${className}Meta extends  EntityMeta<$className> {
     ''');
             } else {
               var typeName = isPremitiveType ? alias : fieldName;
-              final map = writeFn != null
-                  ? '.$writeFn()'
-                  : (isPremitiveType
-                      ? (fieldType == 'DateTime' ? '.toIso8601String()' : '')
-                      : (isEnum ? '.name' : '.toMap()'));
+              late final String map;
+              if (writeFn != null) {
+                map = '.$writeFn()';
+              } else if (isPremitiveType) {
+                map = (fieldType == 'DateTime' ? '.toIso8601String()' : '');
+              } else if (field.type.isDartCoreMap) {
+                map = '';
+              } else {
+                map = (isEnum ? '.name' : '.toMap()');
+              }
+
               if (isNotNull) {
                 metaCode.writeln('''
             final map = entity.$typeName$map;
