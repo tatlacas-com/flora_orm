@@ -635,6 +635,15 @@ mixin ${className}Migrations on Entity<$className, ${className}Meta> {
         path.current, copy.path.replaceAll('.mg.dart', '.migrations.dart')));
     if (!(await newFile.exists())) {
       await newFile.writeAsString(mixinContent);
+    } else {
+      try {
+        final contents = await newFile.readAsBytes();
+        await newFile.writeAsBytes(contents);
+      } catch (e) {
+        try {
+          await newFile.writeAsString(mixinContent);
+        } catch (e) {}
+      }
     }
   }
 
