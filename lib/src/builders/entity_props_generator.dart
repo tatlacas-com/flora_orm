@@ -629,21 +629,10 @@ mixin ${className}Migrations on Entity<$className, ${className}Meta> {
   }
 }''';
 
-    var inputId = buildStep.inputId;
-    var copy = inputId.changeExtension('.mg.dart');
-    final newFile = File(path.join(
-        path.current, copy.path.replaceAll('.mg.dart', '.migrations.dart')));
+    final newFile = File(path.join(path.current,
+        buildStep.inputId.path.replaceAll('.dart', '.migrations.dart')));
     if (!(await newFile.exists())) {
       await newFile.writeAsString(mixinContent);
-    } else {
-      try {
-        final contents = await newFile.readAsBytes();
-        await newFile.writeAsBytes(contents);
-      } catch (e) {
-        try {
-          await newFile.writeAsString(mixinContent);
-        } catch (e) {}
-      }
     }
   }
 

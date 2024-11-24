@@ -1,4 +1,8 @@
 
+## 2.0.18
+
+* Fix .migrations.dart generation
+
 ## 2.0.17
 
 * 
