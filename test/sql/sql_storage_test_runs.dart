@@ -2,9 +2,10 @@ import 'package:flora_orm/src/bloc/test.entity.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:meta/meta.dart';
 import 'package:flora_orm/flora_orm.dart';
+import 'package:sqflite_common/sqlite_api.dart';
 
-@isTest
-void run(TestEntityOrm storage) {
+@isTestGroup
+void run(String desc, TestEntityOrm storage) {
   test('insert(entity) should insert entity', () async {
     final entity = TestEntity(
         testBool: true,
@@ -717,6 +718,25 @@ void run(TestEntityOrm storage) {
       a,
       b,
     ]);
+  });
+
+  test('insertList() with duplicate ids should throw', () async {
+    var entity = TestEntity(
+        id: 'id1',
+        testBool: true,
+        testDateTime: DateTime.now(),
+        testDouble: 1.0,
+        testInt: 11,
+        testString: 'Testing a');
+    var entity1 = TestEntity(
+        id: 'id1',
+        testBool: true,
+        testDateTime: DateTime.now(),
+        testDouble: 1.0,
+        testInt: 12,
+        testString: 'Testing b');
+    expect(() async => await storage.insertList(<TestEntity>[entity, entity1]),
+        throwsA(const TypeMatcher<DatabaseException>()));
   });
 
   test('update() without columnValues should update entity', () async {

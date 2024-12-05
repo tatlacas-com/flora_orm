@@ -23,7 +23,7 @@ void main() {
       });
     });
     var orm = OrmManager(
-      dbVersion: 1,
+      dbVersion: 4,
       engine: DbEngine.sqfliteCommon,
       dbName: 'common_storage_db.db',
       tables: <Entity>[
@@ -56,7 +56,7 @@ void main() {
           '{version: 1, readOnly: false, singleInstance: true}');
     });
 
-    run(storage);
+    run('Test engine', storage);
 
     group('Test Db upgrade', () {
       setUp(() async {

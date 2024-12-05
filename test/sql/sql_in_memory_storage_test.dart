@@ -8,7 +8,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   group('Test Sql In Memory Storage', () {
     var orm = OrmManager(
-      dbVersion: 1,
+      dbVersion: 4,
       engine: DbEngine.inMemory,
       dbName: 'common_storage_db.db',
       tables: <Entity>[
@@ -18,7 +18,7 @@ void main() {
 
     group('Test Engine', () {
       TestEntityOrm storage = orm.getStorage(const TestEntity());
-      run(storage);
+      run('Test engine', storage);
     });
     group('Test Db upgrade', () {
       setUp(() async {

@@ -1,4 +1,7 @@
 
+## 2.0.19
+
+* Throw on error in transaction
 ## 2.0.18
 
 * Fix .migrations.dart generation

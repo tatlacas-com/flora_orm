@@ -85,8 +85,7 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
   @override
   ColumnDefinition<TestEntity, String> get collectionId =>
       ColumnDefinition<TestEntity, String>(
-        'id',
-        primaryKey: true,
+        'collectionId',
         write: (entity) => entity.collectionId,
         read: (json, entity, value) =>
             entity.copyWith(collectionId: value, json: json),

@@ -32,21 +32,20 @@ void main() {
   SharedPreferences.setMockInitialValues(_mockValues);
   group('Test Shared Preferences Storage', () {
     var orm = OrmManager(
-      dbVersion: 1,
+      dbVersion: 4,
       engine: DbEngine.sharedPreferences,
       dbName: 'common_storage_db.db',
       tables: <Entity>[
         const TestEntity(),
       ],
     );
-    group('Test engine', () {
-      TestEntityOrm storage = MockSharedPreferenceEngine(
+    run(
+      'Test engine',
+      MockSharedPreferenceEngine(
         const TestEntity(),
         dbContext: orm.dbContext,
-      );
-
-      run(storage);
-    });
+      ),
+    );
 
     group('Test Db upgrade', () {
       setUp(() async {

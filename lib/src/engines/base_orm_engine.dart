@@ -303,7 +303,7 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
 
   Future<List<TEntity>> _finishBatch(
       Batch batch, Iterable<TEntity> items) async {
-    var result = await batch.commit(noResult: false, continueOnError: true);
+    var result = await batch.commit(noResult: false, continueOnError: false);
     List<TEntity> inserted = <TEntity>[];
     var indx = 0;
     for (var element in result) {
@@ -360,7 +360,7 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
         where: formattedQuery?.filter,
         whereArgs: formattedQuery?.whereArgs,
       );
-      var result = await batch.commit(noResult: false, continueOnError: true);
+      var result = await batch.commit(noResult: false, continueOnError: false);
       if (result.isEmpty) {
         return 0;
       }
