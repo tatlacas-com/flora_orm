@@ -1,4 +1,6 @@
 
+## 2.0.20
+
 ## 2.0.19
 
 * Throw on error in transaction

@@ -633,6 +633,17 @@ mixin ${className}Migrations on Entity<$className, ${className}Meta> {
         buildStep.inputId.path.replaceAll('.dart', '.migrations.dart')));
     if (!(await newFile.exists())) {
       await newFile.writeAsString(mixinContent);
+    } else {
+      // ignore: avoid_print
+      print('${newFile.absolute} already exists');
+      try {
+        final contents = await newFile.readAsBytes();
+        await newFile.writeAsBytes(contents);
+      } catch (e) {
+        try {
+          await newFile.writeAsString(mixinContent);
+        } catch (e) {}
+      }
     }
   }
 
