@@ -242,8 +242,6 @@ abstract class Entity<TEntity extends IEntity,
         return 'REAL';
       case ColumnType.blob:
         return 'BLOB';
-      default:
-        return 'TEXT';
     }
   }
 

@@ -642,7 +642,10 @@ mixin ${className}Migrations on Entity<$className, ${className}Meta> {
       } catch (e) {
         try {
           await newFile.writeAsString(mixinContent);
-        } catch (e) {}
+        } catch (e) {
+          // ignore: avoid_print
+          print('exception writing migrations file ${newFile.absolute}: $e');
+        }
       }
     }
   }

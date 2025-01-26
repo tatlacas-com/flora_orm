@@ -138,10 +138,10 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
   }
 
   @override
-  Future<TEntity?> firstWhereOrNull({
+  Future<TEntity?> firstWhereOrNull(
+    Filter Function(TMeta t) where, {
     Iterable<ColumnDefinition>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
-    required Filter Function(TMeta t) where,
     int? offset,
     final bool? useIsolate,
     Map<String, dynamic>? isolateArgs,
@@ -164,10 +164,10 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
   }
 
   @override
-  Future<Map<String, dynamic>?> firstWhereOrNullMap({
+  Future<Map<String, dynamic>?> firstWhereOrNullMap(
+    Filter Function(TMeta t) where, {
     Iterable<ColumnDefinition>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
-    required Filter Function(TMeta t) where,
     int? offset,
     final bool? useIsolate,
     Map<String, dynamic>? isolateArgs,
@@ -384,8 +384,8 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
     final formattedQuery = await whereString(where, useIsolate);
     var createdAt = entity?.createdAt;
     if (entity == null) {
-      final res = await firstWhereOrNullMap(
-          where: where, columns: (t) => [t.createdAt]);
+      final res =
+          await firstWhereOrNullMap(where, columns: (t) => [t.createdAt]);
       if (res?.containsKey(t.createdAt.name) == true) {
         createdAt = DateTime.parse(res![t.createdAt.name]);
       }

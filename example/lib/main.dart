@@ -57,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
 
     final user = await storage.firstWhereOrNull(
-      where: (t) => Filter(t.lastName, value: 'Doe'),
+      (t) => Filter(t.lastName, value: 'Doe'),
     );
     return user!;
   }

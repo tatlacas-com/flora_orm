@@ -61,7 +61,7 @@ void run(String desc, TestEntityOrm storage) {
     expect(insertedEntity, isNotNull);
     fxn() async => await storage.firstWhereOrNull(
           columns: (t) => [],
-          where: (t) => Filter(
+          (t) => Filter(
             t.id,
             value: insertedEntity!.id,
           )
@@ -98,7 +98,7 @@ void run(String desc, TestEntityOrm storage) {
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var json = await storage.firstWhereOrNull(
-      where: (t) => Filter(
+      (t) => Filter(
         entity.meta.id,
         value: insertedEntity!.id,
       ),
@@ -120,7 +120,7 @@ void run(String desc, TestEntityOrm storage) {
     var insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     var json = await storage.firstWhereOrNull(
-      where: (t) => Filter(
+      (t) => Filter(
         entity.meta.id,
         value: insertedEntity!.id,
       )
@@ -159,7 +159,7 @@ void run(String desc, TestEntityOrm storage) {
     expect(insertedEntity, isNotNull);
     var json = await storage.firstWhereOrNull(
       columns: (t) => [t.testInt],
-      where: (t) => Filter(
+      (t) => Filter(
         entity.meta.id,
         value: insertedEntity!.id,
       )
@@ -202,7 +202,7 @@ void run(String desc, TestEntityOrm storage) {
           direction: OrderDirection.desc,
         )
       ],
-      where: (t) => Filter(
+      (t) => Filter(
         entity.meta.id,
         condition: OrmCondition.notEqualTo,
         value: '12',
@@ -228,7 +228,7 @@ void run(String desc, TestEntityOrm storage) {
           direction: OrderDirection.desc,
         )
       ],
-      where: (t) => Filter(
+      (t) => Filter(
         t.testInt,
         condition: OrmCondition.isNull,
       ).and(
@@ -256,7 +256,7 @@ void run(String desc, TestEntityOrm storage) {
           direction: OrderDirection.desc,
         )
       ],
-      where: (t) => Filter(
+      (t) => Filter(
         t.testString,
         condition: OrmCondition.notNull,
       ),
@@ -281,7 +281,7 @@ void run(String desc, TestEntityOrm storage) {
           direction: OrderDirection.desc,
         )
       ],
-      where: (t) => Filter(
+      (t) => Filter(
         t.testInt,
         condition: OrmCondition.lessThan,
         value: -14,
@@ -308,7 +308,7 @@ void run(String desc, TestEntityOrm storage) {
           direction: OrderDirection.desc,
         )
       ],
-      where: (t) => Filter(
+      (t) => Filter(
         t.testInt,
         condition: OrmCondition.greaterThan,
         value: 19999,
@@ -335,7 +335,7 @@ void run(String desc, TestEntityOrm storage) {
           direction: OrderDirection.desc,
         )
       ],
-      where: (t) => Filter(
+      (t) => Filter(
         t.testInt,
         condition: OrmCondition.greaterThanOrEqual,
         value: 100,
@@ -362,7 +362,7 @@ void run(String desc, TestEntityOrm storage) {
           direction: OrderDirection.desc,
         )
       ],
-      where: (t) => Filter(
+      (t) => Filter(
         t.testInt,
         condition: OrmCondition.greaterThanOrEqual,
         value: -10,
@@ -389,7 +389,7 @@ void run(String desc, TestEntityOrm storage) {
           direction: OrderDirection.desc,
         )
       ],
-      where: (t) => Filter(
+      (t) => Filter(
         t.testInt,
         condition: OrmCondition.between,
         value: 1000,
@@ -417,7 +417,7 @@ void run(String desc, TestEntityOrm storage) {
           direction: OrderDirection.desc,
         )
       ],
-      where: (t) => Filter(
+      (t) => Filter(
         t.testInt,
         condition: OrmCondition.notBetween,
         value: -500,
@@ -445,7 +445,7 @@ void run(String desc, TestEntityOrm storage) {
           direction: OrderDirection.desc,
         )
       ],
-      where: (t) => Filter(
+      (t) => Filter(
         t.testInt,
         condition: OrmCondition.isIn,
         value: const [11001],
@@ -472,7 +472,7 @@ void run(String desc, TestEntityOrm storage) {
           direction: OrderDirection.desc,
         )
       ],
-      where: (t) => Filter(
+      (t) => Filter(
         t.testInt,
         condition: OrmCondition.notIn,
         value: const [11001, 11005],
@@ -499,7 +499,7 @@ void run(String desc, TestEntityOrm storage) {
           direction: OrderDirection.desc,
         )
       ],
-      where: (t) => Filter(
+      (t) => Filter(
         t.testString,
         condition: OrmCondition.like,
         value: '%Like%',
@@ -526,7 +526,7 @@ void run(String desc, TestEntityOrm storage) {
           direction: OrderDirection.desc,
         )
       ],
-      where: (t) => Filter(
+      (t) => Filter(
         t.testString,
         condition: OrmCondition.notLike,
         value: '%Dummy%',
@@ -554,7 +554,7 @@ void run(String desc, TestEntityOrm storage) {
           direction: OrderDirection.desc,
         )
       ],
-      where: (t) => Filter.startGroup()
+      (t) => Filter.startGroup()
           .filter(
             t.testString,
             condition: OrmCondition.like,
@@ -779,7 +779,7 @@ void run(String desc, TestEntityOrm storage) {
         columnValues: (t) => {t.testString: 'Updated ax1'});
     expect(total, 1);
     var json = await storage.firstWhereOrNull(
-        where: (t) => Filter(entity.meta.id, value: insertedEntity?.id));
+        (t) => Filter(entity.meta.id, value: insertedEntity?.id));
     insertedEntity =
         insertedEntity?.copyWith(testString: CopyWith('Updated ax1'));
     entity = json!;

@@ -50,19 +50,19 @@ abstract class OrmEngine<
     final bool? useIsolate,
   });
 
-  Future<TEntity?> firstWhereOrNull({
+  Future<TEntity?> firstWhereOrNull(
+    Filter Function(TMeta t) where, {
     List<ColumnDefinition>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
-    required Filter Function(TMeta t) where,
     int? offset,
     final bool? useIsolate,
     Map<String, dynamic>? isolateArgs,
     void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   });
-  Future<Map<String, dynamic>?> firstWhereOrNullMap({
+  Future<Map<String, dynamic>?> firstWhereOrNullMap(
+    Filter Function(TMeta t) where, {
     List<ColumnDefinition>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
-    required Filter Function(TMeta t) where,
     int? offset,
     final bool? useIsolate,
     Map<String, dynamic>? isolateArgs,

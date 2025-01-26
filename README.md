@@ -5,10 +5,10 @@
 Database ORM (Object-Relational Mapping) for [Flutter](https://flutter.io).
 
 The ORM supports:
-* [shared_preferences](https://pub.dev/packages/shared_preferences) - All platforms support
-* [sqflite](https://pub.dev/packages/sqflite) - iOS/Android/MacOS support
-* [sqflite_common_ffi - on disk](https://pub.dev/packages/sqflite_common_ffi) - iOS/Android/MacOS/Linux/Windows support
-* [sqflite_common_ffi - in memory](https://pub.dev/packages/sqflite_common_ffi) - iOS/Android/MacOS/Linux/Windows support
+* [shared_preferences](https://pub.dev/packages/shared_preferences) - All platforms
+* [sqflite](https://pub.dev/packages/sqflite) - iOS/Android/MacOS
+* [sqflite_common_ffi - on disk](https://pub.dev/packages/sqflite_common_ffi) - iOS/Android/MacOS/Linux/Windows
+* [sqflite_common_ffi - in memory](https://pub.dev/packages/sqflite_common_ffi) - iOS/Android/MacOS/Linux/Windows
 
 ## Getting Started
 
@@ -68,6 +68,7 @@ class UserEntity extends Entity<UserEntity, UserEntityMeta>
 
   const UserEntity({
     super.id,
+    super.collectionId,
     super.createdAt,
     super.updatedAt,
     this.claims,
@@ -127,11 +128,10 @@ For example, in your `void main()` function before `runApp()`,  you can have the
 
 ```dart
 final ormManager = OrmManager(
-     /// update this version number whenever you update your entities
+     /// update this version number whenever you add or update your entities
      /// such as adding new properties/fields.
       dbVersion: 1,
-      /// dbEngine defaults to DbEngine.sqflite so you can remove this line if
-      // you want to use the default engine
+      /// dbEngine defaults to DbEngine.sqflite if not specified
       dbEngine: DbEngine.sqflite,
       dbName: 'your_db_name_here.db',
       tables: <Entity>[
@@ -150,7 +150,7 @@ To keep your code clean, we recommend you have the above code in a seperate file
 dart run build_runner build
 ```
 2. Update `dbVersion` in `OrmManager`  - if you changed columns or added new Entity classes.
-3. **REGISTER** the new entity in `OrmManager`'s `tables: []`.
+3. **REGISTER** any new entities in `OrmManager`'s `tables: []`.
 
 The `dbEngine` value defaults to `DbEngine.sqflite`, and may be one of the following:
 
@@ -161,6 +161,7 @@ The `dbEngine` value defaults to `DbEngine.sqflite`, and may be one of the follo
   sharedPreferences,
 ```
 However, not all engines are available on all platforms. Here is a breakdown of each platform and supported engines:
+** If you provide a `dbEngine` value not supported by a platform, then the default for that platform is used.
 
 ```yaml
 Andoid: all (we recommend sqflite)
@@ -170,7 +171,6 @@ Linux: inMemory, sqfliteCommon, sharedPreferences (defaults to sqfliteCommon)
 Windows: inMemory, sqfliteCommon, sharedPreferences (defaults to sqfliteCommon)
 web: sharedPreferences (defaults to sharedPreferences)
 ```
-If you provide a `dbEngine` value not supported by a platform, then the default for that platform is used.
 
 Once your `OrmManager` is set, you can use it from anywhere in your code. If you are using [get_it](https://pub.dev/packages/get_it) for example, you can get your `storage` instance as:
 
