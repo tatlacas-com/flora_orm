@@ -403,7 +403,7 @@ class ${className}Meta extends  EntityMeta<$className> {
     ''');
             } else {
               metaCode.writeln('''
-           defaultValue: $defaultValue,
+           defaultValue: ${jsonEncoded ? 'jsonEncode($defaultValue)' : defaultValue},
     ''');
             }
           }

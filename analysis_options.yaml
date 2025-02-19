@@ -19,6 +19,7 @@ linter:
     - avoid_escaping_inner_quotes
     - sort_pub_dependencies
     - use_super_parameters
+    - public_member_api_docs
 analyzer:
   errors:
     todo: ignore
