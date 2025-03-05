@@ -100,7 +100,7 @@ class UserEntity extends Entity<UserEntity, UserEntityMeta>
   final String? displayName;
   
   @override
-  @OrmColumn(isEnum: true)
+  @column
   final OAuthProvider? provider;
 
   @override
@@ -397,7 +397,7 @@ dart run build_runner build
 * int
 * double
 * DateTime
-* enums (needs `@OrmColumn(isEnum: true)` to be specified)
+* enums
 * Custom classes (Objects) - they need to have factory `fromMap(map)` and function `toMap()`
 * Lists of above types (e.g `List<String>`)
 

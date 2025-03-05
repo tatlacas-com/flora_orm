@@ -27,10 +27,10 @@ class UserEntity extends Entity<UserEntity, UserEntityMeta>
   @column
   final String? lastName;
   @override
-  @OrmColumn(isEnum: true)
+  @column
   final TestEnum? testEnum;
   @override
-  @OrmColumn(isEnum: true, defaultValue: 'first')
+  @OrmColumn(defaultValue: 'first')
   final TestEnum testEnum2;
 
   late final String? test;

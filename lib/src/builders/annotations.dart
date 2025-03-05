@@ -13,7 +13,6 @@ class OrmColumn<TColumnType> {
     this.primaryKey = false,
     this.unique = false,
     this.autoIncrementPrimary = false,
-    this.isEnum = false,
     this.notNull,
     this.defaultValue,
   });
@@ -24,7 +23,6 @@ class OrmColumn<TColumnType> {
   // read function name. defaults to fromMap
   final String? readFn;
   final bool primaryKey;
-  final bool isEnum;
   final bool autoIncrementPrimary;
   final bool? notNull;
   final bool unique;

@@ -14,6 +14,14 @@ import 'package:path/path.dart' as path;
 extension DartTypeExtension on DartType {
   String get cleanDisplayString =>
       getDisplayString().replaceFirst(RegExp(r'[?*]'), '');
+
+  bool get isEnum {
+    if (this is InterfaceType) {
+      InterfaceElement element = this.element as InterfaceElement;
+      return element is EnumElement;
+    }
+    return false;
+  }
 }
 
 class _ExtraField {
@@ -203,8 +211,7 @@ class ${className}Meta extends  EntityMeta<$className> {
 
         for (final annotation in fieldAnnotations) {
           final dbColumnAnnotation = annotation.computeConstantValue()!;
-          final isEnum =
-              dbColumnAnnotation.getField('isEnum')?.toBoolValue() ?? false;
+          final isEnum = field.type.isEnum;
 
           final String name =
               dbColumnAnnotation.getField('name')?.toStringValue() ?? fieldName;
@@ -401,7 +408,7 @@ class ${className}Meta extends  EntityMeta<$className> {
     ''');
           }
           if (defaultValue != null) {
-            if (field.type.isDartCoreString) {
+            if (field.type.isDartCoreString || isEnum) {
               metaCode.writeln('''
            defaultValue: '$defaultValue',
     ''');

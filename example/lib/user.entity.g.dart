@@ -174,7 +174,7 @@ class UserEntityMeta extends EntityMeta<UserEntity> {
       ColumnDefinition<UserEntity, String>(
         'testEnum2',
         notNull: true,
-        defaultValue: jsonEncode(first),
+        defaultValue: 'first',
         write: (entity) {
           final map = entity.testEnum2.name;
 

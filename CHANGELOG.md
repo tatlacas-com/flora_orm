@@ -1,4 +1,10 @@
 
+## 2.0.25
+
+* refactor enum type column generation
+## 2.0.24
+
+* Fix defaultValue specify required type
 ## 2.0.23
 
 * Fix defaultValue specify required type
