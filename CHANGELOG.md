@@ -1,5 +1,9 @@
 
-## 2.0.212
+## 2.0.23
+
+* Fix defaultValue specify required type
+
+## 2.0.22
 
 * Fix encoded defaultValue
 ## 2.0.21

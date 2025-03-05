@@ -24,6 +24,18 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
     );
   }
 
+  UserEntity readTestEnum2(Map<String, dynamic> json, value) {
+    TestEnum? item;
+    if (value != null) {
+      item = <TestEnum?>[...TestEnum.values].firstWhere(
+          (element) => element?.name == value as String,
+          orElse: () => null);
+    }
+    return copyWith(
+      testEnum2: item,
+    );
+  }
+
   UserEntity readReactionsCounts(Map<String, dynamic> json, value) {
     Map<String, int>? item;
     if (value != null) {
@@ -39,6 +51,7 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
   String? get firstName;
   String? get lastName;
   TestEnum? get testEnum;
+  TestEnum get testEnum2;
   Map<String, int> get reactionsCounts;
   String? get test2;
 
@@ -48,6 +61,7 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
         firstName,
         lastName,
         testEnum,
+        testEnum2,
         reactionsCounts,
         test2,
       ];
@@ -60,6 +74,7 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
     CopyWith<String?>? firstName,
     CopyWith<String?>? lastName,
     CopyWith<TestEnum?>? testEnum,
+    TestEnum? testEnum2,
     Map<String, int>? reactionsCounts,
     CopyWith<String?>? test2,
     Map<String, dynamic>? json,
@@ -72,6 +87,7 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
       firstName: firstName != null ? firstName.value : this.firstName,
       lastName: lastName != null ? lastName.value : this.lastName,
       testEnum: testEnum != null ? testEnum.value : this.testEnum,
+      testEnum2: testEnum2 ?? this.testEnum2,
       reactionsCounts: reactionsCounts ?? this.reactionsCounts,
       test2: test2 != null ? test2.value : this.test2,
     );
@@ -154,6 +170,21 @@ class UserEntityMeta extends EntityMeta<UserEntity> {
         },
       );
 
+  ColumnDefinition<UserEntity, String> get testEnum2 =>
+      ColumnDefinition<UserEntity, String>(
+        'testEnum2',
+        notNull: true,
+        defaultValue: jsonEncode(first),
+        write: (entity) {
+          final map = entity.testEnum2.name;
+
+          return map;
+        },
+        read: (json, entity, value) {
+          return entity.readTestEnum2(json, value);
+        },
+      );
+
   ColumnDefinition<UserEntity, String> get reactionsCounts =>
       ColumnDefinition<UserEntity, String>(
         'reactionsCounts',
@@ -177,6 +208,7 @@ class UserEntityMeta extends EntityMeta<UserEntity> {
         firstName,
         lastName,
         testEnum,
+        testEnum2,
         reactionsCounts,
       ];
 }

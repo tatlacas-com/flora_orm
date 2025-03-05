@@ -241,6 +241,10 @@ class ${className}Meta extends  EntityMeta<$className> {
             defaultValue = df?.toDoubleValue();
           } else {
             defaultValue = df?.toStringValue();
+            if (defaultValue == null && df != null && df.isNull != true) {
+              throw ArgumentError(
+                  'Cannot save the supplied defaultValue for ${field.name}. Make sure defaultValue is of type bool, int, double or String.');
+            }
           }
           var columnType = fieldType;
           String? jsonEncodedType;

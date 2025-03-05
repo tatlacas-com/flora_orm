@@ -14,6 +14,7 @@ class UserEntity extends Entity<UserEntity, UserEntityMeta>
       this.firstName,
       this.lastName,
       this.testEnum,
+      this.testEnum2 = TestEnum.first,
       this.test2,
       this.reactionsCounts = const {}}) {
     test = '';
@@ -28,6 +29,9 @@ class UserEntity extends Entity<UserEntity, UserEntityMeta>
   @override
   @OrmColumn(isEnum: true)
   final TestEnum? testEnum;
+  @override
+  @OrmColumn(isEnum: true, defaultValue: 'first')
+  final TestEnum testEnum2;
 
   late final String? test;
   @override
