@@ -131,7 +131,7 @@ abstract class BaseContext<TEntity extends IEntity> extends DbContext<TEntity> {
       }
       if (!upgradeQueriesFound && kDebugMode) {
         throw ArgumentError(
-            'No Upgrade queries found. If you added new entities, make sure they are are added in EntitiesDbConfig.tables');
+            'No Upgrade queries found. If you added new entities, make sure they are also added to OrmManager.tables');
       }
       await batch.commit(noResult: true);
       _logBatchResult('onDbUpgrade', allQueries,

@@ -634,8 +634,6 @@ mixin ${className}Migrations on Entity<$className, ${className}Meta> {
     if (!(await newFile.exists())) {
       await newFile.writeAsString(mixinContent);
     } else {
-      // ignore: avoid_print
-      print('${newFile.absolute} already exists');
       try {
         final contents = await newFile.readAsBytes();
         await newFile.writeAsBytes(contents);
