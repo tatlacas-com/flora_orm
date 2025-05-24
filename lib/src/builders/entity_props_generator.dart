@@ -317,8 +317,9 @@ class ${className}Meta extends  EntityMeta<$className> {
               mixinCode.writeln('''
     List<$fieldType>? items;
     if (value != null) {
-      List<dynamic>? map = value is List ? value : jsonDecode(value as String);
-      items = map?.map<$fieldType>((e) => $map).toList();
+      final list = value is List ? value : jsonDecode(value as String);
+      items =
+          (list as List<dynamic>?)?.map<$fieldType>((e) => $map).toList();
     }
     return copyWith(
       $fieldName: ${notNull ? 'items' : 'CopyWith(items)'},
@@ -332,13 +333,13 @@ class ${className}Meta extends  EntityMeta<$className> {
               } else if (field.type.isDartCoreMap) {
                 fnName = 'map.cast()';
               } else {
-                fnName = '$fieldType.fromMap(map)';
+                fnName = '$fieldType.fromMap(map as Map<String, dynamic>)';
               }
 
               mixinCode.writeln('''
     $fieldType? item;
     if (value != null) {
-      ${isEnum ? '' : 'Map<String, dynamic> map = value is Map<String, dynamic> ? value : jsonDecode(value as String);'}
+      ${isEnum ? '' : 'final map = value is Map<String, dynamic> ? value : jsonDecode(value as String);'}
       item = ${isEnum ? '''<$fieldType?>[...$fieldType.values].firstWhere(
           (element) => element?.name == value as String,
           orElse: () => null)''' : fnName} ;
@@ -503,12 +504,18 @@ class ${className}Meta extends  EntityMeta<$className> {
     ''');
           } else if (notNull) {
             metaCode.writeln('''
-          read: (json, entity, value) => entity.copyWith($fieldName: value as $fieldType?, json: json),
+          read: (json, entity, value) => entity.copyWith(
+            $fieldName: value as $fieldType?, 
+            json: json,
+          ),
         );
     ''');
           } else {
             metaCode.writeln('''
-          read: (json, entity, value) => entity.copyWith($fieldName: CopyWith(value as $fieldType?), json: json),
+          read: (json, entity, value) => entity.copyWith(
+            $fieldName: CopyWith(value as $fieldType?), 
+            json: json,
+          ),
         );
     ''');
           }
@@ -630,7 +637,8 @@ mixin ${className}Migrations on Entity<$className, ${className}Meta> {
   bool createTableAt(int newVersion) {
     return switch (newVersion) {
     /// replace dbVersion with the version number this entity was introduced.
-    /// remember to update dbVersion to this version in your OrmManager instance 
+    /// remember to update dbVersion to this version
+    /// in your OrmManager instance 
     // TODO(dev): replace _dbVersion with number
       _dbVersion => true,
       _ => false,
@@ -644,7 +652,9 @@ mixin ${className}Migrations on Entity<$className, ${className}Meta> {
     };
   }
   @override
-  List<ColumnDefinition<$className, dynamic>> addColumnsAt(int newVersion) {
+  List<ColumnDefinition<$className, dynamic>> addColumnsAt(
+    int newVersion,
+  ) {
     return switch (newVersion) {
       _ => [],
     };

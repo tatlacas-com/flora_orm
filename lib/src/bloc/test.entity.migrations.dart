@@ -20,7 +20,9 @@ mixin TestEntityMigrations on Entity<TestEntity, TestEntityMeta> {
   }
 
   @override
-  List<ColumnDefinition<TestEntity, dynamic>> addColumnsAt(int newVersion) {
+  List<ColumnDefinition<TestEntity, dynamic>> addColumnsAt(
+    int newVersion,
+  ) {
     return switch (newVersion) {
       _ => [],
     };

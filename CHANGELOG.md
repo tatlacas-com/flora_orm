@@ -1,4 +1,8 @@
 
+## 2.0.27
+
+* formatting updates
+
 ## 2.0.26
 
 * refactor code generation - fix analysis issues

@@ -362,7 +362,9 @@ mixin UserEntityMigrations on Entity<UserEntity, UserEntityMeta> {
   }
 
   @override
-  List<ColumnDefinition<UserEntity, dynamic>> addColumnsAt(int newVersion) {
+  List<ColumnDefinition<UserEntity, dynamic>> addColumnsAt(
+    int newVersion,
+  ) {
     return switch (newVersion) {
         /// Here we are saying we added property 
         /// named provider when we set dbVersion = 2.

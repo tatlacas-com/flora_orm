@@ -17,7 +17,9 @@ mixin UserEntityMigrations on Entity<UserEntity, UserEntityMeta> {
   }
 
   @override
-  List<ColumnDefinition<UserEntity, dynamic>> addColumnsAt(int newVersion) {
+  List<ColumnDefinition<UserEntity, dynamic>> addColumnsAt(
+    int newVersion,
+  ) {
     return switch (newVersion) {
       _ => [],
     };
