@@ -1,6 +1,6 @@
+import 'package:flora_orm/flora_orm.dart';
 import 'package:flora_orm/src/bloc/test.entity.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flora_orm/flora_orm.dart';
 
 import 'sql_storage_test_runs.dart';
 
@@ -11,14 +11,14 @@ void main() {
       dbVersion: 4,
       engine: DbEngine.inMemory,
       dbName: 'common_storage_db.db',
-      tables: <Entity>[
-        const TestEntity(),
+      tables: const <Entity>[
+        TestEntity(),
       ],
     );
 
     group('Test Engine', () {
-      TestEntityOrm storage = orm.getStorage(const TestEntity());
-      run('Test engine', storage);
+      final storage = orm.getStorage(const TestEntity());
+      run('Test engine', storage as TestEntityOrm);
     });
     group('Test Db upgrade', () {
       setUp(() async {
@@ -45,12 +45,16 @@ void main() {
     });
 
     test('getDbFullName() should throw UnimplementedError', () {
-      expect(() async => await orm.dbContext.getDbFullName(),
-          throwsA(const TypeMatcher<UnimplementedError>()));
+      expect(
+        () async => orm.dbContext.getDbFullName(),
+        throwsA(const TypeMatcher<UnimplementedError>()),
+      );
     });
     test('getDbPath() should throw UnimplementedError', () {
-      expect(() async => await orm.dbContext.getDbPath(),
-          throwsA(const TypeMatcher<UnimplementedError>()));
+      expect(
+        () async => orm.dbContext.getDbPath(),
+        throwsA(const TypeMatcher<UnimplementedError>()),
+      );
     });
   });
 }

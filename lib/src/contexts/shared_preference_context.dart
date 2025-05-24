@@ -12,7 +12,7 @@ class SharedPreferenceContext<TEntity extends IEntity>
   SharedPreferenceContext<TEntity> copyWith({
     String? dbName,
     int? dbVersion,
-    List<IEntity>? tables,
+    List<TEntity>? tables,
   }) {
     return SharedPreferenceContext<TEntity>(
       dbName: dbName ?? this.dbName,

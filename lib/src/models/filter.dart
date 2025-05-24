@@ -1,13 +1,13 @@
 import 'package:equatable/equatable.dart';
+import 'package:flora_orm/src/models/column_definition.dart';
+import 'package:flora_orm/src/models/entity.dart';
+import 'package:flora_orm/src/models/filter_condition.dart';
+import 'package:flora_orm/src/models/orm_condition.dart';
 
-import 'column_definition.dart';
-import 'orm_condition.dart';
-import 'filter_condition.dart';
-
-class Filter extends Equatable {
+class Filter<TEntity extends IEntity> extends Equatable {
   /// [openGroup] adds left bracket, [closeGroup] adds right bracket
   Filter(
-    ColumnDefinition? column, {
+    ColumnDefinition<TEntity, dynamic>? column, {
     OrmCondition condition = OrmCondition.equalTo,
     dynamic value,
     dynamic secondaryValue,
@@ -25,7 +25,7 @@ class Filter extends Equatable {
           secondaryValue: secondaryValue,
           openGroup: openGroup,
           closeGroup: closeGroup,
-        )
+        ),
       ];
     } else {
       this.filters = filters;
@@ -37,13 +37,14 @@ class Filter extends Equatable {
 
   factory Filter.startGroup() {
     return Filter._(
-        filters: [const FilterCondition(openGroup: true, isForGrouping: true)]
-            .toList());
+      filters: [const FilterCondition(openGroup: true, isForGrouping: true)]
+          .toList(),
+    );
   }
   late final List<FilterCondition> filters;
 
   FilterCondition _addFilter(
-    ColumnDefinition column, {
+    ColumnDefinition<TEntity, dynamic> column, {
     OrmCondition condition = OrmCondition.equalTo,
     dynamic value,
     dynamic secondaryValue,
@@ -67,80 +68,97 @@ class Filter extends Equatable {
   }
 
   Filter startGroup() {
-    return Filter(null, filters: [
-      ...filters,
-      const FilterCondition(openGroup: true, isForGrouping: true)
-    ]);
+    return Filter(
+      null,
+      filters: [
+        ...filters,
+        const FilterCondition(openGroup: true, isForGrouping: true),
+      ],
+    );
   }
 
   Filter endGroup() {
-    return Filter(null, filters: [
-      ...filters,
-      const FilterCondition(closeGroup: true, isForGrouping: true)
-    ]);
+    return Filter(
+      null,
+      filters: [
+        ...filters,
+        const FilterCondition(closeGroup: true, isForGrouping: true),
+      ],
+    );
   }
 
-  Filter and(ColumnDefinition column,
-      {OrmCondition condition = OrmCondition.equalTo,
-      dynamic value,
-      dynamic secondaryValue,
-      bool openGroup = false,
-      bool closeGroup = false}) {
-    return Filter(null, filters: [
-      ...filters,
-      _addFilter(
-        column,
-        condition: condition,
-        value: value,
-        secondaryValue: secondaryValue,
-        openGroup: openGroup,
-        closeGroup: closeGroup,
-        and: true,
-      )
-    ]);
+  Filter and(
+    ColumnDefinition<TEntity, dynamic> column, {
+    OrmCondition condition = OrmCondition.equalTo,
+    dynamic value,
+    dynamic secondaryValue,
+    bool openGroup = false,
+    bool closeGroup = false,
+  }) {
+    return Filter(
+      null,
+      filters: [
+        ...filters,
+        _addFilter(
+          column,
+          condition: condition,
+          value: value,
+          secondaryValue: secondaryValue,
+          openGroup: openGroup,
+          closeGroup: closeGroup,
+          and: true,
+        ),
+      ],
+    );
   }
 
   Filter filter(
-    ColumnDefinition column, {
+    ColumnDefinition<TEntity, dynamic> column, {
     OrmCondition condition = OrmCondition.equalTo,
     dynamic value,
     dynamic secondaryValue,
     bool openGroup = false,
     bool closeGroup = false,
   }) {
-    return Filter(null, filters: [
-      ...filters,
-      _addFilter(
-        column,
-        condition: condition,
-        value: value,
-        secondaryValue: secondaryValue,
-        openGroup: openGroup,
-        closeGroup: closeGroup,
-      )
-    ]);
+    return Filter(
+      null,
+      filters: [
+        ...filters,
+        _addFilter(
+          column,
+          condition: condition,
+          value: value,
+          secondaryValue: secondaryValue,
+          openGroup: openGroup,
+          closeGroup: closeGroup,
+        ),
+      ],
+    );
   }
 
   Filter or(
-    ColumnDefinition column, {
+    ColumnDefinition<TEntity, dynamic> column, {
     OrmCondition condition = OrmCondition.equalTo,
     dynamic value,
     dynamic secondaryValue,
     bool openGroup = false,
     bool closeGroup = false,
   }) {
-    return Filter(null, filters: [
-      ...filters,
-      _addFilter(
-        column,
-        condition: condition,
-        value: value,
-        secondaryValue: secondaryValue,
-        openGroup: openGroup,
-        closeGroup: closeGroup,
-        or: true,
-      )
-    ]);
+    return Filter(
+      null,
+      filters: [
+        ...filters,
+        _addFilter(
+          column,
+          condition: condition,
+          value: value,
+          secondaryValue: secondaryValue,
+          openGroup: openGroup,
+          closeGroup: closeGroup,
+          or: true,
+        ),
+      ],
+    );
   }
 
   @override

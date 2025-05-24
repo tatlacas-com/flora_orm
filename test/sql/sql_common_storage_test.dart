@@ -1,14 +1,14 @@
 import 'package:flora_orm/flora_orm.dart';
 import 'package:flora_orm/src/bloc/test.entity.dart';
+import 'package:flora_orm/src/open_options.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sqlite_api.dart';
-import 'package:flora_orm/src/open_options.dart';
 
 import 'sql_storage_test_runs.dart';
 
-clearDb(Database database) {}
+void clearDb(Database database) {}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -26,12 +26,12 @@ void main() {
       dbVersion: 4,
       engine: DbEngine.sqfliteCommon,
       dbName: 'common_storage_db.db',
-      tables: <Entity>[
-        const TestEntity(),
+      tables: const <Entity>[
+        TestEntity(),
       ],
     );
 
-    TestEntityOrm storage = orm.getStorage(const TestEntity());
+    final storage = orm.getStorage(const TestEntity());
 
     /* test('drop database', () async {
       var database = await orm.dbContext.database;
@@ -51,12 +51,14 @@ void main() {
     }); */
 
     test('SqfliteOpenDatabaseOptions', () async {
-      var options = SqfliteOpenDatabaseOptions(version: 1);
-      expect(options.toString(),
-          '{version: 1, readOnly: false, singleInstance: true}');
+      final options = SqfliteOpenDatabaseOptions(version: 1);
+      expect(
+        options.toString(),
+        '{version: 1, readOnly: false, singleInstance: true}',
+      );
     });
 
-    run('Test engine', storage);
+    run('Test engine', storage as TestEntityOrm);
 
     group('Test Db upgrade', () {
       setUp(() async {

@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
+import 'package:flora_orm/src/models/column_definition_extension.dart';
+import 'package:flora_orm/src/models/orm.dart';
 import 'package:meta/meta.dart';
-import 'orm.dart';
-import 'column_definition_extension.dart';
 
 abstract class IEntity {
   const IEntity({
@@ -35,10 +35,6 @@ abstract class IEntity {
 
   bool createTableAt(int newVersion);
 
-  String addColumn(ColumnDefinition column);
-
-  List<ColumnDefinition> addColumnsAt(int newVersion);
-
   List<String> recreateTable(int newVersion);
 
   List<String> downgradeTable(int oldVersion, int newVersion);
@@ -55,9 +51,6 @@ abstract class IEntity {
 
   Map<String, dynamic> toDb();
 
-  Map<String, dynamic> toStorageJson(
-      {required Map<ColumnDefinition, dynamic> columnValues});
-
   IEntity load(Map<String, dynamic> json);
 }
 
@@ -66,12 +59,12 @@ abstract class EntityMeta<TEntity extends IEntity> {
   String get tableName;
 
   Iterable<ColumnDefinition<TEntity, dynamic>> get columns;
-  ColumnDefinition<IEntity, String> get id;
-  ColumnDefinition<IEntity, String> get collectionId;
+  ColumnDefinition<TEntity, String> get id;
+  ColumnDefinition<TEntity, String> get collectionId;
 
-  ColumnDefinition<IEntity, DateTime> get createdAt;
+  ColumnDefinition<TEntity, DateTime> get createdAt;
 
-  ColumnDefinition<IEntity, DateTime> get updatedAt;
+  ColumnDefinition<TEntity, DateTime> get updatedAt;
 }
 
 abstract class Entity<TEntity extends IEntity,
@@ -103,8 +96,8 @@ abstract class Entity<TEntity extends IEntity,
   @override
   String toString() => indentedString({runtimeType.toString(): toMap()});
 
-  String indentedString(json) {
-    var encoder = const JsonEncoder.withIndent('     ');
+  String indentedString(dynamic json) {
+    const encoder = JsonEncoder.withIndent('     ');
     return encoder.convert(json);
   }
 
@@ -123,7 +116,7 @@ abstract class Entity<TEntity extends IEntity,
   @override
   TEntity updateDates({DateTime? createdAt}) {
     createdAt ??= this.createdAt ?? DateTime.now().toUtc();
-    var updatedAt = DateTime.now().toUtc();
+    final updatedAt = DateTime.now().toUtc();
     return copyWith(
       createdAt: createdAt,
       updatedAt: updatedAt,
@@ -132,8 +125,8 @@ abstract class Entity<TEntity extends IEntity,
 
   @override
   Map<String, dynamic> toMap() {
-    Map<String, dynamic> map = {};
-    for (var column in meta.columns) {
+    final map = <String, dynamic>{};
+    for (final column in meta.columns) {
       column.commitValue(this as TEntity, map);
     }
     return map;
@@ -141,8 +134,8 @@ abstract class Entity<TEntity extends IEntity,
 
   @override
   Map<String, dynamic> toDb() {
-    Map<String, dynamic> map = {};
-    for (var column in meta.columns) {
+    final map = <String, dynamic>{};
+    for (final column in meta.columns) {
       column.commitValue(this as TEntity, map);
     }
     return map;
@@ -151,8 +144,8 @@ abstract class Entity<TEntity extends IEntity,
   ///Reads the values from database and set the corresponding values
   @override
   TEntity load(Map<String, dynamic> json) {
-    TEntity entity = this as TEntity;
-    for (var column in meta.columns) {
+    var entity = this as TEntity;
+    for (final column in meta.columns) {
       final value = column.getValueFrom(json);
       if (column is ColumnDefinition<TEntity, double> && value is int) {
         entity = column.read(json, entity, value.toDouble());
@@ -172,15 +165,14 @@ abstract class Entity<TEntity extends IEntity,
     ];
   }
 
-  @override
-  List<ColumnDefinition> addColumnsAt(int newVersion);
+  List<ColumnDefinition<TEntity, dynamic>> addColumnsAt(int newVersion);
 
   @override
   @nonVirtual
   String createTable(int version) {
-    int indx = 1;
-    StringBuffer stringBuffer = StringBuffer();
-    for (var element in meta.columns) {
+    var indx = 1;
+    final stringBuffer = StringBuffer();
+    for (final element in meta.columns) {
       stringBuffer
           .write('${element.name} ${getColumnType(element.columnType)}');
       columnDefinition(element, stringBuffer);
@@ -189,8 +181,8 @@ abstract class Entity<TEntity extends IEntity,
 
     var composite = '';
     if (compositePrimaryKey.isNotEmpty) {
-      bool firstItem = true;
-      var keys = compositePrimaryKey.fold('', (prev, element) {
+      var firstItem = true;
+      final keys = compositePrimaryKey.fold('', (prev, element) {
         var cm = ', ';
         if (firstItem) {
           cm = '';
@@ -202,7 +194,7 @@ abstract class Entity<TEntity extends IEntity,
     }
     return '''
   CREATE TABLE IF NOT EXISTS ${meta.tableName} (
-  ${stringBuffer.toString()}$composite)
+  $stringBuffer$composite)
   ''';
   }
 
@@ -212,21 +204,21 @@ abstract class Entity<TEntity extends IEntity,
     return 'DROP TABLE IF EXISTS $tableName';
   }
 
-  @override
-  Map<String, dynamic> toStorageJson(
-      {required Map<ColumnDefinition, dynamic> columnValues}) {
-    Map<String, dynamic> map = {};
+  Map<String, dynamic> toStorageJson({
+    required Map<ColumnDefinition<TEntity, dynamic>, dynamic> columnValues,
+  }) {
+    final map = <String, dynamic>{};
     columnValues.forEach((key, value) {
       key.setValue(map, value);
     });
     return map;
   }
 
-  @override
-  String addColumn(ColumnDefinition column) {
-    var str = StringBuffer();
+  String addColumn(ColumnDefinition<TEntity, dynamic> column) {
+    final str = StringBuffer();
     columnDefinition(column, str);
-    return 'ALTER TABLE ${meta.tableName} ADD ${column.name} ${getColumnType(column.columnType)}${str.toString()}';
+    return 'ALTER TABLE ${meta.tableName} ADD ${column.name} '
+        '${getColumnType(column.columnType)}$str';
   }
 
   @protected
@@ -246,31 +238,37 @@ abstract class Entity<TEntity extends IEntity,
   }
 
   @protected
-  void columnDefinition(ColumnDefinition element, StringBuffer stringBuffer) {
+  void columnDefinition(
+    ColumnDefinition<TEntity, dynamic> element,
+    StringBuffer stringBuffer,
+  ) {
     if (element.primaryKey) stringBuffer.write(' PRIMARY KEY');
     if (element.autoIncrementPrimary) stringBuffer.write(' AUTOINCREMENT');
     if (element.unique) stringBuffer.write(' UNIQUE');
     if (element.notNull) stringBuffer.write(' NOT NULL');
     if (element.defaultValue != null) {
       stringBuffer.write(
-          ' DEFAULT ${generateDefaultValue(colType: element.columnType, defaultValue: element.defaultValue)}');
+        ' DEFAULT ${generateDefaultValue(
+          colType: element.columnType,
+          defaultValue: element.defaultValue,
+        )}',
+      );
     }
   }
 
-  dynamic generateDefaultValue(
-      {required ColumnType colType, required dynamic defaultValue}) {
-    switch (colType) {
-      case ColumnType.text:
-        return "'$defaultValue'";
-      case ColumnType.boolean:
-        if (defaultValue is bool) {
-          return defaultValue ? 1 : 0;
-        }
-        break;
-      default:
-        break;
-    }
-    return defaultValue;
+  dynamic generateDefaultValue({
+    required ColumnType colType,
+    required dynamic defaultValue,
+  }) {
+    return switch (colType) {
+      ColumnType.text => "'$defaultValue'",
+      ColumnType.boolean =>
+        (defaultValue is bool) ? (defaultValue ? 1 : 0) : defaultValue,
+      ColumnType.integer => defaultValue,
+      ColumnType.real => defaultValue,
+      ColumnType.blob => defaultValue,
+      ColumnType.dateTime => defaultValue,
+    };
   }
 
   @override

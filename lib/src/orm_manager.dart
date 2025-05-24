@@ -2,21 +2,20 @@
 import 'dart:io';
 
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-
 import 'package:flora_orm/engines/shared_preference_engine.dart';
 import 'package:flora_orm/engines/sqflite_common_engine.dart';
 import 'package:flora_orm/engines/sqflite_in_memory_engine.dart';
 import 'package:flora_orm/engines/sqflite_storage.dart';
 import 'package:flora_orm/flora_orm.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class OrmManager extends Equatable {
   OrmManager({
-    DbEngine engine = DbEngine.sqflite,
     required int dbVersion,
     required String dbName,
     required List<IEntity> tables,
-  }) : _engine = engine {
+    DbEngine engine = DbEngine.sqflite,
+  }) {
     if (kIsWeb && !engine.suppportsWeb) {
       engine = DbEngine.sharedPreferences;
     } else if (Platform.isWindows && !engine.suppportsWindows) {
@@ -26,7 +25,8 @@ class OrmManager extends Equatable {
     } else if (Platform.isMacOS && !engine.suppportsLinux) {
       engine = DbEngine.sqfliteCommon;
     }
-    dbContext = switch (engine) {
+    _engine = engine;
+    dbContext = switch (_engine) {
       DbEngine.inMemory => SqfliteInMemoryDbContext(
           dbVersion: dbVersion,
           dbName: dbName,
@@ -50,11 +50,14 @@ class OrmManager extends Equatable {
     };
   }
   late final DbContext dbContext;
-  final DbEngine _engine;
+
+  late final DbEngine _engine;
+  DbEngine get engine => _engine;
 
   OrmEngine<TEntity, TMeta, DbContext<TEntity>>
       getStorage<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>>(
-          TEntity t) {
+    TEntity t,
+  ) {
     return switch (dbContext) {
       SharedPreferenceContext() =>
         SharedPreferenceEngine<TEntity, TMeta>(t, dbContext: dbContext),
@@ -70,7 +73,9 @@ class OrmManager extends Equatable {
   }
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [
+        _engine,
+      ];
 
   OrmManager copyWith({
     DbEngine? engine,

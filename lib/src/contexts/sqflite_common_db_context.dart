@@ -1,10 +1,9 @@
+import 'package:flora_orm/flora_orm.dart';
+import 'package:flora_orm/src/contexts/base_context.dart';
+import 'package:flora_orm/src/open_options.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-
-import '../../flora_orm.dart';
-import 'base_context.dart';
-import '../open_options.dart';
 
 class SqfliteCommonDbContext<TEntity extends IEntity>
     extends BaseContext<TEntity> {
@@ -17,7 +16,7 @@ class SqfliteCommonDbContext<TEntity extends IEntity>
   SqfliteCommonDbContext<TEntity> copyWith({
     String? dbName,
     int? dbVersion,
-    List<IEntity>? tables,
+    List<TEntity>? tables,
   }) {
     return SqfliteCommonDbContext<TEntity>(
       dbName: dbName ?? this.dbName,
@@ -40,7 +39,7 @@ class SqfliteCommonDbContext<TEntity extends IEntity>
   Future<Database> open() async {
     sqfliteFfiInit();
 
-    var databaseFactory = databaseFactoryFfi;
+    final databaseFactory = databaseFactoryFfi;
     return databaseFactory.openDatabase(
       await getDbFullName(),
       options: SqfliteOpenDatabaseOptions(

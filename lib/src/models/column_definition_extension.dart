@@ -1,5 +1,5 @@
-import 'entity.dart';
-import 'column_definition.dart';
+import 'package:flora_orm/src/models/column_definition.dart';
+import 'package:flora_orm/src/models/entity.dart';
 
 extension ColumnDefinitionExtension<TEntity extends IEntity, TType>
     on ColumnDefinition<TEntity, TType> {

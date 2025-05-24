@@ -1,14 +1,14 @@
 import 'package:flora_orm/src/engines/isolates/db_value.isolate.dart';
 import 'package:flora_orm/src/engines/isolates/get_condition.isolate.dart';
 import 'package:flora_orm/src/models/entity.dart';
+import 'package:flora_orm/src/models/filter.dart';
 import 'package:flora_orm/src/models/formatted_query.dart';
 import 'package:flora_orm/src/models/orm_condition.dart';
-import 'package:flora_orm/src/models/filter.dart';
 
 FormattedQuery getWhereString<TEntity extends IEntity>(Filter filter) {
-  StringBuffer stringBuffer = StringBuffer();
+  final stringBuffer = StringBuffer();
   final whereArgs = <dynamic>[];
-  for (var element in filter.filters) {
+  for (final element in filter.filters) {
     if (element.isForGrouping) {
       if (element.openGroup) stringBuffer.write('(');
       if (element.closeGroup) stringBuffer.write(')');
@@ -21,8 +21,9 @@ FormattedQuery getWhereString<TEntity extends IEntity>(Filter filter) {
     }
     if (element.openGroup) stringBuffer.write('(');
 
-    stringBuffer.write(element.column!.name);
-    stringBuffer.write(getCondition(element.condition));
+    stringBuffer
+      ..write(element.column!.name)
+      ..write(getCondition(element.condition));
     if (element.condition != OrmCondition.isNull &&
         element.condition != OrmCondition.notNull) {
       if ((element.condition == OrmCondition.isIn ||

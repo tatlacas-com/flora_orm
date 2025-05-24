@@ -1,4 +1,4 @@
-const column = OrmColumn();
+const column = OrmColumn<dynamic>();
 const entity = OrmEntity();
 
 /// Supported types:

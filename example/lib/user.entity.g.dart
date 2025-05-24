@@ -12,7 +12,7 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
   @override
   UserEntityMeta get meta => _meta;
 
-  UserEntity readTestEnum(Map<String, dynamic> json, value) {
+  UserEntity readTestEnum(Map<String, dynamic> json, dynamic value) {
     TestEnum? item;
     if (value != null) {
       item = <TestEnum?>[...TestEnum.values].firstWhere(
@@ -24,7 +24,7 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
     );
   }
 
-  UserEntity readTestEnum2(Map<String, dynamic> json, value) {
+  UserEntity readTestEnum2(Map<String, dynamic> json, dynamic value) {
     TestEnum? item;
     if (value != null) {
       item = <TestEnum?>[...TestEnum.values].firstWhere(
@@ -36,11 +36,11 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
     );
   }
 
-  UserEntity readReactionsCounts(Map<String, dynamic> json, value) {
+  UserEntity readReactionsCounts(Map<String, dynamic> json, dynamic value) {
     Map<String, int>? item;
     if (value != null) {
       Map<String, dynamic> map =
-          value is Map<String, dynamic> ? value : jsonDecode(value);
+          value is Map<String, dynamic> ? value : jsonDecode(value as String);
       item = map.cast();
     }
     return copyWith(
@@ -108,7 +108,8 @@ class UserEntityMeta extends EntityMeta<UserEntity> {
         'id',
         primaryKey: true,
         write: (entity) => entity.id,
-        read: (json, entity, value) => entity.copyWith(id: value, json: json),
+        read: (json, entity, value) =>
+            entity.copyWith(id: value as String?, json: json),
       );
 
   @override
@@ -117,7 +118,7 @@ class UserEntityMeta extends EntityMeta<UserEntity> {
         'collectionId',
         write: (entity) => entity.collectionId,
         read: (json, entity, value) =>
-            entity.copyWith(collectionId: value, json: json),
+            entity.copyWith(collectionId: value as String?, json: json),
       );
 
   @override
@@ -126,7 +127,7 @@ class UserEntityMeta extends EntityMeta<UserEntity> {
         'createdAt',
         write: (entity) => entity.createdAt,
         read: (json, entity, value) =>
-            entity.copyWith(createdAt: value, json: json),
+            entity.copyWith(createdAt: value as DateTime?, json: json),
       );
 
   @override
@@ -135,7 +136,7 @@ class UserEntityMeta extends EntityMeta<UserEntity> {
         'updatedAt',
         write: (entity) => entity.updatedAt,
         read: (json, entity, value) =>
-            entity.copyWith(updatedAt: value, json: json),
+            entity.copyWith(updatedAt: value as DateTime?, json: json),
       );
 
   ColumnDefinition<UserEntity, String> get firstName =>
@@ -143,7 +144,7 @@ class UserEntityMeta extends EntityMeta<UserEntity> {
         'firstName',
         write: (entity) => entity.firstName,
         read: (json, entity, value) =>
-            entity.copyWith(firstName: CopyWith(value), json: json),
+            entity.copyWith(firstName: CopyWith(value as String?), json: json),
       );
 
   ColumnDefinition<UserEntity, String> get lastName =>
@@ -151,7 +152,7 @@ class UserEntityMeta extends EntityMeta<UserEntity> {
         'lastName',
         write: (entity) => entity.lastName,
         read: (json, entity, value) =>
-            entity.copyWith(lastName: CopyWith(value), json: json),
+            entity.copyWith(lastName: CopyWith(value as String?), json: json),
       );
 
   ColumnDefinition<UserEntity, String> get testEnum =>

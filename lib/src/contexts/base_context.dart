@@ -1,9 +1,8 @@
 import 'dart:async';
 
+import 'package:flora_orm/flora_orm.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite_common/sqlite_api.dart';
-
-import '../../flora_orm.dart';
 
 abstract class BaseContext<TEntity extends IEntity> extends DbContext<TEntity> {
   BaseContext({
@@ -24,7 +23,7 @@ abstract class BaseContext<TEntity extends IEntity> extends DbContext<TEntity> {
   }
 
   @override
-  Future close() async {
+  Future<void> close() async {
     await _database?.close();
     _database = null;
   }
@@ -40,32 +39,38 @@ abstract class BaseContext<TEntity extends IEntity> extends DbContext<TEntity> {
   }
 
   FutureOr<void> onDbDowngrade(
-      Database db, int oldVersion, int newVersion) async {
+    Database db,
+    int oldVersion,
+    int newVersion,
+  ) async {
     // Run the CREATE TABLE statement on the database.
     await db.transaction((txn) async {
-      var batch = txn.batch();
-      List<String> allQueries = [];
-      for (var element in tables) {
+      final batch = txn.batch();
+      final allQueries = <String>[];
+      for (final element in tables) {
         final queries = element.downgradeTable(oldVersion, newVersion);
         if (queries.isNotEmpty == true) {
           allQueries.addAll(queries);
-          for (var query in queries) {
+          for (final query in queries) {
             batch.execute(query);
           }
         }
       }
       await batch.commit(noResult: true);
-      _logBatchResult('onDbDowngrade', allQueries,
-          'Database downgraded from $oldVersion to $newVersion');
+      _logBatchResult(
+        'onDbDowngrade',
+        allQueries,
+        'Database downgraded from $oldVersion to $newVersion',
+      );
     });
     await db.transaction((txn) async {
-      var batch = txn.batch();
-      List<String> allQueries = [];
-      for (var element in tables) {
+      final batch = txn.batch();
+      final allQueries = <String>[];
+      for (final element in tables) {
         final queries = element.onDowngradeComplete(oldVersion, newVersion);
         if (queries.isNotEmpty == true) {
           allQueries.addAll(queries);
-          for (var query in queries) {
+          for (final query in queries) {
             batch.execute(query);
           }
         }
@@ -76,23 +81,34 @@ abstract class BaseContext<TEntity extends IEntity> extends DbContext<TEntity> {
   }
 
   List<String> _upgradeQueries(
-      IEntity element, int oldVersion, int newVersion) {
-    List<String> allQueries = [];
-    List<ColumnDefinition> columns = [];
-    while (++oldVersion < newVersion) {
-      columns.addAll(element.addColumnsAt(oldVersion));
+    TEntity element,
+    int oldVersion,
+    int newVersion,
+  ) {
+    if (element is! Entity) {
+      return [];
     }
-    columns.addAll(element.addColumnsAt(newVersion));
-    allQueries.addAll(columns.map(
-      (column) => element.addColumn(column),
-    ));
-    allQueries.addAll(element.additionalUpgradeQueries(oldVersion, newVersion));
+    final allQueries = <String>[];
+    final columns = <ColumnDefinition<TEntity, dynamic>>[];
+    var old = oldVersion;
+    while (++old < newVersion) {
+      columns.addAll(element.addColumnsAt(old).cast());
+    }
+    columns.addAll(element.addColumnsAt(newVersion).cast());
+    allQueries
+      ..addAll(
+        columns.map(
+          (column) => element.addColumn(column),
+        ),
+      )
+      ..addAll(element.additionalUpgradeQueries(old, newVersion));
     return allQueries;
   }
 
   bool _recreateOn(IEntity element, int oldVersion, int newVersion) {
-    while (++oldVersion < newVersion) {
-      if (element.recreateTableAt(oldVersion)) {
+    var old = oldVersion;
+    while (++old < newVersion) {
+      if (element.recreateTableAt(old)) {
         return true;
       }
     }
@@ -100,8 +116,9 @@ abstract class BaseContext<TEntity extends IEntity> extends DbContext<TEntity> {
   }
 
   bool _createOn(IEntity element, int oldVersion, int newVersion) {
-    while (++oldVersion < newVersion) {
-      if (element.createTableAt(oldVersion)) {
+    var old = oldVersion;
+    while (++old < newVersion) {
+      if (element.createTableAt(old)) {
         return true;
       }
     }
@@ -109,13 +126,16 @@ abstract class BaseContext<TEntity extends IEntity> extends DbContext<TEntity> {
   }
 
   FutureOr<void> onDbUpgrade(
-      Database db, int oldVersion, int newVersion) async {
+    Database db,
+    int oldVersion,
+    int newVersion,
+  ) async {
     // Run the CREATE TABLE statement on the database.
     await db.transaction((txn) async {
-      var batch = txn.batch();
+      final batch = txn.batch();
       var upgradeQueriesFound = false;
-      List<String> allQueries = [];
-      for (var element in tables) {
+      final allQueries = <String>[];
+      for (final element in tables) {
         final queries = _recreateOn(element, oldVersion, newVersion)
             ? element.recreateTable(newVersion)
             : _createOn(element, oldVersion, newVersion)
@@ -124,27 +144,32 @@ abstract class BaseContext<TEntity extends IEntity> extends DbContext<TEntity> {
         if (queries.isNotEmpty == true) {
           allQueries.addAll(queries);
           upgradeQueriesFound = true;
-          for (var query in queries) {
+          for (final query in queries) {
             batch.execute(query);
           }
         }
       }
       if (!upgradeQueriesFound && kDebugMode) {
         throw ArgumentError(
-            'No Upgrade queries found. If you added new entities, make sure they are also added to OrmManager.tables');
+          'No Upgrade queries found. If you added new entities, '
+          'make sure they are also added to OrmManager.tables',
+        );
       }
       await batch.commit(noResult: true);
-      _logBatchResult('onDbUpgrade', allQueries,
-          'Database upgraded from $oldVersion to $newVersion');
+      _logBatchResult(
+        'onDbUpgrade',
+        allQueries,
+        'Database upgraded from $oldVersion to $newVersion',
+      );
     });
     await db.transaction((txn) async {
-      var batch = txn.batch();
-      List<String> allQueries = [];
-      for (var element in tables) {
+      final batch = txn.batch();
+      final allQueries = <String>[];
+      for (final element in tables) {
         final queries = element.onUpgradeComplete(oldVersion, newVersion);
         if (queries.isNotEmpty == true) {
           allQueries.addAll(queries);
-          for (var query in queries) {
+          for (final query in queries) {
             batch.execute(query);
           }
         } else {}
@@ -158,8 +183,10 @@ abstract class BaseContext<TEntity extends IEntity> extends DbContext<TEntity> {
     if (res.isNotEmpty) {
       final title = 'SQFLITE $what';
       final titleSize = title.length + 5;
+      final paddingsCount = (titleSize < 78 ? (78 - titleSize) : 0);
       debugPrint(
-          '╔${'═' * 4} SQFLITE $what ${'═' * (titleSize < 78 ? (78 - titleSize) : 0)}╗');
+        '╔${'═' * 4} SQFLITE $what ${'═' * paddingsCount}╗',
+      );
       if (moreInfo != null) {
         _printMaxed(moreInfo);
       }
@@ -192,26 +219,29 @@ abstract class BaseContext<TEntity extends IEntity> extends DbContext<TEntity> {
   FutureOr<void> onDbCreate(Database db, int version) async {
     // Run the CREATE TABLE statement on the database.
     await db.transaction((txn) async {
-      var batch = txn.batch();
-      List<String> allQueries = [];
-      for (var element in tables) {
+      final batch = txn.batch();
+      final allQueries = <String>[];
+      for (final element in tables) {
         final query = element.createTable(version);
         allQueries.add(query);
         batch.execute(query);
       }
       await batch.commit(noResult: true);
 
-      _logBatchResult('onDbCreate', allQueries,
-          'Database tables created with version from $version');
+      _logBatchResult(
+        'onDbCreate',
+        allQueries,
+        'Database tables created with version from $version',
+      );
     });
     await db.transaction((txn) async {
-      var batch = txn.batch();
-      List<String> allQueries = [];
-      for (var element in tables) {
+      final batch = txn.batch();
+      final allQueries = <String>[];
+      for (final element in tables) {
         final queries = element.onCreateComplete(version);
         if (queries.isNotEmpty == true) {
           allQueries.addAll(queries);
-          for (var query in queries) {
+          for (final query in queries) {
             batch.execute(query);
           }
         }

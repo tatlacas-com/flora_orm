@@ -1,4 +1,4 @@
-import '../models/entity.dart';
+import 'package:flora_orm/src/models/entity.dart';
 
 abstract class DbContext<TEntity extends IEntity> {
   const DbContext({
@@ -8,7 +8,7 @@ abstract class DbContext<TEntity extends IEntity> {
   });
   final int dbVersion;
   final String dbName;
-  final List<IEntity> tables;
+  final List<TEntity> tables;
 
   Future<String> getDbPath();
 
@@ -16,5 +16,5 @@ abstract class DbContext<TEntity extends IEntity> {
 
   Future<int> getVersion();
 
-  Future close();
+  Future<void> close();
 }

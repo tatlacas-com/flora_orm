@@ -1,7 +1,7 @@
 import 'package:flora_orm/engines/shared_preference_engine.dart';
+import 'package:flora_orm/flora_orm.dart';
 import 'package:flora_orm/src/bloc/test.entity.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flora_orm/flora_orm.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'sql_storage_test_runs.dart';
@@ -17,8 +17,8 @@ class MockSharedPreferenceEngine<TEntity extends IEntity,
   Future<void> write(
       {required String key,
       required Map<String, dynamic> value,
-      Map<String, dynamic>? additionalData}) async {
-    Map<String, dynamic> items = await getItems() ?? {};
+      Map<String, dynamic>? additionalData,}) async {
+    final items = await getItems() ?? {};
     items[key] = value;
     _mockValues[t.tableName] = jsonEncode(items);
     SharedPreferences.setMockInitialValues(_mockValues);
@@ -35,8 +35,8 @@ void main() {
       dbVersion: 4,
       engine: DbEngine.sharedPreferences,
       dbName: 'common_storage_db.db',
-      tables: <Entity>[
-        const TestEntity(),
+      tables: const <Entity>[
+        TestEntity(),
       ],
     );
     run(
@@ -73,12 +73,12 @@ void main() {
 
     group('Test Unimplemented functions', () {
       test('getDbFullName() should throw UnimplementedError', () {
-        expect(() async => await orm.dbContext.getDbFullName(),
-            throwsA(const TypeMatcher<UnimplementedError>()));
+        expect(() async => orm.dbContext.getDbFullName(),
+            throwsA(const TypeMatcher<UnimplementedError>()),);
       });
       test('getDbPath() should throw UnimplementedError', () {
-        expect(() async => await orm.dbContext.getDbPath(),
-            throwsA(const TypeMatcher<UnimplementedError>()));
+        expect(() async => orm.dbContext.getDbPath(),
+            throwsA(const TypeMatcher<UnimplementedError>()),);
       });
     });
   });

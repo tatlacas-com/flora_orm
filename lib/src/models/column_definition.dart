@@ -1,13 +1,14 @@
 import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
-
-import 'entity.dart';
-import 'column_definition_extension.dart';
+import 'package:flora_orm/src/models/column_definition_extension.dart';
+import 'package:flora_orm/src/models/entity.dart';
 
 class ColumnDefinition<TEntity extends IEntity, TType> extends Equatable {
   ColumnDefinition(
     this.name, {
+    required this.write,
+    required this.read,
     this.alias,
     this.jsonEncodeAlias = false,
     this.primaryKey = false,
@@ -15,8 +16,6 @@ class ColumnDefinition<TEntity extends IEntity, TType> extends Equatable {
     this.autoIncrementPrimary = false,
     this.notNull = false,
     this.defaultValue,
-    required this.write,
-    required this.read,
   }) : _columnType = computeColumnType<TType>();
   final String name;
   final String? alias;
@@ -31,7 +30,10 @@ class ColumnDefinition<TEntity extends IEntity, TType> extends Equatable {
   final TType? defaultValue;
   final TType? Function(TEntity entity) write;
   final TEntity Function(
-      Map<String, dynamic> json, TEntity entity, dynamic value) read;
+    Map<String, dynamic> json,
+    TEntity entity,
+    dynamic value,
+  ) read;
 
   @override
   List<Object?> get props => [
@@ -43,12 +45,14 @@ class ColumnDefinition<TEntity extends IEntity, TType> extends Equatable {
         notNull,
         unique,
         _columnType,
-        defaultValue
+        defaultValue,
       ];
 
   @override
   String toString() =>
-      'StorageColumn<$TEntity, $TType> {name:$name, primaryKey:$primaryKey, autoIncrementPrimary:$autoIncrementPrimary, notNull:$notNull, unique:$unique, _columnType:$_columnType}';
+      'StorageColumn<$TEntity, $TType> {name:$name, primaryKey:$primaryKey, '
+      'autoIncrementPrimary:$autoIncrementPrimary, notNull:$notNull, '
+      'unique:$unique, _columnType:$_columnType}';
 
   static ColumnType computeColumnType<TType>() {
     if (TType == String) {
@@ -73,7 +77,7 @@ class ColumnDefinition<TEntity extends IEntity, TType> extends Equatable {
     }
     if (TType == bool) return (value == true || value == 1) as TType;
     if (TType == DateTime) {
-      var dt = value;
+      final dt = value as String?;
       if (dt != null) return DateTime.tryParse(dt) as TType;
       return null;
     }

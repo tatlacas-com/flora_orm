@@ -1,4 +1,8 @@
 
+## 2.0.26
+
+* refactor code generation - fix analysis issues
+
 ## 2.0.25
 
 * refactor enum type column generation

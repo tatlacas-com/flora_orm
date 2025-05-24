@@ -79,7 +79,8 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
         'id',
         primaryKey: true,
         write: (entity) => entity.id,
-        read: (json, entity, value) => entity.copyWith(id: value, json: json),
+        read: (json, entity, value) =>
+            entity.copyWith(id: value as String?, json: json),
       );
 
   @override
@@ -88,7 +89,7 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
         'collectionId',
         write: (entity) => entity.collectionId,
         read: (json, entity, value) =>
-            entity.copyWith(collectionId: value, json: json),
+            entity.copyWith(collectionId: value as String?, json: json),
       );
 
   @override
@@ -97,7 +98,7 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
         'createdAt',
         write: (entity) => entity.createdAt,
         read: (json, entity, value) =>
-            entity.copyWith(createdAt: value, json: json),
+            entity.copyWith(createdAt: value as DateTime?, json: json),
       );
 
   @override
@@ -106,7 +107,7 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
         'updatedAt',
         write: (entity) => entity.updatedAt,
         read: (json, entity, value) =>
-            entity.copyWith(updatedAt: value, json: json),
+            entity.copyWith(updatedAt: value as DateTime?, json: json),
       );
 
   ColumnDefinition<TestEntity, String> get testString =>
@@ -114,23 +115,27 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
         'testString',
         write: (entity) => entity.testString,
         read: (json, entity, value) =>
-            entity.copyWith(testString: CopyWith(value), json: json),
+            entity.copyWith(testString: CopyWith(value as String?), json: json),
       );
 
   ColumnDefinition<TestEntity, String> get testUpgrade =>
       ColumnDefinition<TestEntity, String>(
         'testUpgrade',
         write: (entity) => entity.testUpgrade,
-        read: (json, entity, value) =>
-            entity.copyWith(testUpgrade: CopyWith(value), json: json),
+        read: (json, entity, value) => entity.copyWith(
+          testUpgrade: CopyWith(value as String?),
+          json: json,
+        ),
       );
 
   ColumnDefinition<TestEntity, DateTime> get testDateTime =>
       ColumnDefinition<TestEntity, DateTime>(
         'testDateTime',
         write: (entity) => entity.testDateTime,
-        read: (json, entity, value) =>
-            entity.copyWith(testDateTime: CopyWith(value), json: json),
+        read: (json, entity, value) => entity.copyWith(
+          testDateTime: CopyWith(value as DateTime?),
+          json: json,
+        ),
       );
 
   ColumnDefinition<TestEntity, int> get testInt =>
@@ -138,15 +143,17 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
         'testInt',
         write: (entity) => entity.testInt,
         read: (json, entity, value) =>
-            entity.copyWith(testInt: CopyWith(value), json: json),
+            entity.copyWith(testInt: CopyWith(value as int?), json: json),
       );
 
   ColumnDefinition<TestEntity, int> get testIntWithDefault =>
       ColumnDefinition<TestEntity, int>(
         'testIntWithDefault',
         write: (entity) => entity.testIntWithDefault,
-        read: (json, entity, value) =>
-            entity.copyWith(testIntWithDefault: CopyWith(value), json: json),
+        read: (json, entity, value) => entity.copyWith(
+          testIntWithDefault: CopyWith(value as int?),
+          json: json,
+        ),
       );
 
   ColumnDefinition<TestEntity, bool> get testBool =>
@@ -154,7 +161,7 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
         'testBool',
         write: (entity) => entity.testBool,
         read: (json, entity, value) =>
-            entity.copyWith(testBool: CopyWith(value), json: json),
+            entity.copyWith(testBool: CopyWith(value as bool?), json: json),
       );
 
   ColumnDefinition<TestEntity, double> get testDouble =>
@@ -162,7 +169,7 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
         'testDouble',
         write: (entity) => entity.testDouble,
         read: (json, entity, value) =>
-            entity.copyWith(testDouble: CopyWith(value), json: json),
+            entity.copyWith(testDouble: CopyWith(value as double?), json: json),
       );
 
   @override

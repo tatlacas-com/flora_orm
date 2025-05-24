@@ -5,7 +5,8 @@ mixin TestEntityMigrations on Entity<TestEntity, TestEntityMeta> {
   bool createTableAt(int newVersion) {
     return switch (newVersion) {
       /// replace dbVersion with the version number this entity was introduced.
-      /// remember to update dbVersion to this version in your OrmManager instance
+      /// remember to update dbVersion to this version
+      /// in your OrmManager instance
       4 => true,
       _ => false,
     };
@@ -19,7 +20,7 @@ mixin TestEntityMigrations on Entity<TestEntity, TestEntityMeta> {
   }
 
   @override
-  List<ColumnDefinition> addColumnsAt(int newVersion) {
+  List<ColumnDefinition<TestEntity, dynamic>> addColumnsAt(int newVersion) {
     return switch (newVersion) {
       _ => [],
     };

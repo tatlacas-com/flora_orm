@@ -24,7 +24,7 @@ In VSCode click on __Settings__ icon then __Snippets__. Create new snippet then 
 		"    super.createdAt,",
 		"    super.updatedAt,",
 		"  });",
-		"  factory ${TM_FILENAME_BASE/^(.*)\\.entity$/${1:/pascalcase}/}Entity.fromMap(map) {",
+		"  factory ${TM_FILENAME_BASE/^(.*)\\.entity$/${1:/pascalcase}/}Entity.fromMap(Map<String, dynamic> map) {",
 		"    return const ${TM_FILENAME_BASE/^(.*)\\.entity$/${1:/pascalcase}/}Entity().load(map);",
 		"  }",
 		"${0://Press space then RUN `dart run build_runner build` from terminal.}",

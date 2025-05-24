@@ -1,8 +1,7 @@
 import 'package:flora_orm/flora_orm.dart';
+import 'package:flora_orm/src/contexts/base_context.dart';
+import 'package:flora_orm/src/open_options.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-
-import 'base_context.dart';
-import '../open_options.dart';
 
 class SqfliteInMemoryDbContext<TEntity extends IEntity>
     extends BaseContext<TEntity> {
@@ -15,7 +14,7 @@ class SqfliteInMemoryDbContext<TEntity extends IEntity>
   SqfliteInMemoryDbContext<TEntity> copyWith({
     String? dbName,
     int? dbVersion,
-    List<IEntity>? tables,
+    List<TEntity>? tables,
   }) {
     return SqfliteInMemoryDbContext<TEntity>(
       dbName: dbName ?? this.dbName,
@@ -29,7 +28,7 @@ class SqfliteInMemoryDbContext<TEntity extends IEntity>
     // Initialize FFI
     sqfliteFfiInit();
     // Change the default factory
-    var databaseFactory = databaseFactoryFfi;
+    final databaseFactory = databaseFactoryFfi;
 
     return databaseFactory.openDatabase(
       inMemoryDatabasePath,
