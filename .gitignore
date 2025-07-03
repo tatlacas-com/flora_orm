@@ -75,3 +75,6 @@ build/
 !**/ios/**/default.perspectivev3
 coverage/lcov.info
 .vscode/settings.json
+
+# FVM Version Cache
+.fvm/

@@ -22,7 +22,7 @@ void main() {
         return '.';
       });
     });
-    var orm = OrmManager(
+    var orm = OrmContext(
       dbVersion: 4,
       engine: DbEngine.sqfliteCommon,
       dbName: 'common_storage_db.db',
@@ -31,7 +31,7 @@ void main() {
       ],
     );
 
-    final storage = orm.getStorage(const TestEntity());
+    final dataSource = orm.getDataSource(const TestEntity());
 
     /* test('drop database', () async {
       var database = await orm.dbContext.database;
@@ -58,7 +58,7 @@ void main() {
       );
     });
 
-    run('Test engine', storage as TestEntityOrm);
+    run('Test engine', dataSource as TestEntityLocalDataSource);
 
     group('Test Db upgrade', () {
       setUp(() async {

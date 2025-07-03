@@ -39,7 +39,7 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
   UserEntity readReactionsCounts(Map<String, dynamic> json, dynamic value) {
     Map<String, int>? item;
     if (value != null) {
-      Map<String, dynamic> map =
+      final map =
           value is Map<String, dynamic> ? value : jsonDecode(value as String);
       item = map.cast();
     }
@@ -93,7 +93,7 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
     );
   }
 }
-typedef UserEntityOrm
+typedef UserEntityLocalDataSource
     = OrmEngine<UserEntity, UserEntityMeta, DbContext<UserEntity>>;
 
 class UserEntityMeta extends EntityMeta<UserEntity> {
@@ -143,16 +143,20 @@ class UserEntityMeta extends EntityMeta<UserEntity> {
       ColumnDefinition<UserEntity, String>(
         'firstName',
         write: (entity) => entity.firstName,
-        read: (json, entity, value) =>
-            entity.copyWith(firstName: CopyWith(value as String?), json: json),
+        read: (json, entity, value) => entity.copyWith(
+          firstName: CopyWith(value as String?),
+          json: json,
+        ),
       );
 
   ColumnDefinition<UserEntity, String> get lastName =>
       ColumnDefinition<UserEntity, String>(
         'lastName',
         write: (entity) => entity.lastName,
-        read: (json, entity, value) =>
-            entity.copyWith(lastName: CopyWith(value as String?), json: json),
+        read: (json, entity, value) => entity.copyWith(
+          lastName: CopyWith(value as String?),
+          json: json,
+        ),
       );
 
   ColumnDefinition<UserEntity, String> get testEnum =>

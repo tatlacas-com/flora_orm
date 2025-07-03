@@ -66,5 +66,5 @@ You can then begin adding your properties such as `@column`s.
 ```bash
 dart run build_runner build
 ```
-2. Update `dbVersion` in `OrmManager` - if you changed columns or added new Entity classes.
-3. **REGISTER** the new entity in `OrmManager`'s `tables: []`.
+2. Update `dbVersion` in `OrmContext` - if you changed columns or added new Entity classes.
+3. **REGISTER** the new entity in `OrmContext`'s `tables: []`.
