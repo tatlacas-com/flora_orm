@@ -31,7 +31,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   SharedPreferences.setMockInitialValues(_mockValues);
   group('Test Shared Preferences Storage', () {
-    var orm = OrmManager(
+    var orm = OrmContext(
       dbVersion: 4,
       engine: DbEngine.sharedPreferences,
       dbName: 'common_storage_db.db',

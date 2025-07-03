@@ -64,7 +64,7 @@ mixin _TestEntityMixin on Entity<TestEntity, TestEntityMeta> {
     );
   }
 }
-typedef TestEntityOrm
+typedef TestEntityLocalDataSource
     = OrmEngine<TestEntity, TestEntityMeta, DbContext<TestEntity>>;
 
 class TestEntityMeta extends EntityMeta<TestEntity> {
@@ -114,8 +114,10 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
       ColumnDefinition<TestEntity, String>(
         'testString',
         write: (entity) => entity.testString,
-        read: (json, entity, value) =>
-            entity.copyWith(testString: CopyWith(value as String?), json: json),
+        read: (json, entity, value) => entity.copyWith(
+          testString: CopyWith(value as String?),
+          json: json,
+        ),
       );
 
   ColumnDefinition<TestEntity, String> get testUpgrade =>
@@ -142,8 +144,10 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
       ColumnDefinition<TestEntity, int>(
         'testInt',
         write: (entity) => entity.testInt,
-        read: (json, entity, value) =>
-            entity.copyWith(testInt: CopyWith(value as int?), json: json),
+        read: (json, entity, value) => entity.copyWith(
+          testInt: CopyWith(value as int?),
+          json: json,
+        ),
       );
 
   ColumnDefinition<TestEntity, int> get testIntWithDefault =>
@@ -160,16 +164,20 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
       ColumnDefinition<TestEntity, bool>(
         'testBool',
         write: (entity) => entity.testBool,
-        read: (json, entity, value) =>
-            entity.copyWith(testBool: CopyWith(value as bool?), json: json),
+        read: (json, entity, value) => entity.copyWith(
+          testBool: CopyWith(value as bool?),
+          json: json,
+        ),
       );
 
   ColumnDefinition<TestEntity, double> get testDouble =>
       ColumnDefinition<TestEntity, double>(
         'testDouble',
         write: (entity) => entity.testDouble,
-        read: (json, entity, value) =>
-            entity.copyWith(testDouble: CopyWith(value as double?), json: json),
+        read: (json, entity, value) => entity.copyWith(
+          testDouble: CopyWith(value as double?),
+          json: json,
+        ),
       );
 
   @override

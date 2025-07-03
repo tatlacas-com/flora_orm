@@ -90,7 +90,7 @@ class EntityPropsGenerator extends GeneratorForAnnotation<OrmEntity> {
     );
     metaCode
       ..writeln('''
-typedef ${className}Orm
+typedef ${className}LocalDataSource
     = OrmEngine<$className, ${className}Meta, DbContext<$className>>;
 
 class ${className}Meta extends  EntityMeta<$className> {     
@@ -638,7 +638,7 @@ mixin ${className}Migrations on Entity<$className, ${className}Meta> {
     return switch (newVersion) {
     /// replace dbVersion with the version number this entity was introduced.
     /// remember to update dbVersion to this version
-    /// in your OrmManager instance 
+    /// in your OrmContext instance 
     // TODO(dev): replace _dbVersion with number
       _dbVersion => true,
       _ => false,

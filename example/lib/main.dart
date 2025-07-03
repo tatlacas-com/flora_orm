@@ -32,8 +32,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  /// we recommened you instatiate and register OrmManager as singleton
-  final orm = OrmManager(
+  /// we recommened you instatiate and register OrmContext as singleton
+  final orm = OrmContext(
     dbVersion: 1,
     dbName: 'orm_db_test.db',
     tables: <Entity>[
@@ -43,9 +43,10 @@ class _MyHomePageState extends State<MyHomePage> {
   );
 
   /// Get a storage instance of the Entity type you want to use.
-  /// **IMPORTANT remember to specify type ([UserEntityOrm] for this example)
+  /// **IMPORTANT remember to specify type ([UserLocalDataSource] for this example)
   /// to make your life easier when using storage object
-  late final UserEntityOrm storage = orm.getStorage(UserEntity());
+  late final UserEntityLocalDataSource storage =
+      orm.getDataSource(UserEntity());
 
   Future<UserEntity> _insertUser() async {
     await storage.insertOrUpdate(

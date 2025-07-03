@@ -7,7 +7,7 @@ import 'sql_storage_test_runs.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   group('Test Sql In Memory Storage', () {
-    var orm = OrmManager(
+    var orm = OrmContext(
       dbVersion: 4,
       engine: DbEngine.inMemory,
       dbName: 'common_storage_db.db',
@@ -17,8 +17,8 @@ void main() {
     );
 
     group('Test Engine', () {
-      final storage = orm.getStorage(const TestEntity());
-      run('Test engine', storage as TestEntityOrm);
+      final dataSource = orm.getDataSource(const TestEntity());
+      run('Test engine', dataSource as TestEntityLocalDataSource);
     });
     group('Test Db upgrade', () {
       setUp(() async {

@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:meta/meta.dart';
 
 @isTestGroup
-void run(String desc, TestEntityOrm storage) {
+void run(String desc, TestEntityLocalDataSource storage) {
   test('insert(entity) should insert entity', () async {
     final entity = TestEntity(
       testBool: true,

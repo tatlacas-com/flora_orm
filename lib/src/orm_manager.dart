@@ -9,8 +9,11 @@ import 'package:flora_orm/engines/sqflite_storage.dart';
 import 'package:flora_orm/flora_orm.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
-class OrmManager extends Equatable {
-  OrmManager({
+@Deprecated('Use OrmContext instead')
+typedef OrmManager = OrmContext;
+
+class OrmContext extends Equatable {
+  OrmContext({
     required int dbVersion,
     required String dbName,
     required List<IEntity> tables,
@@ -54,8 +57,15 @@ class OrmManager extends Equatable {
   late final DbEngine _engine;
   DbEngine get engine => _engine;
 
+  @Deprecated('Use getDataSource instead')
   OrmEngine<TEntity, TMeta, DbContext<TEntity>>
       getStorage<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>>(
+    TEntity t,
+  ) =>
+          getDataSource(t);
+
+  OrmEngine<TEntity, TMeta, DbContext<TEntity>>
+      getDataSource<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>>(
     TEntity t,
   ) {
     return switch (dbContext) {
@@ -77,13 +87,13 @@ class OrmManager extends Equatable {
         _engine,
       ];
 
-  OrmManager copyWith({
+  OrmContext copyWith({
     DbEngine? engine,
     int? dbVersion,
     String? dbName,
     List<IEntity>? tables,
   }) {
-    return OrmManager(
+    return OrmContext(
       engine: engine ?? _engine,
       dbName: dbName ?? dbContext.dbName,
       dbVersion: dbVersion ?? dbContext.dbVersion,

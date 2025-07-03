@@ -116,18 +116,18 @@ Once you have created or updated your entity files, open terminal and run the fo
 dart run build_runner build
 ```
 
-## OrmManager
+## OrmContext
 
-You need an instance of `OrmManager` to interact with the storage.  
+You need an instance of `OrmContext` to interact with the storage.  
 
-Create an instance of `OrmManager` as early as possible.  
+Create an instance of `OrmContext` as early as possible.  
   
 We recommend registering it as a singleton during app start-up using [get_it](https://pub.dev/packages/get_it) or any DI you prefer.
 
 For example, in your `void main()` function before `runApp()`,  you can have the following:
 
 ```dart
-final ormManager = OrmManager(
+final ormManager = OrmContext(
      /// update this version number whenever you add or update your entities
      /// such as adding new properties/fields.
       dbVersion: 1,
@@ -149,8 +149,8 @@ To keep your code clean, we recommend you have the above code in a seperate file
 ```bash
 dart run build_runner build
 ```
-2. Update `dbVersion` in `OrmManager`  - if you changed columns or added new Entity classes.
-3. **REGISTER** any new entities in `OrmManager`'s `tables: []`.
+2. Update `dbVersion` in `OrmContext`  - if you changed columns or added new Entity classes.
+3. **REGISTER** any new entities in `OrmContext`'s `tables: []`.
 
 The `dbEngine` value defaults to `DbEngine.sqflite`, and may be one of the following:
 
@@ -172,19 +172,19 @@ Windows: inMemory, sqfliteCommon, sharedPreferences (defaults to sqfliteCommon)
 web: sharedPreferences (defaults to sharedPreferences)
 ```
 
-Once your `OrmManager` is set, you can use it from anywhere in your code. If you are using [get_it](https://pub.dev/packages/get_it) for example, you can get your `storage` instance as:
+Once your `OrmContext` is set, you can use it from anywhere in your code. If you are using [get_it](https://pub.dev/packages/get_it) for example, you can get your `storage` instance as:
 
 ```dart
-final orm = GetIt.I<OrmManager>();
+final orm = GetIt.I<OrmContext>();
 final {EntityType}Orm storage = orm.getStorage(/* Instance of your Entity here */);
 ```
 For example, to get `storage` for `UserEntity`:
 
 ```dart
-final orm = GetIt.I<OrmManager>();
-final UserEntityOrm storage = orm.getStorage(const UserEntity())
+final orm = GetIt.I<OrmContext>();
+final UserLocalDataSource storage = orm.getStorage(const UserEntity())
 ```
-**IMPORTANT**: You **NEED** to specify type (e.g `UserEntityOrm` above) for you to get `ColumnDefition`s on your `Filter`s later. The type class is auto-generated when you run `dart run build_runner build`
+**IMPORTANT**: You **NEED** to specify type (e.g `UserLocalDataSource` above) for you to get `ColumnDefition`s on your `Filter`s later. The type class is auto-generated when you run `dart run build_runner build`
 
 ## CRUD operations
 
@@ -344,7 +344,7 @@ final users = await storage.where(
 
 If you update any of your `Entity` classes, you need to run `dart run build_runner build` again.  
 
-If you add/remove `@column` or any annotated item in your `Entity`  classes then **increment**  `OrmManager`'s `dbVersion`, **register** new Entity classes in `OrmManager`'s `tables: []`, and add the migrations in the respective `{entity_name}.entity.migrations.dart` files.  
+If you add/remove `@column` or any annotated item in your `Entity`  classes then **increment**  `OrmContext`'s `dbVersion`, **register** new Entity classes in `OrmContext`'s `tables: []`, and add the migrations in the respective `{entity_name}.entity.migrations.dart` files.  
 
 The simplest way to migrate is either to drop and recreate the entity table (losing all data in that table), or specifying the added columns:  
 
@@ -389,8 +389,8 @@ There is also `onCreateComplete` which you can return queries that will be run t
 ```bash
 dart run build_runner build
 ```
-2. Update `dbVersion` in `OrmManager` - if you changed columns or added new Entity classes.
-3. **REGISTER** the new entity in `OrmManager`'s `tables: []`.
+2. Update `dbVersion` in `OrmContext` - if you changed columns or added new Entity classes.
+3. **REGISTER** the new entity in `OrmContext`'s `tables: []`.
 
 ## Supported data types
 
