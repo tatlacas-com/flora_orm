@@ -41,7 +41,7 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
     if (value != null) {
       final map =
           value is Map<String, dynamic> ? value : jsonDecode(value as String);
-      item = map.cast();
+      item = map.cast<String, int>();
     }
     return copyWith(
       reactionsCounts: item,

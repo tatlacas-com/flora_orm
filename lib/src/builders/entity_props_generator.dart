@@ -331,7 +331,7 @@ class ${className}Meta extends  EntityMeta<$className> {
               if (readFn != null) {
                 fnName = '$readFn(json, map)';
               } else if (field.type.isDartCoreMap) {
-                fnName = 'map.cast()';
+                fnName = 'map.cast${fieldType.replaceFirst('Map', '')}()';
               } else {
                 fnName = '$fieldType.fromMap(map as Map<String, dynamic>)';
               }
