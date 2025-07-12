@@ -4,71 +4,11 @@ import 'package:equatable/equatable.dart';
 import 'package:flora_orm/src/models/column_definition_extension.dart';
 import 'package:flora_orm/src/models/orm.dart';
 import 'package:meta/meta.dart';
+part 'entity_base.dart';
+part 'entity_meta.dart';
 
-abstract class IEntity {
-  const IEntity({
-    this.id,
-    this.collectionId,
-    this.createdAt,
-    this.updatedAt,
-  });
-  final String? id;
-  final String? collectionId;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
-
-  IEntity updateDates({DateTime? createdAt});
-
-  IEntity copyWith({
-    String? id,
-    String? collectionId,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-    Map<String, dynamic>? json,
-  });
-
-  EntityMeta get meta;
-
-  List<String> additionalUpgradeQueries(int oldVersion, int newVersion);
-
-  bool recreateTableAt(int newVersion);
-
-  bool createTableAt(int newVersion);
-
-  List<String> recreateTable(int newVersion);
-
-  List<String> downgradeTable(int oldVersion, int newVersion);
-
-  List<String> onUpgradeComplete(int oldVersion, int newVersion);
-
-  List<String> onCreateComplete(int newVersion);
-
-  List<String> onDowngradeComplete(int oldVersion, int newVersion);
-
-  String createTable(int version);
-
-  Map<String, dynamic> toMap();
-
-  Map<String, dynamic> toDb();
-
-  IEntity load(Map<String, dynamic> json);
-}
-
-abstract class EntityMeta<TEntity extends IEntity> {
-  const EntityMeta();
-  String get tableName;
-
-  Iterable<ColumnDefinition<TEntity, dynamic>> get columns;
-  ColumnDefinition<TEntity, String> get id;
-  ColumnDefinition<TEntity, String> get collectionId;
-
-  ColumnDefinition<TEntity, DateTime> get createdAt;
-
-  ColumnDefinition<TEntity, DateTime> get updatedAt;
-}
-
-abstract class Entity<TEntity extends IEntity,
-    TMeta extends EntityMeta<TEntity>> extends Equatable implements IEntity {
+abstract class Entity<TEntity extends EntityBase,
+    TMeta extends EntityMeta<TEntity>> extends Equatable implements EntityBase {
   const Entity({
     this.id,
     this.collectionId,

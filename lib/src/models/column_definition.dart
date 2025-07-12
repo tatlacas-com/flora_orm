@@ -4,7 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flora_orm/src/models/column_definition_extension.dart';
 import 'package:flora_orm/src/models/entity.dart';
 
-class ColumnDefinition<TEntity extends IEntity, TType> extends Equatable {
+class ColumnDefinition<TEntity extends EntityBase, TType> extends Equatable {
   ColumnDefinition(
     this.name, {
     required this.write,

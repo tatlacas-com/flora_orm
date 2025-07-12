@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flora_orm/flora_orm.dart';
 
-class OrmOrder<TEntity extends IEntity> extends Equatable {
+class OrmOrder<TEntity extends EntityBase> extends Equatable {
   const OrmOrder({
     required this.column,
     this.direction = OrderDirection.asc,

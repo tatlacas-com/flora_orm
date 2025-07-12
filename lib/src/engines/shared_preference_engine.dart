@@ -1,15 +1,16 @@
 import 'package:collection/collection.dart';
 import 'package:flora_orm/flora_orm.dart';
-import 'package:flora_orm/src/contexts/shared_preference_context.dart';
+import 'package:flora_orm/src/contexts/shared_preference_store_context.dart';
 import 'package:flora_orm/src/engines/base_orm_engine.dart';
 import 'package:flora_orm/src/models/orm.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
-class SharedPreferenceEngine<TEntity extends IEntity,
+class SharedPreferenceEngine<TEntity extends EntityBase,
         TMeta extends EntityMeta<TEntity>>
-    extends BaseOrmEngine<TEntity, TMeta, SharedPreferenceContext<TEntity>> {
+    extends BaseOrmEngine<TEntity, TMeta,
+        SharedPreferenceStoreContext<TEntity>> {
   SharedPreferenceEngine(
     super.t, {
     required super.dbContext,

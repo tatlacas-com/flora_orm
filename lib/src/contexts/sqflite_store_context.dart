@@ -1,14 +1,15 @@
 import 'dart:async';
 
-import 'package:flora_orm/src/contexts/base_context.dart';
+import 'package:flora_orm/src/contexts/sqflite_store_context_base.dart';
 import 'package:flora_orm/src/models/entity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
-class SqfliteDbContext<TEntity extends IEntity> extends BaseContext<TEntity> {
-  SqfliteDbContext({
+class SqfliteStoreContext<TEntity extends EntityBase>
+    extends SqfliteStoreContextBase<TEntity> {
+  SqfliteStoreContext({
     required super.dbName,
     required super.dbVersion,
     required super.tables,

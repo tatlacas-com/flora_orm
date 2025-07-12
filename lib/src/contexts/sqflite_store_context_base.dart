@@ -4,8 +4,9 @@ import 'package:flora_orm/flora_orm.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite_common/sqlite_api.dart';
 
-abstract class BaseContext<TEntity extends IEntity> extends DbContext<TEntity> {
-  BaseContext({
+abstract class SqfliteStoreContextBase<TEntity extends EntityBase>
+    extends StoreContext<TEntity> {
+  SqfliteStoreContextBase({
     required super.dbName,
     required super.dbVersion,
     required super.tables,
@@ -105,7 +106,7 @@ abstract class BaseContext<TEntity extends IEntity> extends DbContext<TEntity> {
     return allQueries;
   }
 
-  bool _recreateOn(IEntity element, int oldVersion, int newVersion) {
+  bool _recreateOn(EntityBase element, int oldVersion, int newVersion) {
     var old = oldVersion;
     while (++old < newVersion) {
       if (element.recreateTableAt(old)) {
@@ -115,7 +116,7 @@ abstract class BaseContext<TEntity extends IEntity> extends DbContext<TEntity> {
     return element.recreateTableAt(newVersion);
   }
 
-  bool _createOn(IEntity element, int oldVersion, int newVersion) {
+  bool _createOn(EntityBase element, int oldVersion, int newVersion) {
     var old = oldVersion;
     while (++old < newVersion) {
       if (element.createTableAt(old)) {

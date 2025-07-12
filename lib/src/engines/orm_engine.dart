@@ -1,13 +1,14 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:equatable/equatable.dart';
-import 'package:flora_orm/src/contexts/db_context.dart';
+import 'package:flora_orm/src/contexts/store_context.dart';
 import 'package:flora_orm/src/engines/isolates/get_where_string.isolate.dart';
 import 'package:flora_orm/src/models/entity.dart';
 import 'package:flora_orm/src/models/orm.dart';
 import 'package:flora_orm/src/models/orm_order.dart';
 import 'package:flutter/foundation.dart';
 
-class WhereParams<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>> {
+class WhereParams<TEntity extends EntityBase,
+    TMeta extends EntityMeta<TEntity>> {
   WhereParams({
     required this.filter,
     required this.t,
@@ -17,10 +18,10 @@ class WhereParams<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>> {
 }
 
 abstract class OrmEngine<
-    TEntity extends IEntity,
+    TEntity extends EntityBase,
     TMeta extends EntityMeta<TEntity>,
-    TDbContext extends DbContext<TEntity>> extends Equatable {
-  final DbContext dbContext;
+    TDbContext extends StoreContext<TEntity>> extends Equatable {
+  final StoreContext dbContext;
   @protected
   final TEntity mType;
   TMeta get t => mType.meta as TMeta;

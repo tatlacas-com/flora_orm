@@ -1,7 +1,7 @@
 import 'package:flora_orm/src/models/entity.dart';
 
-abstract class DbContext<TEntity extends IEntity> {
-  const DbContext({
+abstract class StoreContext<TEntity extends EntityBase> {
+  const StoreContext({
     required this.dbName,
     required this.dbVersion,
     required this.tables,
