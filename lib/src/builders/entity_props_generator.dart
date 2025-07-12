@@ -91,7 +91,7 @@ class EntityPropsGenerator extends GeneratorForAnnotation<OrmEntity> {
     metaCode
       ..writeln('''
 typedef ${className}LocalDataSource
-    = OrmEngine<$className, ${className}Meta, DbContext<$className>>;
+    = OrmEngine<$className, ${className}Meta, StoreContext<$className>>;
 
 class ${className}Meta extends  EntityMeta<$className> {     
   const ${className}Meta();

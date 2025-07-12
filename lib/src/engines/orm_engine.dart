@@ -20,7 +20,7 @@ class WhereParams<TEntity extends EntityBase,
 abstract class OrmEngine<
     TEntity extends EntityBase,
     TMeta extends EntityMeta<TEntity>,
-    TDbContext extends StoreContext<TEntity>> extends Equatable {
+    TStoreContext extends StoreContext<TEntity>> extends Equatable {
   final StoreContext dbContext;
   @protected
   final TEntity mType;
