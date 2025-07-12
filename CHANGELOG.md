@@ -1,4 +1,7 @@
 
+## 3.0.0
+
+* BREAKING_CHANGES refactor class naming to 'clean' names
 ## 2.1.1
 
 * fix map casting in entity
