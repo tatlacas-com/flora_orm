@@ -65,7 +65,7 @@ mixin _TestEntityMixin on Entity<TestEntity, TestEntityMeta> {
   }
 }
 typedef TestEntityLocalDataSource
-    = OrmEngine<TestEntity, TestEntityMeta, DbContext<TestEntity>>;
+    = OrmEngine<TestEntity, TestEntityMeta, StoreContext<TestEntity>>;
 
 class TestEntityMeta extends EntityMeta<TestEntity> {
   const TestEntityMeta();

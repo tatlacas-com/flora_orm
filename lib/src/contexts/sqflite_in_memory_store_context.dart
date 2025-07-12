@@ -1,22 +1,22 @@
 import 'package:flora_orm/flora_orm.dart';
-import 'package:flora_orm/src/contexts/base_context.dart';
+import 'package:flora_orm/src/contexts/sqflite_store_context_base.dart';
 import 'package:flora_orm/src/open_options.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-class SqfliteInMemoryDbContext<TEntity extends IEntity>
-    extends BaseContext<TEntity> {
-  SqfliteInMemoryDbContext({
+class SqfliteInMemoryStoreContext<TEntity extends EntityBase>
+    extends SqfliteStoreContextBase<TEntity> {
+  SqfliteInMemoryStoreContext({
     required super.dbName,
     required super.dbVersion,
     required super.tables,
   });
 
-  SqfliteInMemoryDbContext<TEntity> copyWith({
+  SqfliteInMemoryStoreContext<TEntity> copyWith({
     String? dbName,
     int? dbVersion,
     List<TEntity>? tables,
   }) {
-    return SqfliteInMemoryDbContext<TEntity>(
+    return SqfliteInMemoryStoreContext<TEntity>(
       dbName: dbName ?? this.dbName,
       dbVersion: dbVersion ?? this.dbVersion,
       tables: tables ?? this.tables,

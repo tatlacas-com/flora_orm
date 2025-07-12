@@ -1,7 +1,7 @@
 import 'package:flora_orm/src/models/column_definition.dart';
 import 'package:flora_orm/src/models/entity.dart';
 
-extension ColumnDefinitionExtension<TEntity extends IEntity, TType>
+extension ColumnDefinitionExtension<TEntity extends EntityBase, TType>
     on ColumnDefinition<TEntity, TType> {
   void setValue(Map<String, dynamic> map, TType? value) {
     map[name] = switch (columnType) {

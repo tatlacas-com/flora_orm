@@ -1,20 +1,19 @@
 import 'package:flora_orm/flora_orm.dart';
-import 'package:flora_orm/src/contexts/base_context.dart';
 
-class SharedPreferenceContext<TEntity extends IEntity>
-    extends BaseContext<TEntity> {
-  SharedPreferenceContext({
+class SharedPreferenceStoreContext<TEntity extends EntityBase>
+    extends StoreContext<TEntity> {
+  SharedPreferenceStoreContext({
     required super.dbName,
     required super.dbVersion,
     required super.tables,
   });
 
-  SharedPreferenceContext<TEntity> copyWith({
+  SharedPreferenceStoreContext<TEntity> copyWith({
     String? dbName,
     int? dbVersion,
     List<TEntity>? tables,
   }) {
-    return SharedPreferenceContext<TEntity>(
+    return SharedPreferenceStoreContext<TEntity>(
       dbName: dbName ?? this.dbName,
       dbVersion: dbVersion ?? this.dbVersion,
       tables: tables ?? this.tables,
@@ -35,4 +34,7 @@ class SharedPreferenceContext<TEntity extends IEntity>
   Future<int> getVersion() async {
     return dbVersion;
   }
+
+  @override
+  Future<void> close() async {}
 }

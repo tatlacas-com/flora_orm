@@ -1,14 +1,10 @@
-import 'package:flora_orm/src/contexts/base_context.dart';
-import 'package:flora_orm/src/engines/orm_engine.dart';
-import 'package:flora_orm/src/models/column_definition.dart';
-import 'package:flora_orm/src/models/entity.dart';
-import 'package:flora_orm/src/models/filter.dart';
-import 'package:flora_orm/src/models/orm_order.dart';
+import 'package:flora_orm/flora_orm.dart';
+import 'package:flora_orm/src/contexts/sqflite_store_context_base.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite_common/sqlite_api.dart';
 import 'package:uuid/uuid.dart';
 
-class Args<TEntity extends IEntity> {
+class Args<TEntity extends EntityBase> {
   Args({
     required this.t,
     required this.maps,
@@ -16,14 +12,14 @@ class Args<TEntity extends IEntity> {
     required this.onIsolatePreMap,
   });
 
-  final IEntity t;
+  final EntityBase t;
   final List<Map<String, dynamic>> maps;
 
   final Map<String, dynamic>? isolateArgs;
   void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap;
 }
 
-List<IEntity> entitiesFromMap<TEntity extends IEntity>(Args args) {
+List<EntityBase> entitiesFromMap<TEntity extends EntityBase>(Args args) {
   final entities = <TEntity>[];
   args.onIsolatePreMap?.call(args.isolateArgs);
   for (final item in args.maps) {
@@ -32,14 +28,14 @@ List<IEntity> entitiesFromMap<TEntity extends IEntity>(Args args) {
   return entities;
 }
 
-InsertPrep<IEntity> wInsertOrUpdate(IEntity item) {
+InsertPrep<EntityBase> wInsertOrUpdate(EntityBase item) {
   var copy = item;
   if (copy.id == null) copy = copy.copyWith(id: const Uuid().v4());
   copy = copy.updateDates();
   return InsertPrep(entity: copy, map: copy.toDb());
 }
 
-List<InsertPrep<TEntity>> wInsertOrUpdateList<TEntity extends IEntity>(
+List<InsertPrep<TEntity>> wInsertOrUpdateList<TEntity extends EntityBase>(
   Iterable<TEntity> items,
 ) {
   final resultItems = <InsertPrep<TEntity>>[];
@@ -51,14 +47,16 @@ List<InsertPrep<TEntity>> wInsertOrUpdateList<TEntity extends IEntity>(
   return resultItems;
 }
 
-class InsertPrep<TEntity extends IEntity> {
+class InsertPrep<TEntity extends EntityBase> {
   InsertPrep({required this.entity, required this.map});
   final TEntity entity;
   final Map<String, dynamic> map;
 }
 
-class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
-        TDbContext extends BaseContext<TEntity>>
+class BaseOrmEngine<
+        TEntity extends EntityBase,
+        TMeta extends EntityMeta<TEntity>,
+        TDbContext extends StoreContext<TEntity>>
     extends OrmEngine<TEntity, TMeta, TDbContext> {
   const BaseOrmEngine(
     super.t, {
@@ -66,7 +64,8 @@ class BaseOrmEngine<TEntity extends IEntity, TMeta extends EntityMeta<TEntity>,
     required super.useIsolateDefault,
   });
   @override
-  BaseContext get dbContext => super.dbContext as BaseContext;
+  SqfliteStoreContextBase get dbContext =>
+      super.dbContext as SqfliteStoreContextBase;
 
   @override
   Future<TEntity?> insert(

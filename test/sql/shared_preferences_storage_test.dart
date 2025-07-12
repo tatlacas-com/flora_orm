@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'sql_storage_test_runs.dart';
 
-class MockSharedPreferenceEngine<TEntity extends IEntity,
+class MockSharedPreferenceEngine<TEntity extends EntityBase,
         TMeta extends EntityMeta<TEntity>>
     extends SharedPreferenceEngine<TEntity, TMeta> {
   MockSharedPreferenceEngine(super.t, {required super.dbContext});
@@ -14,10 +14,11 @@ class MockSharedPreferenceEngine<TEntity extends IEntity,
   @override
   Future<SharedPreferences> get prefs => SharedPreferences.getInstance();
   @override
-  Future<void> write(
-      {required String key,
-      required Map<String, dynamic> value,
-      Map<String, dynamic>? additionalData,}) async {
+  Future<void> write({
+    required String key,
+    required Map<String, dynamic> value,
+    Map<String, dynamic>? additionalData,
+  }) async {
     final items = await getItems() ?? {};
     items[key] = value;
     _mockValues[t.tableName] = jsonEncode(items);
@@ -73,12 +74,16 @@ void main() {
 
     group('Test Unimplemented functions', () {
       test('getDbFullName() should throw UnimplementedError', () {
-        expect(() async => orm.dbContext.getDbFullName(),
-            throwsA(const TypeMatcher<UnimplementedError>()),);
+        expect(
+          () async => orm.dbContext.getDbFullName(),
+          throwsA(const TypeMatcher<UnimplementedError>()),
+        );
       });
       test('getDbPath() should throw UnimplementedError', () {
-        expect(() async => orm.dbContext.getDbPath(),
-            throwsA(const TypeMatcher<UnimplementedError>()),);
+        expect(
+          () async => orm.dbContext.getDbPath(),
+          throwsA(const TypeMatcher<UnimplementedError>()),
+        );
       });
     });
   });

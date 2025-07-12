@@ -4,7 +4,7 @@ import 'package:flora_orm/src/models/entity.dart';
 import 'package:flora_orm/src/models/filter_condition.dart';
 import 'package:flora_orm/src/models/orm_condition.dart';
 
-class Filter<TEntity extends IEntity> extends Equatable {
+class Filter<TEntity extends EntityBase> extends Equatable {
   /// [openGroup] adds left bracket, [closeGroup] adds right bracket
   Filter(
     ColumnDefinition<TEntity, dynamic>? column, {

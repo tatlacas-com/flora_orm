@@ -4,7 +4,7 @@ import 'package:flora_orm/src/models/column_definition.dart';
 import 'package:flora_orm/src/models/entity.dart';
 import 'package:flora_orm/src/models/orm_condition.dart';
 
-class FilterCondition<TEntity extends IEntity> extends Equatable {
+class FilterCondition<TEntity extends EntityBase> extends Equatable {
   const FilterCondition({
     this.column,
     this.condition = OrmCondition.equalTo,

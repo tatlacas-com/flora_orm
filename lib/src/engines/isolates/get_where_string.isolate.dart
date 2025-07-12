@@ -5,7 +5,7 @@ import 'package:flora_orm/src/models/filter.dart';
 import 'package:flora_orm/src/models/formatted_query.dart';
 import 'package:flora_orm/src/models/orm_condition.dart';
 
-FormattedQuery getWhereString<TEntity extends IEntity>(Filter filter) {
+FormattedQuery getWhereString<TEntity extends EntityBase>(Filter filter) {
   final stringBuffer = StringBuffer();
   final whereArgs = <dynamic>[];
   for (final element in filter.filters) {
