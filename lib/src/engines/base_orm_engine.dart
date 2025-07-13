@@ -259,6 +259,27 @@ class BaseOrmEngine<
   }
 
   @override
+  Future<List<TEntity>> all({
+    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? columns,
+    List<OrmOrder>? Function(TMeta t)? orderBy,
+    int? limit,
+    int? offset,
+    bool? useIsolate,
+    Map<String, dynamic>? isolateArgs,
+    void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
+  }) async {
+    return where(
+      columns: columns,
+      orderBy: orderBy,
+      limit: limit,
+      offset: offset,
+      useIsolate: useIsolate,
+      isolateArgs: isolateArgs,
+      onIsolatePreMap: onIsolatePreMap,
+    );
+  }
+
+  @override
   Future<List<TEntity>> where({
     Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,

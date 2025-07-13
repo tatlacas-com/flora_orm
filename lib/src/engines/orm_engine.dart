@@ -132,6 +132,16 @@ abstract class OrmEngine<
     void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   });
 
+  Future<List<TEntity>> all({
+    List<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? columns,
+    List<OrmOrder>? Function(TMeta t)? orderBy,
+    int? limit,
+    int? offset,
+    bool? useIsolate,
+    Map<String, dynamic>? isolateArgs,
+    void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
+  });
+
   Future<List<TEntity>> where({
     List<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? columns,
     List<OrmOrder>? Function(TMeta t)? orderBy,
