@@ -1,4 +1,7 @@
 
+## 3.1.1
+
+* fix default value setting from OrmColumn annotation
 ## 3.1.0
 
 * BREAKING_CHANGES refactor class naming to 'clean' names
