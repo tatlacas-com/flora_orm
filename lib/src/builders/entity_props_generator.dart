@@ -246,7 +246,7 @@ class ${className}Meta extends  EntityMeta<$className> {
           } else if (field.type.isDartCoreInt) {
             defaultValue = df?.toIntValue();
           } else if (field.type.isDartCoreDouble) {
-            defaultValue = df?.toDoubleValue();
+            defaultValue = df?.toDoubleValue() ?? df?.toIntValue();
           } else {
             defaultValue = df?.toStringValue();
             if (defaultValue == null && df != null && df.isNull != true) {

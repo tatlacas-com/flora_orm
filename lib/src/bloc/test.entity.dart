@@ -18,6 +18,10 @@ class TestEntity extends Entity<TestEntity, TestEntityMeta>
     this.testIntWithDefault,
     this.testBool,
     this.testDouble,
+    this.testEnum1,
+    this.testEnum2,
+    this.testEnum3 = TestEnum.value1,
+    this.testDouble2 = 10,
   });
   @override
   @column
@@ -32,6 +36,9 @@ class TestEntity extends Entity<TestEntity, TestEntityMeta>
   @column
   final int? testInt;
   @override
+  @OrmColumn<double>(defaultValue: 10)
+  final double testDouble2;
+  @override
   @column
   final int? testIntWithDefault;
   @override
@@ -40,4 +47,15 @@ class TestEntity extends Entity<TestEntity, TestEntityMeta>
   @override
   @column
   final double? testDouble;
+  @override
+  @column
+  final TestEnum? testEnum1;
+  @override
+  @OrmColumn<TestEnum>(defaultValue: 'value1')
+  final TestEnum? testEnum2;
+  @override
+  @OrmColumn<TestEnum>(defaultValue: 'value1')
+  final TestEnum testEnum3;
 }
+
+enum TestEnum { value1, value2 }

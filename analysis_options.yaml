@@ -5,6 +5,8 @@ analyzer:
     todo: ignore
   exclude: 
     - "lib/generated/**"
+    - "**.g.dart"
+    
 
 
 linter:
