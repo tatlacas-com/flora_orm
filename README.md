@@ -127,7 +127,7 @@ We recommend registering it as a singleton during app start-up using [get_it](ht
 For example, in your `void main()` function before `runApp()`,  you can have the following:
 
 ```dart
-final ormManager = OrmContext(
+final ormContext = OrmContext(
      /// update this version number whenever you add or update your entities
      /// such as adding new properties/fields.
       dbVersion: 1,
@@ -139,7 +139,7 @@ final ormManager = OrmContext(
         const UserEntity(),
       ],
     );
-GetIt.I.registerSingleton(ormManager);
+GetIt.I.registerSingleton(ormContext);
 ```
 To keep your code clean, we recommend you have the above code in a seperate file. For example in `src/orm.init.dart`  
 
