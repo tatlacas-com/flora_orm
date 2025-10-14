@@ -37,13 +37,13 @@ mixin _TestEntityMixin on Entity<TestEntity, TestEntityMeta> {
     String? collectionId,
     DateTime? createdAt,
     DateTime? updatedAt,
-    CopyWith<String?>? testString,
-    CopyWith<String?>? testUpgrade,
-    CopyWith<DateTime?>? testDateTime,
-    CopyWith<int?>? testInt,
-    CopyWith<int?>? testIntWithDefault,
-    CopyWith<bool?>? testBool,
-    CopyWith<double?>? testDouble,
+    ValueGetter<String?>? testString,
+    ValueGetter<String?>? testUpgrade,
+    ValueGetter<DateTime?>? testDateTime,
+    ValueGetter<int?>? testInt,
+    ValueGetter<int?>? testIntWithDefault,
+    ValueGetter<bool?>? testBool,
+    ValueGetter<double?>? testDouble,
     Map<String, dynamic>? json,
   }) {
     return TestEntity(
@@ -51,16 +51,15 @@ mixin _TestEntityMixin on Entity<TestEntity, TestEntityMeta> {
       collectionId: collectionId ?? this.collectionId,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-      testString: testString != null ? testString.value : this.testString,
-      testUpgrade: testUpgrade != null ? testUpgrade.value : this.testUpgrade,
-      testDateTime:
-          testDateTime != null ? testDateTime.value : this.testDateTime,
-      testInt: testInt != null ? testInt.value : this.testInt,
+      testString: testString != null ? testString() : this.testString,
+      testUpgrade: testUpgrade != null ? testUpgrade() : this.testUpgrade,
+      testDateTime: testDateTime != null ? testDateTime() : this.testDateTime,
+      testInt: testInt != null ? testInt() : this.testInt,
       testIntWithDefault: testIntWithDefault != null
-          ? testIntWithDefault.value
+          ? testIntWithDefault()
           : this.testIntWithDefault,
-      testBool: testBool != null ? testBool.value : this.testBool,
-      testDouble: testDouble != null ? testDouble.value : this.testDouble,
+      testBool: testBool != null ? testBool() : this.testBool,
+      testDouble: testDouble != null ? testDouble() : this.testDouble,
     );
   }
 }
@@ -115,7 +114,7 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
         'testString',
         write: (entity) => entity.testString,
         read: (json, entity, value) => entity.copyWith(
-          testString: CopyWith(value as String?),
+          testString: () => value as String?,
           json: json,
         ),
       );
@@ -125,7 +124,7 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
         'testUpgrade',
         write: (entity) => entity.testUpgrade,
         read: (json, entity, value) => entity.copyWith(
-          testUpgrade: CopyWith(value as String?),
+          testUpgrade: () => value as String?,
           json: json,
         ),
       );
@@ -135,7 +134,7 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
         'testDateTime',
         write: (entity) => entity.testDateTime,
         read: (json, entity, value) => entity.copyWith(
-          testDateTime: CopyWith(value as DateTime?),
+          testDateTime: () => value as DateTime?,
           json: json,
         ),
       );
@@ -145,7 +144,7 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
         'testInt',
         write: (entity) => entity.testInt,
         read: (json, entity, value) => entity.copyWith(
-          testInt: CopyWith(value as int?),
+          testInt: () => value as int?,
           json: json,
         ),
       );
@@ -155,7 +154,7 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
         'testIntWithDefault',
         write: (entity) => entity.testIntWithDefault,
         read: (json, entity, value) => entity.copyWith(
-          testIntWithDefault: CopyWith(value as int?),
+          testIntWithDefault: () => value as int?,
           json: json,
         ),
       );
@@ -165,7 +164,7 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
         'testBool',
         write: (entity) => entity.testBool,
         read: (json, entity, value) => entity.copyWith(
-          testBool: CopyWith(value as bool?),
+          testBool: () => value as bool?,
           json: json,
         ),
       );
@@ -175,7 +174,7 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
         'testDouble',
         write: (entity) => entity.testDouble,
         read: (json, entity, value) => entity.copyWith(
-          testDouble: CopyWith(value as double?),
+          testDouble: () => value as double?,
           json: json,
         ),
       );

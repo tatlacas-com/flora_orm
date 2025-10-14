@@ -1,4 +1,7 @@
 
+## 3.2.0
+
+* BREAKING_CHANGES removed `CopyWith`. Use `ValueGetter` instead
 ## 3.1.0
 
 * BREAKING_CHANGES refactor class naming to 'clean' names

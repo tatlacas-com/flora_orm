@@ -20,7 +20,7 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
           orElse: () => null);
     }
     return copyWith(
-      testEnum: CopyWith(item),
+      testEnum: () => item,
     );
   }
 
@@ -48,21 +48,21 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
     );
   }
 
-  String? get firstName;
-  String? get lastName;
   TestEnum? get testEnum;
   TestEnum get testEnum2;
   Map<String, int> get reactionsCounts;
+  String? get firstName;
+  String? get lastName;
   String? get test2;
 
   @override
   List<Object?> get props => [
         ...super.props,
-        firstName,
-        lastName,
         testEnum,
         testEnum2,
         reactionsCounts,
+        firstName,
+        lastName,
         test2,
       ];
   @override
@@ -71,12 +71,12 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
     String? collectionId,
     DateTime? createdAt,
     DateTime? updatedAt,
-    CopyWith<String?>? firstName,
-    CopyWith<String?>? lastName,
-    CopyWith<TestEnum?>? testEnum,
+    ValueGetter<TestEnum?>? testEnum,
     TestEnum? testEnum2,
     Map<String, int>? reactionsCounts,
-    CopyWith<String?>? test2,
+    ValueGetter<String?>? firstName,
+    ValueGetter<String?>? lastName,
+    ValueGetter<String?>? test2,
     Map<String, dynamic>? json,
   }) {
     return UserEntity(
@@ -84,12 +84,12 @@ mixin _UserEntityMixin on Entity<UserEntity, UserEntityMeta> {
       collectionId: collectionId ?? this.collectionId,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-      firstName: firstName != null ? firstName.value : this.firstName,
-      lastName: lastName != null ? lastName.value : this.lastName,
-      testEnum: testEnum != null ? testEnum.value : this.testEnum,
+      testEnum: testEnum != null ? testEnum() : this.testEnum,
       testEnum2: testEnum2 ?? this.testEnum2,
       reactionsCounts: reactionsCounts ?? this.reactionsCounts,
-      test2: test2 != null ? test2.value : this.test2,
+      firstName: firstName != null ? firstName() : this.firstName,
+      lastName: lastName != null ? lastName() : this.lastName,
+      test2: test2 != null ? test2() : this.test2,
     );
   }
 }
@@ -139,26 +139,6 @@ class UserEntityMeta extends EntityMeta<UserEntity> {
             entity.copyWith(updatedAt: value as DateTime?, json: json),
       );
 
-  ColumnDefinition<UserEntity, String> get firstName =>
-      ColumnDefinition<UserEntity, String>(
-        'firstName',
-        write: (entity) => entity.firstName,
-        read: (json, entity, value) => entity.copyWith(
-          firstName: CopyWith(value as String?),
-          json: json,
-        ),
-      );
-
-  ColumnDefinition<UserEntity, String> get lastName =>
-      ColumnDefinition<UserEntity, String>(
-        'lastName',
-        write: (entity) => entity.lastName,
-        read: (json, entity, value) => entity.copyWith(
-          lastName: CopyWith(value as String?),
-          json: json,
-        ),
-      );
-
   ColumnDefinition<UserEntity, String> get testEnum =>
       ColumnDefinition<UserEntity, String>(
         'testEnum',
@@ -204,16 +184,36 @@ class UserEntityMeta extends EntityMeta<UserEntity> {
         },
       );
 
+  ColumnDefinition<UserEntity, String> get firstName =>
+      ColumnDefinition<UserEntity, String>(
+        'firstName',
+        write: (entity) => entity.firstName,
+        read: (json, entity, value) => entity.copyWith(
+          firstName: () => value as String?,
+          json: json,
+        ),
+      );
+
+  ColumnDefinition<UserEntity, String> get lastName =>
+      ColumnDefinition<UserEntity, String>(
+        'lastName',
+        write: (entity) => entity.lastName,
+        read: (json, entity, value) => entity.copyWith(
+          lastName: () => value as String?,
+          json: json,
+        ),
+      );
+
   @override
   Iterable<ColumnDefinition<UserEntity, dynamic>> get columns => [
         id,
         collectionId,
         createdAt,
         updatedAt,
-        firstName,
-        lastName,
         testEnum,
         testEnum2,
         reactionsCounts,
+        firstName,
+        lastName,
       ];
 }

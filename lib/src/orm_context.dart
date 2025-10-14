@@ -7,7 +7,6 @@ import 'package:flora_orm/engines/sqflite_common_engine.dart';
 import 'package:flora_orm/engines/sqflite_in_memory_engine.dart';
 import 'package:flora_orm/engines/sqflite_storage.dart';
 import 'package:flora_orm/flora_orm.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 @Deprecated('Use OrmContext instead')
 typedef OrmManager = OrmContext;

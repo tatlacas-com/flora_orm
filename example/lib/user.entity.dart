@@ -3,16 +3,32 @@ import 'package:flora_orm/flora_orm.dart';
 part 'user.entity.g.dart';
 part 'user.entity.migrations.dart';
 
+abstract class BaseUser<TEntity extends EntityBase,
+    TMeta extends EntityMeta<TEntity>> extends Entity<TEntity, TMeta> {
+  const BaseUser({
+    super.id,
+    super.collectionId,
+    super.createdAt,
+    super.updatedAt,
+    this.firstName,
+    this.lastName,
+  });
+  @column
+  final String? firstName;
+  @column
+  final String? lastName;
+}
+
 @OrmEntity(tableName: 'user')
-class UserEntity extends Entity<UserEntity, UserEntityMeta>
+class UserEntity extends BaseUser<UserEntity, UserEntityMeta>
     with _UserEntityMixin, UserEntityMigrations {
   UserEntity(
       {super.id,
       super.collectionId,
       super.createdAt,
       super.updatedAt,
-      this.firstName,
-      this.lastName,
+      super.firstName,
+      super.lastName,
       this.testEnum,
       this.testEnum2 = TestEnum.first,
       this.test2,
@@ -20,12 +36,6 @@ class UserEntity extends Entity<UserEntity, UserEntityMeta>
     test = '';
   }
 
-  @override
-  @column
-  final String? firstName;
-  @override
-  @column
-  final String? lastName;
   @override
   @column
   final TestEnum? testEnum;
