@@ -60,6 +60,13 @@ class EntityPropsGenerator extends GeneratorForAnnotation<OrmEntity> {
         const TypeChecker.fromRuntime(NullableProp).hasAnnotationOfExact(field);
   }
 
+  static const _excludedSuperClasses = [
+    'Entity',
+    'Equatable',
+    'EntityBase',
+    'Object',
+  ];
+
   @override
   Future<String> generateForAnnotatedElement(
     Element element,
@@ -75,8 +82,18 @@ class EntityPropsGenerator extends GeneratorForAnnotation<OrmEntity> {
       throw Exception('$className is not an Entity class');
     }
 
-    final fields = classElement.fields;
-
+    final allFields = <FieldElement>[...classElement.fields];
+    for (final supertype in classElement.allSupertypes) {
+      if (supertype.element is ClassElement) {
+        final superClass = supertype.element as ClassElement;
+        // Filter out Object and other system classes if needed
+        if (!_excludedSuperClasses.contains(superClass.name)) {
+          // ignore: avoid_print
+          print('### Adding fields from ${superClass.name}');
+          allFields.addAll(superClass.fields);
+        }
+      }
+    }
     final mixinCode = StringBuffer();
     final metaCode = StringBuffer();
     final columnsList = StringBuffer();
@@ -146,7 +163,7 @@ class ${className}Meta extends  EntityMeta<$className> {
   ${className}Meta get meta => _meta;
     ''');
     final extraFields = <String, _ExtraField>{}..addEntries(
-        fields
+        allFields
             .where(
               (field) =>
                   field.isFinal &&
@@ -170,7 +187,7 @@ class ${className}Meta extends  EntityMeta<$className> {
             )
             .toList(),
       );
-    for (final field in fields) {
+    for (final field in allFields) {
       if (const TypeChecker.fromRuntime(OrmColumn)
           .hasAnnotationOfExact(field)) {
         final fieldName = field.name;
@@ -322,7 +339,7 @@ class ${className}Meta extends  EntityMeta<$className> {
           (list as List<dynamic>?)?.map<$fieldType>((e) => $map).toList();
     }
     return copyWith(
-      $fieldName: ${notNull ? 'items' : 'CopyWith(items)'},
+      $fieldName: ${notNull ? 'items' : '()=>items'},
     );
   }
  ''');
@@ -345,7 +362,7 @@ class ${className}Meta extends  EntityMeta<$className> {
           orElse: () => null)''' : fnName} ;
     }
     return copyWith(
-      $fieldName: ${notNull ? 'item' : 'CopyWith(item)'},
+      $fieldName: ${notNull ? 'item' : '()=>item'},
     );
   }
  ''');
@@ -369,8 +386,8 @@ class ${className}Meta extends  EntityMeta<$className> {
       $alias = $fnName;
     }
     return copyWith(
-      $fieldName: ${notNull ? 'val' : 'CopyWith(val)'},
-      $alias: ${aliasNotNull ? alias : 'CopyWith($alias)'},
+      $fieldName: ${notNull ? 'val' : '()=>val'},
+      $alias: ${aliasNotNull ? alias : '()=>$alias'},
       json: json,
     );
   }
@@ -487,9 +504,9 @@ class ${className}Meta extends  EntityMeta<$className> {
                 copyWithList.writeln('$alias: $alias ?? this.$alias,');
               } else {
                 copyWithPropsList
-                    .writeln('CopyWith<$jsonEncodedType?>? $alias,');
+                    .writeln('ValueGetter<$jsonEncodedType?>? $alias,');
                 copyWithList.writeln(
-                  '$alias: $alias != null ? $alias.value : this.$alias,',
+                  '$alias: $alias != null ? $alias() : this.$alias,',
                 );
               }
               if (extraFields.containsKey(alias)) {
@@ -513,7 +530,7 @@ class ${className}Meta extends  EntityMeta<$className> {
           } else {
             metaCode.writeln('''
           read: (json, entity, value) => entity.copyWith(
-            $fieldName: CopyWith(value as $fieldType?), 
+            $fieldName: ()=>value as $fieldType?, 
             json: json,
           ),
         );
@@ -526,10 +543,10 @@ class ${className}Meta extends  EntityMeta<$className> {
             copyWithList.writeln('$fieldName: $fieldName ?? this.$fieldName,');
           } else {
             copyWithPropsList
-                .writeln('CopyWith<$prefix$fieldType$suffix?>? $fieldName,');
+                .writeln('ValueGetter<$prefix$fieldType$suffix?>? $fieldName,');
             copyWithList.writeln(
               '$fieldName: $fieldName != null ? '
-              '$fieldName.value : this.$fieldName,',
+              '$fieldName() : this.$fieldName,',
             );
           }
 
@@ -568,10 +585,11 @@ class ${className}Meta extends  EntityMeta<$className> {
         copyWithPropsList.writeln('${extraField.type}? $fieldName,');
         copyWithList.writeln('$fieldName: $fieldName ?? this.$fieldName,');
       } else {
-        copyWithPropsList.writeln('CopyWith<${extraField.type}?>? $fieldName,');
+        copyWithPropsList
+            .writeln('ValueGetter<${extraField.type}?>? $fieldName,');
         copyWithList.writeln(
           '$fieldName: $fieldName != null ? '
-          '$fieldName.value : this.$fieldName,',
+          '$fieldName() : this.$fieldName,',
         );
       }
     }

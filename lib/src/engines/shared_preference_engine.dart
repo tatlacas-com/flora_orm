@@ -3,7 +3,6 @@ import 'package:flora_orm/flora_orm.dart';
 import 'package:flora_orm/src/contexts/shared_preference_store_context.dart';
 import 'package:flora_orm/src/engines/base_orm_engine.dart';
 import 'package:flora_orm/src/models/orm.dart';
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 

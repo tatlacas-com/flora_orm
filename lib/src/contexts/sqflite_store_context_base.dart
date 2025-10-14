@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flora_orm/flora_orm.dart';
-import 'package:flutter/foundation.dart';
 import 'package:sqflite_common/sqlite_api.dart';
 
 abstract class SqfliteStoreContextBase<TEntity extends EntityBase>

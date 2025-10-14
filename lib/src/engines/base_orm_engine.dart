@@ -1,6 +1,5 @@
 import 'package:flora_orm/flora_orm.dart';
 import 'package:flora_orm/src/contexts/sqflite_store_context_base.dart';
-import 'package:flutter/foundation.dart';
 import 'package:sqflite_common/sqlite_api.dart';
 import 'package:uuid/uuid.dart';
 

@@ -45,7 +45,7 @@ void run(String desc, TestEntityLocalDataSource storage) {
 
     final insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
-    entity = insertedEntity!.copyWith(testString: CopyWith('Updated string'));
+    entity = insertedEntity!.copyWith(testString: () => 'Updated string');
     final updated = await storage.insertOrUpdate(entity);
     expect(updated, isNotNull);
     expect(updated, entity);
@@ -781,7 +781,7 @@ void run(String desc, TestEntityLocalDataSource storage) {
 
     final insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
-    entity = (insertedEntity!).copyWith(testString: CopyWith('Updated a'));
+    entity = (insertedEntity!).copyWith(testString: () => 'Updated a');
     final total = await storage.update(
       entity: entity,
       where: (t) => Filter(
@@ -814,8 +814,7 @@ void run(String desc, TestEntityLocalDataSource storage) {
     final json = await storage.firstWhereOrNull(
       (t) => Filter(entity.meta.id, value: insertedEntity?.id),
     );
-    insertedEntity =
-        insertedEntity?.copyWith(testString: CopyWith('Updated ax1'));
+    insertedEntity = insertedEntity?.copyWith(testString: () => 'Updated ax1');
     entity = json!;
     expect(entity, insertedEntity);
   });
@@ -866,8 +865,8 @@ void run(String desc, TestEntityLocalDataSource storage) {
         await storage.insertList(<TestEntity>[entity, entity1]);
     expect(insertedEntity, isNotNull);
     expect(insertedEntity!.length, 2);
-    entity = insertedEntity[0].copyWith(testString: CopyWith('Updated a'));
-    entity1 = insertedEntity[1].copyWith(testString: CopyWith('Updated b'));
+    entity = insertedEntity[0].copyWith(testString: () => 'Updated a');
+    entity1 = insertedEntity[1].copyWith(testString: () => 'Updated b');
     insertedEntity =
         await storage.insertOrUpdateList(<TestEntity>[entity, entity1]);
     expect(insertedEntity, isNotNull);
