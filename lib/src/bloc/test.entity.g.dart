@@ -12,13 +12,53 @@ mixin _TestEntityMixin on Entity<TestEntity, TestEntityMeta> {
   @override
   TestEntityMeta get meta => _meta;
 
+  TestEntity readTestEnum1(Map<String, dynamic> json, dynamic value) {
+    TestEnum? item;
+    if (value != null) {
+      item = <TestEnum?>[...TestEnum.values].firstWhere(
+          (element) => element?.name == value as String,
+          orElse: () => null);
+    }
+    return copyWith(
+      testEnum1: () => item,
+    );
+  }
+
+  TestEntity readTestEnum2(Map<String, dynamic> json, dynamic value) {
+    TestEnum? item;
+    if (value != null) {
+      item = <TestEnum?>[...TestEnum.values].firstWhere(
+          (element) => element?.name == value as String,
+          orElse: () => null);
+    }
+    return copyWith(
+      testEnum2: () => item,
+    );
+  }
+
+  TestEntity readTestEnum3(Map<String, dynamic> json, dynamic value) {
+    TestEnum? item;
+    if (value != null) {
+      item = <TestEnum?>[...TestEnum.values].firstWhere(
+          (element) => element?.name == value as String,
+          orElse: () => null);
+    }
+    return copyWith(
+      testEnum3: item,
+    );
+  }
+
   String? get testString;
   String? get testUpgrade;
   DateTime? get testDateTime;
   int? get testInt;
+  double get testDouble2;
   int? get testIntWithDefault;
   bool? get testBool;
   double? get testDouble;
+  TestEnum? get testEnum1;
+  TestEnum? get testEnum2;
+  TestEnum get testEnum3;
 
   @override
   List<Object?> get props => [
@@ -27,9 +67,13 @@ mixin _TestEntityMixin on Entity<TestEntity, TestEntityMeta> {
         testUpgrade,
         testDateTime,
         testInt,
+        testDouble2,
         testIntWithDefault,
         testBool,
         testDouble,
+        testEnum1,
+        testEnum2,
+        testEnum3,
       ];
   @override
   TestEntity copyWith({
@@ -41,9 +85,13 @@ mixin _TestEntityMixin on Entity<TestEntity, TestEntityMeta> {
     ValueGetter<String?>? testUpgrade,
     ValueGetter<DateTime?>? testDateTime,
     ValueGetter<int?>? testInt,
+    double? testDouble2,
     ValueGetter<int?>? testIntWithDefault,
     ValueGetter<bool?>? testBool,
     ValueGetter<double?>? testDouble,
+    ValueGetter<TestEnum?>? testEnum1,
+    ValueGetter<TestEnum?>? testEnum2,
+    TestEnum? testEnum3,
     Map<String, dynamic>? json,
   }) {
     return TestEntity(
@@ -55,11 +103,15 @@ mixin _TestEntityMixin on Entity<TestEntity, TestEntityMeta> {
       testUpgrade: testUpgrade != null ? testUpgrade() : this.testUpgrade,
       testDateTime: testDateTime != null ? testDateTime() : this.testDateTime,
       testInt: testInt != null ? testInt() : this.testInt,
+      testDouble2: testDouble2 ?? this.testDouble2,
       testIntWithDefault: testIntWithDefault != null
           ? testIntWithDefault()
           : this.testIntWithDefault,
       testBool: testBool != null ? testBool() : this.testBool,
       testDouble: testDouble != null ? testDouble() : this.testDouble,
+      testEnum1: testEnum1 != null ? testEnum1() : this.testEnum1,
+      testEnum2: testEnum2 != null ? testEnum2() : this.testEnum2,
+      testEnum3: testEnum3 ?? this.testEnum3,
     );
   }
 }
@@ -149,6 +201,18 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
         ),
       );
 
+  ColumnDefinition<TestEntity, double> get testDouble2 =>
+      ColumnDefinition<TestEntity, double>(
+        'testDouble2',
+        notNull: true,
+        defaultValue: 10,
+        write: (entity) => entity.testDouble2,
+        read: (json, entity, value) => entity.copyWith(
+          testDouble2: value as double?,
+          json: json,
+        ),
+      );
+
   ColumnDefinition<TestEntity, int> get testIntWithDefault =>
       ColumnDefinition<TestEntity, int>(
         'testIntWithDefault',
@@ -179,6 +243,54 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
         ),
       );
 
+  ColumnDefinition<TestEntity, String> get testEnum1 =>
+      ColumnDefinition<TestEntity, String>(
+        'testEnum1',
+        write: (entity) {
+          if (entity.testEnum1 == null) {
+            return null;
+          }
+          final map = entity.testEnum1?.name;
+
+          return map;
+        },
+        read: (json, entity, value) {
+          return entity.readTestEnum1(json, value);
+        },
+      );
+
+  ColumnDefinition<TestEntity, String> get testEnum2 =>
+      ColumnDefinition<TestEntity, String>(
+        'testEnum2',
+        defaultValue: 'value1',
+        write: (entity) {
+          if (entity.testEnum2 == null) {
+            return null;
+          }
+          final map = entity.testEnum2?.name;
+
+          return map;
+        },
+        read: (json, entity, value) {
+          return entity.readTestEnum2(json, value);
+        },
+      );
+
+  ColumnDefinition<TestEntity, String> get testEnum3 =>
+      ColumnDefinition<TestEntity, String>(
+        'testEnum3',
+        notNull: true,
+        defaultValue: 'value1',
+        write: (entity) {
+          final map = entity.testEnum3.name;
+
+          return map;
+        },
+        read: (json, entity, value) {
+          return entity.readTestEnum3(json, value);
+        },
+      );
+
   @override
   Iterable<ColumnDefinition<TestEntity, dynamic>> get columns => [
         id,
@@ -189,8 +301,12 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
         testUpgrade,
         testDateTime,
         testInt,
+        testDouble2,
         testIntWithDefault,
         testBool,
         testDouble,
+        testEnum1,
+        testEnum2,
+        testEnum3,
       ];
 }
