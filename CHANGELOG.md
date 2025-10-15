@@ -1,21 +1,25 @@
 
 
+## 3.3.1
+
+* FIX: conditions that do not require args
+
 ## 3.3.0
 
-* BREAKING_CHANGES refactored `LocalDataSource` -> `Store`
-* BREAKING_CHANGES renamed `OrmConditions`.
+* BREAKING_CHANGES: refactored `LocalDataSource` -> `Store`
+* BREAKING_CHANGES: renamed `OrmConditions`.
 * Added more `OrmConditions`
 
 ## 3.2.0
 
-* BREAKING_CHANGES removed `CopyWith`. Use `ValueGetter` instead
+* BREAKING_CHANGES: removed `CopyWith`. Use `ValueGetter` instead
 
 ## 3.1.1
 
 * fix default value setting from OrmColumn annotation
 ## 3.1.0
 
-* BREAKING_CHANGES refactor class naming to 'clean' names
+* BREAKING_CHANGES: refactor class naming to 'clean' names
 ## 2.1.1
 
 * fix map casting in entity
