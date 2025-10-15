@@ -1,5 +1,11 @@
 
 
+## 3.3.0
+
+* BREAKING_CHANGES refactored `LocalDataSource` -> `Store`
+* BREAKING_CHANGES renamed `OrmConditions`.
+* Added more `OrmConditions`
+
 ## 3.2.0
 
 * BREAKING_CHANGES removed `CopyWith`. Use `ValueGetter` instead
