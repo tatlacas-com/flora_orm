@@ -88,8 +88,6 @@ class EntityPropsGenerator extends GeneratorForAnnotation<OrmEntity> {
         final superClass = supertype.element as ClassElement;
         // Filter out Object and other system classes if needed
         if (!_excludedSuperClasses.contains(superClass.name)) {
-          // ignore: avoid_print
-          print('### Adding fields from ${superClass.name}');
           allFields.addAll(superClass.fields);
         }
       }

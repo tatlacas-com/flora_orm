@@ -22,8 +22,7 @@ FormattedQuery getWhereString<TEntity extends EntityBase>(Filter filter) {
     if (element.openGroup) stringBuffer.write('(');
 
     stringBuffer.write(getCondition(element.column!.name, element.condition));
-    if (element.condition != OrmCondition.isNull &&
-        element.condition != OrmCondition.isNotNull) {
+    if (!OrmCondition.noArgsConditions.contains(element.condition)) {
       if ((element.condition == OrmCondition.isIn ||
               element.condition == OrmCondition.isNotIn) &&
           element.value is List) {

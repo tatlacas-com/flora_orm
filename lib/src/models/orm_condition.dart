@@ -16,4 +16,8 @@ enum OrmCondition {
   excludes,
   isNotIn,
   isNotBetween,
+  ;
+
+  static List<OrmCondition> get noArgsConditions =>
+      [isNull, isNotNull, isEmpty, isNullOrEmpty, isNotEmpty];
 }
