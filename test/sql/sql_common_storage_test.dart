@@ -31,7 +31,7 @@ void main() {
       ],
     );
 
-    final dataSource = orm.getDataSource(const TestEntity());
+    final dataSource = orm.getStore(const TestEntity());
 
     /* test('drop database', () async {
       var database = await orm.dbContext.database;
@@ -58,7 +58,7 @@ void main() {
       );
     });
 
-    run('Test engine', dataSource as TestEntityLocalDataSource);
+    run('Test engine', dataSource as TestEntityStore);
 
     group('Test Db upgrade', () {
       setUp(() async {

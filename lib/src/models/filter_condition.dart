@@ -7,7 +7,7 @@ import 'package:flora_orm/src/models/orm_condition.dart';
 class FilterCondition<TEntity extends EntityBase> extends Equatable {
   const FilterCondition({
     this.column,
-    this.condition = OrmCondition.equalTo,
+    this.condition = OrmCondition.isEqualTo,
     this.value,
     this.secondaryValue,
     this.openGroup = false,

@@ -115,7 +115,7 @@ mixin _TestEntityMixin on Entity<TestEntity, TestEntityMeta> {
     );
   }
 }
-typedef TestEntityLocalDataSource
+typedef TestEntityStore
     = OrmEngine<TestEntity, TestEntityMeta, StoreContext<TestEntity>>;
 
 class TestEntityMeta extends EntityMeta<TestEntity> {

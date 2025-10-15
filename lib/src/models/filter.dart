@@ -8,7 +8,7 @@ class Filter<TEntity extends EntityBase> extends Equatable {
   /// [openGroup] adds left bracket, [closeGroup] adds right bracket
   Filter(
     ColumnDefinition<TEntity, dynamic>? column, {
-    OrmCondition condition = OrmCondition.equalTo,
+    OrmCondition condition = OrmCondition.isEqualTo,
     dynamic value,
     dynamic secondaryValue,
     bool openGroup = false,
@@ -45,7 +45,7 @@ class Filter<TEntity extends EntityBase> extends Equatable {
 
   FilterCondition _addFilter(
     ColumnDefinition<TEntity, dynamic> column, {
-    OrmCondition condition = OrmCondition.equalTo,
+    OrmCondition condition = OrmCondition.isEqualTo,
     dynamic value,
     dynamic secondaryValue,
     bool openGroup = false,
@@ -89,7 +89,7 @@ class Filter<TEntity extends EntityBase> extends Equatable {
 
   Filter and(
     ColumnDefinition<TEntity, dynamic> column, {
-    OrmCondition condition = OrmCondition.equalTo,
+    OrmCondition condition = OrmCondition.isEqualTo,
     dynamic value,
     dynamic secondaryValue,
     bool openGroup = false,
@@ -114,7 +114,7 @@ class Filter<TEntity extends EntityBase> extends Equatable {
 
   Filter filter(
     ColumnDefinition<TEntity, dynamic> column, {
-    OrmCondition condition = OrmCondition.equalTo,
+    OrmCondition condition = OrmCondition.isEqualTo,
     dynamic value,
     dynamic secondaryValue,
     bool openGroup = false,
@@ -138,7 +138,7 @@ class Filter<TEntity extends EntityBase> extends Equatable {
 
   Filter or(
     ColumnDefinition<TEntity, dynamic> column, {
-    OrmCondition condition = OrmCondition.equalTo,
+    OrmCondition condition = OrmCondition.isEqualTo,
     dynamic value,
     dynamic secondaryValue,
     bool openGroup = false,

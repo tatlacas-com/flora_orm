@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:meta/meta.dart';
 
 @isTestGroup
-void run(String desc, TestEntityLocalDataSource storage) {
+void run(String desc, TestEntityStore storage) {
   test('insert(entity) should insert entity', () async {
     final entity = TestEntity(
       testBool: true,
@@ -63,7 +63,7 @@ void run(String desc, TestEntityLocalDataSource storage) {
     final insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     Future<TestEntity?>? fxn() async => storage.firstWhereOrNull(
-          columns: (t) => [],
+          select: (t) => [],
           (t) => Filter(
             t.id,
             value: insertedEntity!.id,
@@ -164,7 +164,7 @@ void run(String desc, TestEntityLocalDataSource storage) {
     final insertedEntity = await storage.insert(entity);
     expect(insertedEntity, isNotNull);
     final json = await storage.firstWhereOrNull(
-      columns: (t) => [t.testInt],
+      select: (t) => [t.testInt],
       (t) => Filter(
         entity.meta.id,
         value: insertedEntity!.id,
@@ -211,7 +211,7 @@ void run(String desc, TestEntityLocalDataSource storage) {
       ],
       (t) => Filter(
         entity.meta.id,
-        condition: OrmCondition.notEqualTo,
+        condition: OrmCondition.isNotEqualTo,
         value: '12',
       ),
     );
@@ -267,7 +267,7 @@ void run(String desc, TestEntityLocalDataSource storage) {
       ],
       (t) => Filter(
         t.testString,
-        condition: OrmCondition.notNull,
+        condition: OrmCondition.isNotNull,
       ),
     );
     expect(json, isNotNull);
@@ -293,7 +293,7 @@ void run(String desc, TestEntityLocalDataSource storage) {
       ],
       (t) => Filter(
         t.testInt,
-        condition: OrmCondition.lessThan,
+        condition: OrmCondition.isLessThan,
         value: -14,
       ),
     );
@@ -321,7 +321,7 @@ void run(String desc, TestEntityLocalDataSource storage) {
       ],
       (t) => Filter(
         t.testInt,
-        condition: OrmCondition.greaterThan,
+        condition: OrmCondition.isGreaterThan,
         value: 19999,
       ),
     );
@@ -349,7 +349,7 @@ void run(String desc, TestEntityLocalDataSource storage) {
       ],
       (t) => Filter(
         t.testInt,
-        condition: OrmCondition.greaterThanOrEqual,
+        condition: OrmCondition.isGreaterThanOrEqual,
         value: 100,
       ),
     );
@@ -377,7 +377,7 @@ void run(String desc, TestEntityLocalDataSource storage) {
       ],
       (t) => Filter(
         t.testInt,
-        condition: OrmCondition.greaterThanOrEqual,
+        condition: OrmCondition.isGreaterThanOrEqual,
         value: -10,
       ),
     );
@@ -405,7 +405,7 @@ void run(String desc, TestEntityLocalDataSource storage) {
       ],
       (t) => Filter(
         t.testInt,
-        condition: OrmCondition.between,
+        condition: OrmCondition.isBetween,
         value: 1000,
         secondaryValue: 1002,
       ),
@@ -434,7 +434,7 @@ void run(String desc, TestEntityLocalDataSource storage) {
       ],
       (t) => Filter(
         t.testInt,
-        condition: OrmCondition.notBetween,
+        condition: OrmCondition.isNotBetween,
         value: -500,
         secondaryValue: 2019,
       ),
@@ -491,7 +491,7 @@ void run(String desc, TestEntityLocalDataSource storage) {
       ],
       (t) => Filter(
         t.testInt,
-        condition: OrmCondition.notIn,
+        condition: OrmCondition.isNotIn,
         value: const [11001, 11005],
       ),
     );
@@ -519,7 +519,7 @@ void run(String desc, TestEntityLocalDataSource storage) {
       ],
       (t) => Filter(
         t.testString,
-        condition: OrmCondition.like,
+        condition: OrmCondition.includes,
         value: '%Like%',
       ),
     );
@@ -547,7 +547,7 @@ void run(String desc, TestEntityLocalDataSource storage) {
       ],
       (t) => Filter(
         t.testString,
-        condition: OrmCondition.notLike,
+        condition: OrmCondition.excludes,
         value: '%Dummy%',
       ),
     );
@@ -577,7 +577,7 @@ void run(String desc, TestEntityLocalDataSource storage) {
       (t) => Filter.startGroup()
           .filter(
             t.testString,
-            condition: OrmCondition.like,
+            condition: OrmCondition.includes,
             value: '%Dummy%',
           )
           .and(
@@ -623,14 +623,14 @@ void run(String desc, TestEntityLocalDataSource storage) {
     final insertedEntity1 = await storage.insert(entity1);
     expect(insertedEntity1, isNotNull);
     final json = await storage.where(
-      orderBy: (t) => [OrmOrder(column: t.testInt)],
-      filter: (t) => Filter(
+      (t) => Filter(
         entity.meta.id,
         value: insertedEntity!.id,
       ).or(
         entity.meta.id,
         value: insertedEntity1!.id,
       ),
+      orderBy: (t) => [OrmOrder(column: t.testInt)],
     );
     expect(json, isNotNull);
     final entities = json.map<TestEntity>((e) => e).toList();
@@ -644,11 +644,11 @@ void run(String desc, TestEntityLocalDataSource storage) {
   test('getEntities() should return empty array', () async {
     const entity = TestEntity();
     final json = await storage.where(
-      orderBy: (t) => [OrmOrder(column: t.testInt)],
-      filter: (t) => Filter(
+      (t) => Filter(
         entity.meta.id,
         value: 'xyzNotFound',
       ),
+      orderBy: (t) => [OrmOrder(column: t.testInt)],
     );
     expect(json, isNotNull);
     expect(json.length, 0);
@@ -664,7 +664,7 @@ void run(String desc, TestEntityLocalDataSource storage) {
     );
 
     final insertedEntity = await storage.insert(entity);
-    final json = await storage.where(
+    final json = await storage.all(
       orderBy: (t) => [OrmOrder(column: entity.meta.createdAt)],
     );
     expect(json, isNotNull);
@@ -697,19 +697,19 @@ void run(String desc, TestEntityLocalDataSource storage) {
     final insertedEntity1 = await storage.insert(entity1);
     expect(insertedEntity1, isNotNull);
     final json = await storage.where(
-      orderBy: (t) => [
-        OrmOrder(
-          column: t.testInt,
-          direction: OrderDirection.desc,
-        ),
-      ],
-      filter: (t) => Filter(
+      (t) => Filter(
         entity.meta.id,
         value: insertedEntity!.id,
       ).or(
         entity.meta.id,
         value: insertedEntity1!.id,
       ),
+      orderBy: (t) => [
+        OrmOrder(
+          column: t.testInt,
+          direction: OrderDirection.desc,
+        ),
+      ],
     );
     expect(json, isNotNull);
     final entities = json.map<TestEntity>((e) => e).toList();
@@ -1001,7 +1001,7 @@ void run(String desc, TestEntityLocalDataSource storage) {
     final insertedEntity1 = await storage.insert(entity1);
     expect(insertedEntity1, isNotNull);
     final json = await storage.getSumProduct<double>(
-      columns: (t) => [
+      select: (t) => [
         t.testInt,
         t.testDouble,
       ],

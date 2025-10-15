@@ -176,15 +176,15 @@ Once your `OrmContext` is set, you can use it from anywhere in your code. If you
 
 ```dart
 final orm = GetIt.I<OrmContext>();
-final {EntityType}Orm storage = orm.getStorage(/* Instance of your Entity here */);
+final {EntityType}Orm storage = orm.getStore(/* Instance of your Entity here */);
 ```
 For example, to get `storage` for `UserEntity`:
 
 ```dart
 final orm = GetIt.I<OrmContext>();
-final UserLocalDataSource storage = orm.getStorage(const UserEntity())
+final UserStore storage = orm.getStore(const UserEntity())
 ```
-**IMPORTANT**: You **NEED** to specify type (e.g `UserLocalDataSource` above) for you to get `ColumnDefition`s on your `Filter`s later. The type class is auto-generated when you run `dart run build_runner build`
+**IMPORTANT**: You **NEED** to specify type (e.g `UserStore` above) for you to get `ColumnDefition`s on your `Filter`s later. The type class is auto-generated when you run `dart run build_runner build`
 
 ## CRUD operations
 

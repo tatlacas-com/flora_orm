@@ -21,13 +21,11 @@ FormattedQuery getWhereString<TEntity extends EntityBase>(Filter filter) {
     }
     if (element.openGroup) stringBuffer.write('(');
 
-    stringBuffer
-      ..write(element.column!.name)
-      ..write(getCondition(element.condition));
+    stringBuffer.write(getCondition(element.column!.name, element.condition));
     if (element.condition != OrmCondition.isNull &&
-        element.condition != OrmCondition.notNull) {
+        element.condition != OrmCondition.isNotNull) {
       if ((element.condition == OrmCondition.isIn ||
-              element.condition == OrmCondition.notIn) &&
+              element.condition == OrmCondition.isNotIn) &&
           element.value is List) {
         final args = element.value as List;
         final argsQ = args.map((e) => '?').toList();
@@ -38,8 +36,8 @@ FormattedQuery getWhereString<TEntity extends EntityBase>(Filter filter) {
         whereArgs.add(dbValue(element.value));
       }
     }
-    if (element.condition == OrmCondition.between ||
-        element.condition == OrmCondition.notBetween) {
+    if (element.condition == OrmCondition.isBetween ||
+        element.condition == OrmCondition.isNotBetween) {
       whereArgs.add(element.secondaryValue);
     }
     if (element.closeGroup) stringBuffer.write(')');

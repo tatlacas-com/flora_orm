@@ -149,7 +149,7 @@ class BaseOrmEngine<
   @override
   Future<TEntity?> firstWhereOrNull(
     Filter Function(TMeta t) where, {
-    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? columns,
+    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? offset,
     bool? useIsolate,
@@ -158,7 +158,7 @@ class BaseOrmEngine<
   }) async {
     final maps = await query(
       where: where,
-      columns: columns ?? (t) => t.columns,
+      select: select ?? (t) => t.columns,
       limit: 1,
       offset: offset,
       orderBy: orderBy,
@@ -175,7 +175,7 @@ class BaseOrmEngine<
   @override
   Future<Map<String, dynamic>?> firstWhereOrNullMap(
     Filter Function(TMeta t) where, {
-    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? columns,
+    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? offset,
     bool? useIsolate,
@@ -184,7 +184,7 @@ class BaseOrmEngine<
   }) async {
     final maps = await queryMap(
       where: where,
-      columns: columns ?? (t) => t.columns,
+      select: select ?? (t) => t.columns,
       limit: 1,
       offset: offset,
       orderBy: orderBy,
@@ -225,13 +225,13 @@ class BaseOrmEngine<
   @override
   Future<T> getSumProduct<T>({
     required Iterable<ColumnDefinition<TEntity, dynamic>> Function(TMeta t)
-        columns,
+        select,
     Filter Function(TMeta t)? where,
     bool? useIsolate,
     Map<String, dynamic>? isolateArgs,
     void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   }) async {
-    final cols = columns(t).map((e) => e.name).join(' * ');
+    final cols = select(t).map((e) => e.name).join(' * ');
     final List<Map<String, dynamic>> result = await rawQuery(
       where,
       'SELECT SUM ($cols) FROM ${t.tableName}',
@@ -259,7 +259,7 @@ class BaseOrmEngine<
 
   @override
   Future<List<TEntity>> all({
-    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? columns,
+    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? limit,
     int? offset,
@@ -267,8 +267,8 @@ class BaseOrmEngine<
     Map<String, dynamic>? isolateArgs,
     void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   }) async {
-    return where(
-      columns: columns,
+    return _where(
+      select: select,
       orderBy: orderBy,
       limit: limit,
       offset: offset,
@@ -279,8 +279,30 @@ class BaseOrmEngine<
   }
 
   @override
-  Future<List<TEntity>> where({
-    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? columns,
+  Future<List<TEntity>> where(
+    Filter Function(TMeta t)? filter, {
+    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
+    List<OrmOrder>? Function(TMeta t)? orderBy,
+    int? limit,
+    int? offset,
+    bool? useIsolate,
+    Map<String, dynamic>? isolateArgs,
+    void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
+  }) async {
+    return _where(
+      select: select,
+      orderBy: orderBy,
+      filter: filter,
+      limit: limit,
+      offset: offset,
+      useIsolate: useIsolate,
+      isolateArgs: isolateArgs,
+      onIsolatePreMap: onIsolatePreMap,
+    );
+  }
+
+  Future<List<TEntity>> _where({
+    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     Filter Function(TMeta t)? filter,
     int? limit,
@@ -293,7 +315,7 @@ class BaseOrmEngine<
       where: filter,
       limit: limit,
       offset: offset,
-      columns: columns ?? (t) => t.columns,
+      select: select ?? (t) => t.columns,
       orderBy: orderBy,
       useIsolate: useIsolate,
       isolateArgs: isolateArgs,
@@ -306,8 +328,30 @@ class BaseOrmEngine<
   }
 
   @override
-  Future<List<Map<String, dynamic>>> whereMap({
-    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? columns,
+  Future<List<Map<String, dynamic>>> whereMap(
+    Filter Function(TMeta t)? filter, {
+    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
+    List<OrmOrder>? Function(TMeta t)? orderBy,
+    int? limit,
+    int? offset,
+    bool? useIsolate,
+    Map<String, dynamic>? isolateArgs,
+    void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
+  }) async {
+    return _whereMap(
+      select: select,
+      orderBy: orderBy,
+      filter: filter,
+      limit: limit,
+      offset: offset,
+      useIsolate: useIsolate,
+      isolateArgs: isolateArgs,
+      onIsolatePreMap: onIsolatePreMap,
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> _whereMap({
+    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     Filter Function(TMeta t)? filter,
     int? limit,
@@ -320,7 +364,7 @@ class BaseOrmEngine<
       where: filter,
       limit: limit,
       offset: offset,
-      columns: columns ?? (t) => t.columns,
+      select: select ?? (t) => t.columns,
       orderBy: orderBy,
       useIsolate: useIsolate,
       isolateArgs: isolateArgs,
@@ -428,7 +472,7 @@ class BaseOrmEngine<
     var createdAt = entity?.createdAt;
     if (entity == null) {
       final res =
-          await firstWhereOrNullMap(where, columns: (t) => [t.createdAt]);
+          await firstWhereOrNullMap(where, select: (t) => [t.createdAt]);
       if (res != null && res.containsKey(t.createdAt.name)) {
         createdAt = DateTime.parse(res[t.createdAt.name] as String);
       }
@@ -449,7 +493,7 @@ class BaseOrmEngine<
   @protected
   Future<List<TEntity>> query({
     Filter Function(TMeta t)? where,
-    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? columns,
+    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? limit,
     int? offset,
@@ -459,16 +503,16 @@ class BaseOrmEngine<
   }) async {
     List<Map<String, dynamic>> maps;
     final db = await dbContext.database;
-    final cols1 = columns?.call(t);
+    final cols1 = select?.call(t);
     if (cols1 == null) {
-      throw ArgumentError('no columns supplied');
+      throw ArgumentError('no select columns supplied');
     }
     final cols = <String>[];
     for (final element in cols1) {
       cols.add(element.name);
     }
     if (cols.isEmpty) {
-      throw ArgumentError('no columns supplied');
+      throw ArgumentError('no select columns supplied');
     }
     final orderByFilter = orderBy
         ?.call(t)
@@ -518,7 +562,7 @@ class BaseOrmEngine<
   @protected
   Future<List<Map<String, dynamic>>> queryMap({
     Filter Function(TMeta t)? where,
-    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? columns,
+    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? limit,
     int? offset,
@@ -528,16 +572,16 @@ class BaseOrmEngine<
   }) async {
     List<Map<String, dynamic>> maps;
     final db = await dbContext.database;
-    final cols1 = columns?.call(t);
+    final cols1 = select?.call(t);
     if (cols1 == null) {
-      throw ArgumentError('no columns supplied');
+      throw ArgumentError('no select columns supplied');
     }
     final cols = <String>[];
     for (final element in cols1) {
       cols.add(element.name);
     }
     if (cols.isEmpty) {
-      throw ArgumentError('no columns supplied');
+      throw ArgumentError('no select columns supplied');
     }
     final orderByFilter = orderBy
         ?.call(t)

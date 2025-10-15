@@ -15,7 +15,7 @@
 * fix map casting in entity
 ## 2.1.0
 
-* refactor to OrmContext and XxxxLocalDataSource
+* refactor to OrmContext and XxxxStore
 
 ## 2.0.27
 

@@ -43,10 +43,9 @@ class _MyHomePageState extends State<MyHomePage> {
   );
 
   /// Get a storage instance of the Entity type you want to use.
-  /// **IMPORTANT remember to specify type ([UserLocalDataSource] for this example)
+  /// **IMPORTANT remember to specify type ([UserStore] for this example)
   /// to make your life easier when using storage object
-  late final UserEntityLocalDataSource storage =
-      orm.getDataSource(UserEntity());
+  late final UserEntityStore storage = orm.getStore(UserEntity());
 
   Future<UserEntity> _insertUser() async {
     await storage.insertOrUpdate(

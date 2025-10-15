@@ -17,7 +17,7 @@ class OrmContext extends Equatable {
     required String dbName,
     required List<EntityBase> tables,
     DbEngine engine = DbEngine.sqflite,
-  }) {
+  }) : assert(dbName.trim().isNotEmpty, 'dbName should not be empty') {
     if (kIsWeb && !engine.suppportsWeb) {
       engine = DbEngine.sharedPreferences;
     } else if (Platform.isWindows && !engine.suppportsWindows) {
@@ -28,24 +28,25 @@ class OrmContext extends Equatable {
       engine = DbEngine.sqfliteCommon;
     }
     _engine = engine;
+    final databaseName = dbName.trim();
     dbContext = switch (_engine) {
       DbEngine.inMemory => SqfliteInMemoryStoreContext(
           dbVersion: dbVersion,
-          dbName: dbName,
+          dbName: databaseName,
           tables: tables,
         ),
       DbEngine.sqfliteCommon => SqfliteCommonStoreContext(
           dbVersion: dbVersion,
-          dbName: dbName,
+          dbName: databaseName,
           tables: tables,
         ),
       DbEngine.sqflite => SqfliteStoreContext(
           dbVersion: dbVersion,
-          dbName: dbName,
+          dbName: databaseName,
           tables: tables,
         ),
       DbEngine.sharedPreferences => SharedPreferenceStoreContext(
-          dbName: dbName,
+          dbName: databaseName,
           dbVersion: dbVersion,
           tables: tables,
         ),
@@ -56,15 +57,8 @@ class OrmContext extends Equatable {
   late final DbEngine _engine;
   DbEngine get engine => _engine;
 
-  @Deprecated('Use getDataSource instead')
   OrmEngine<TEntity, TMeta, StoreContext<TEntity>>
-      getStorage<TEntity extends EntityBase, TMeta extends EntityMeta<TEntity>>(
-    TEntity t,
-  ) =>
-          getDataSource(t);
-
-  OrmEngine<TEntity, TMeta, StoreContext<TEntity>> getDataSource<
-      TEntity extends EntityBase, TMeta extends EntityMeta<TEntity>>(
+      getStore<TEntity extends EntityBase, TMeta extends EntityMeta<TEntity>>(
     TEntity t,
   ) {
     return switch (dbContext) {

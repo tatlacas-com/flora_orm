@@ -17,8 +17,8 @@ void main() {
     );
 
     group('Test Engine', () {
-      final dataSource = orm.getDataSource(const TestEntity());
-      run('Test engine', dataSource as TestEntityLocalDataSource);
+      final dataSource = orm.getStore(const TestEntity());
+      run('Test engine', dataSource as TestEntityStore);
     });
     group('Test Db upgrade', () {
       setUp(() async {

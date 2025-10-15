@@ -69,7 +69,7 @@ class SharedPreferenceEngine<TEntity extends EntityBase,
   @override
   Future<TEntity?> firstWhereOrNull(
     Filter Function(TMeta t) where, {
-    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? columns,
+    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? offset,
     bool? useIsolate,
@@ -100,39 +100,45 @@ class SharedPreferenceEngine<TEntity extends EntityBase,
     for (final filter in filters) {
       final column = filter.column?.name ?? '';
       switch (filter.condition) {
-        case OrmCondition.equalTo:
+        case OrmCondition.isEqualTo:
           included = value[column] == filter.value;
-        case OrmCondition.notEqualTo:
+        case OrmCondition.isNotEqualTo:
           included = value[column] != filter.value;
-        case OrmCondition.lessThan:
+        case OrmCondition.isLessThan:
           included = (value[column] as num? ?? double.infinity) <
               (filter.value as num);
-        case OrmCondition.greaterThan:
+        case OrmCondition.isGreaterThan:
           included = (value[column] as num? ?? double.infinity) >
               (filter.value as num);
-        case OrmCondition.lessThanOrEqual:
+        case OrmCondition.isLessThanOrEqual:
           included = (value[column] as num? ?? double.infinity) <=
               (filter.value as num);
-        case OrmCondition.greaterThanOrEqual:
+        case OrmCondition.isGreaterThanOrEqual:
           included = (value[column] as num? ?? double.infinity) >=
               (filter.value as num);
-        case OrmCondition.between:
+        case OrmCondition.isBetween:
           final val = value[column] as num? ?? double.infinity;
           included = val >= (filter.value as num) &&
               val <= (filter.secondaryValue as num);
         case OrmCondition.isNull:
           included = value[column] == null;
-        case OrmCondition.notNull:
+        case OrmCondition.isNotNull:
           included = value[column] != null;
+        case OrmCondition.isNotEmpty:
+          included = value[column] != null && value[column] != '';
+        case OrmCondition.isEmpty:
+          included = value[column] != null && value[column] == '';
+        case OrmCondition.isNullOrEmpty:
+          included = value[column] == null || value[column] == '';
         case OrmCondition.isIn:
           included = (filter.value as List).contains(value[column]);
-        case OrmCondition.like:
+        case OrmCondition.includes:
           included = _like(filter, value, column);
-        case OrmCondition.notLike:
+        case OrmCondition.excludes:
           included = !_like(filter, value, column);
-        case OrmCondition.notIn:
+        case OrmCondition.isNotIn:
           included = !(filter.value as List).contains(value[column]);
-        case OrmCondition.notBetween:
+        case OrmCondition.isNotBetween:
           final val = value[column] as num? ?? double.infinity;
           included = !(val >= (filter.value as num) &&
               val <= (filter.secondaryValue as num));
@@ -279,7 +285,7 @@ class SharedPreferenceEngine<TEntity extends EntityBase,
       var createdAt = entity?.createdAt;
       if (entity == null) {
         final res =
-            await firstWhereOrNullMap(where, columns: (t) => [t.createdAt]);
+            await firstWhereOrNullMap(where, select: (t) => [t.createdAt]);
         if (res != null && res.containsKey(t.createdAt.name)) {
           createdAt = res[t.createdAt.name] as DateTime?;
         }
@@ -297,7 +303,7 @@ class SharedPreferenceEngine<TEntity extends EntityBase,
   @override
   Future<List<TEntity>> query({
     Filter Function(TMeta t)? where,
-    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? columns,
+    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? limit,
     int? offset,

@@ -55,7 +55,7 @@ abstract class OrmEngine<
 
   Future<TEntity?> firstWhereOrNull(
     Filter Function(TMeta t) where, {
-    List<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? columns,
+    List<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? offset,
     bool? useIsolate,
@@ -64,7 +64,7 @@ abstract class OrmEngine<
   });
   Future<Map<String, dynamic>?> firstWhereOrNullMap(
     Filter Function(TMeta t) where, {
-    List<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? columns,
+    List<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? offset,
     bool? useIsolate,
@@ -81,7 +81,7 @@ abstract class OrmEngine<
   });
 
   Future<T> getSumProduct<T>({
-    required List<ColumnDefinition<TEntity, dynamic>> Function(TMeta t) columns,
+    required List<ColumnDefinition<TEntity, dynamic>> Function(TMeta t) select,
     Filter Function(TMeta t)? where,
     bool? useIsolate,
     Map<String, dynamic>? isolateArgs,
@@ -112,7 +112,7 @@ abstract class OrmEngine<
   @protected
   Future<List<TEntity>> query({
     Filter Function(TMeta t)? where,
-    List<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? columns,
+    List<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? limit,
     int? offset,
@@ -123,7 +123,7 @@ abstract class OrmEngine<
   @protected
   Future<List<Map<String, dynamic>>> queryMap({
     Filter Function(TMeta t)? where,
-    List<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? columns,
+    List<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? limit,
     int? offset,
@@ -133,7 +133,7 @@ abstract class OrmEngine<
   });
 
   Future<List<TEntity>> all({
-    List<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? columns,
+    List<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? limit,
     int? offset,
@@ -142,10 +142,10 @@ abstract class OrmEngine<
     void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   });
 
-  Future<List<TEntity>> where({
-    List<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? columns,
+  Future<List<TEntity>> where(
+    Filter Function(TMeta t)? filter, {
+    List<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
-    Filter Function(TMeta t)? filter,
     int? limit,
     int? offset,
     bool? useIsolate,
@@ -153,10 +153,10 @@ abstract class OrmEngine<
     void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   });
 
-  Future<List<Map<String, dynamic>>> whereMap({
-    List<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? columns,
+  Future<List<Map<String, dynamic>>> whereMap(
+    Filter Function(TMeta t)? filter, {
+    List<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
-    Filter Function(TMeta t)? filter,
     int? limit,
     int? offset,
     bool? useIsolate,
