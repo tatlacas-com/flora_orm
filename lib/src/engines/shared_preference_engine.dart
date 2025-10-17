@@ -76,6 +76,11 @@ class SharedPreferenceEngine<TEntity extends EntityBase,
     Map<String, dynamic>? isolateArgs,
     void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   }) async {
+    final customSelect = select?.call(t)?.toList();
+    if (customSelect != null && customSelect.isEmpty) {
+      throw ArgumentError('no select columns supplied');
+    }
+
     final records = await getItems() ?? {};
     final filters = where(t).filters;
     final res = records.entries.firstWhereOrNull(

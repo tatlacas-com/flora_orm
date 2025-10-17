@@ -85,8 +85,8 @@ void run(String desc, TestEntityStore storage) {
                 value: entity.testDateTime,
               ),
         );
-    expect(
-      () async => fxn(),
+    await expectLater(
+      fxn(),
       throwsA(const TypeMatcher<ArgumentError>()),
     );
   });

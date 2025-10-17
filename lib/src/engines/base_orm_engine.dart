@@ -503,15 +503,15 @@ class BaseOrmEngine<
   }) async {
     List<Map<String, dynamic>> maps;
     final db = await dbContext.database;
-    final cols1 = select?.call(t);
-    if (cols1 == null) {
+    final customSelect = select?.call(t);
+    if (customSelect == null) {
       throw ArgumentError('no select columns supplied');
     }
-    final cols = <String>[];
-    for (final element in cols1) {
-      cols.add(element.name);
+    final selectColumns = <String>[];
+    for (final element in customSelect) {
+      selectColumns.add(element.name);
     }
-    if (cols.isEmpty) {
+    if (selectColumns.isEmpty) {
       throw ArgumentError('no select columns supplied');
     }
     final orderByFilter = orderBy
@@ -524,7 +524,7 @@ class BaseOrmEngine<
     if (where == null) {
       maps = await db.query(
         t.tableName,
-        columns: cols,
+        columns: selectColumns,
         orderBy: orderByFilter,
         limit: limit,
         offset: offset,
@@ -536,7 +536,7 @@ class BaseOrmEngine<
       );
       maps = await db.query(
         t.tableName,
-        columns: cols,
+        columns: selectColumns,
         where: formattedQuery.filter,
         whereArgs: formattedQuery.whereArgs,
         orderBy: orderByFilter,
