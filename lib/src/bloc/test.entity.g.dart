@@ -48,6 +48,17 @@ mixin _TestEntityMixin on Entity<TestEntity, TestEntityMeta> {
     );
   }
 
+  TestEntity readIntList(Map<String, dynamic> json, dynamic value) {
+    List<int>? items;
+    if (value != null) {
+      final list = value is List ? value : jsonDecode(value as String);
+      items = (list as List<dynamic>?)?.map<int>((e) => e as int).toList();
+    }
+    return copyWith(
+      intList: items,
+    );
+  }
+
   String? get testString;
   String? get testUpgrade;
   DateTime? get testDateTime;
@@ -59,6 +70,7 @@ mixin _TestEntityMixin on Entity<TestEntity, TestEntityMeta> {
   TestEnum? get testEnum1;
   TestEnum? get testEnum2;
   TestEnum get testEnum3;
+  List<int> get intList;
 
   @override
   List<Object?> get props => [
@@ -74,6 +86,7 @@ mixin _TestEntityMixin on Entity<TestEntity, TestEntityMeta> {
         testEnum1,
         testEnum2,
         testEnum3,
+        intList,
       ];
   @override
   TestEntity copyWith({
@@ -92,6 +105,7 @@ mixin _TestEntityMixin on Entity<TestEntity, TestEntityMeta> {
     ValueGetter<TestEnum?>? testEnum1,
     ValueGetter<TestEnum?>? testEnum2,
     TestEnum? testEnum3,
+    List<int>? intList,
     Map<String, dynamic>? json,
   }) {
     return TestEntity(
@@ -112,6 +126,7 @@ mixin _TestEntityMixin on Entity<TestEntity, TestEntityMeta> {
       testEnum1: testEnum1 != null ? testEnum1() : this.testEnum1,
       testEnum2: testEnum2 != null ? testEnum2() : this.testEnum2,
       testEnum3: testEnum3 ?? this.testEnum3,
+      intList: intList ?? this.intList,
     );
   }
 }
@@ -247,16 +262,18 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
       ColumnDefinition<TestEntity, String>(
         'testEnum1',
         write: (entity) {
-          if (entity.testEnum1 == null) {
+          final testEnum1 = entity.testEnum1;
+
+          if (testEnum1 == null) {
             return null;
+          } else if (testEnum1.isEmpty) {
+            return '';
           }
-          final map = entity.testEnum1?.name;
+          final map = testEnum1?.name;
 
           return map;
         },
-        read: (json, entity, value) {
-          return entity.readTestEnum1(json, value);
-        },
+        read: (json, entity, value) {},
       );
 
   ColumnDefinition<TestEntity, String> get testEnum2 =>
@@ -264,16 +281,18 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
         'testEnum2',
         defaultValue: 'value1',
         write: (entity) {
-          if (entity.testEnum2 == null) {
+          final testEnum2 = entity.testEnum2;
+
+          if (testEnum2 == null) {
             return null;
+          } else if (testEnum2.isEmpty) {
+            return '';
           }
-          final map = entity.testEnum2?.name;
+          final map = testEnum2?.name;
 
           return map;
         },
-        read: (json, entity, value) {
-          return entity.readTestEnum2(json, value);
-        },
+        read: (json, entity, value) {},
       );
 
   ColumnDefinition<TestEntity, String> get testEnum3 =>
@@ -282,12 +301,28 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
         notNull: true,
         defaultValue: 'value1',
         write: (entity) {
-          final map = entity.testEnum3.name;
+          final testEnum3 = entity.testEnum3;
+
+          final map = testEnum3.name;
 
           return map;
         },
+        read: (json, entity, value) {},
+      );
+
+  ColumnDefinition<TestEntity, String> get intList =>
+      ColumnDefinition<TestEntity, String>(
+        'intList',
+        notNull: true,
+        write: (entity) {
+          final map = entity.intList.map((p) => p).toList();
+
+          return jsonEncode(map);
+        },
         read: (json, entity, value) {
-          return entity.readTestEnum3(json, value);
+          if (value == '') {
+            value = '[]';
+          }
         },
       );
 
@@ -308,5 +343,6 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
         testEnum1,
         testEnum2,
         testEnum3,
+        intList,
       ];
 }

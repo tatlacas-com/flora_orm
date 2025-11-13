@@ -20,6 +20,7 @@ class TestEntity extends Entity<TestEntity, TestEntityMeta>
     this.testDouble,
     this.testEnum1,
     this.testEnum2,
+    this.intList = const [],
     this.testEnum3 = TestEnum.value1,
     this.testDouble2 = 10,
   });
@@ -56,6 +57,10 @@ class TestEntity extends Entity<TestEntity, TestEntityMeta>
   @override
   @OrmColumn<TestEnum>(defaultValue: 'value1')
   final TestEnum testEnum3;
+
+  @override
+  @column
+  final List<int> intList;
 }
 
 enum TestEnum { value1, value2 }

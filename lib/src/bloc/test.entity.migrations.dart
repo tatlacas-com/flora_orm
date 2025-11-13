@@ -7,7 +7,6 @@ mixin TestEntityMigrations on Entity<TestEntity, TestEntityMeta> {
       /// replace dbVersion with the version number this entity was introduced.
       /// remember to update dbVersion to this version
       /// in your OrmContext instance
-      4 => true,
       _ => false,
     };
   }

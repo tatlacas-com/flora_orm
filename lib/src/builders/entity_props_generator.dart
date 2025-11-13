@@ -438,21 +438,21 @@ class ${className}Meta extends  EntityMeta<$className> {
     ''');
             }
           }
+
+          var isDartCoreList = !isPremitiveType && isList;
+          if (jsonEncoded && isPremitiveType) {
+            final finder = PropertyFinder(alias!);
+            classElement.accept(finder);
+            final property = finder.foundProperty!;
+            isDartCoreList = property.type.isDartCoreList;
+            jsonEncodedType = property.type.cleanDisplayString;
+          }
+          final isNotNull = isPremitiveType ? aliasNotNull : notNull;
           if (jsonEncoded) {
             final typeName = isPremitiveType ? alias : fieldName;
             metaCode.writeln('''
           write: (entity) {
     ''');
-            var isDartCoreList = !isPremitiveType && isList;
-            if (isPremitiveType) {
-              final finder = PropertyFinder(alias!);
-              classElement.accept(finder);
-              final property = finder.foundProperty!;
-              isDartCoreList = property.type.isDartCoreList;
-              jsonEncodedType = property.type.cleanDisplayString;
-            }
-            final isNotNull = isPremitiveType ? aliasNotNull : notNull;
-
             if (isDartCoreList) {
               final map = ogIsPremitiveType
                   ? (fieldType == 'DateTime' ? 'p.toIso8601String()' : 'p')
@@ -472,20 +472,33 @@ class ${className}Meta extends  EntityMeta<$className> {
               } else {
                 map = (isEnum ? '.name' : '.toMap()');
               }
+              metaCode.writeln('''
+            final $typeName = entity.$typeName;
+    ''');
 
               if (isNotNull) {
+                if (isDartCoreList) {
+                  metaCode.writeln('''
+            if ($typeName.isEmpty) {
+            return '';
+          }
+    ''');
+                }
                 metaCode.writeln('''
-            final map = entity.$typeName$map;
+            final map = $typeName$map;
     ''');
               } else {
                 metaCode.writeln('''
-            if(entity.$typeName == null){
+            if($typeName == null){
                 return null;
-            }
-            final map = entity.$typeName?$map;
+            } else if ($typeName.isEmpty) {
+            return '';
+          }
+            final map = $typeName?$map;
     ''');
               }
             }
+
             metaCode.writeln('''
             return ${isEnum && !isDartCoreList ? 'map' : 'jsonEncode(map)'};
             },
@@ -513,7 +526,15 @@ class ${className}Meta extends  EntityMeta<$className> {
             }
             metaCode.writeln('''
           read: (json, entity, value){
-            return entity.read$fieldNameCamel(json, value);
+    ''');
+            if (isDartCoreList) {
+              metaCode.writeln('''
+            if (value == '') {
+            value = '[]';
+          }
+    ''');
+            }
+            metaCode.writeln('''
           },
         );
     ''');

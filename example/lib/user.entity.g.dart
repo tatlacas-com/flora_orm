@@ -143,16 +143,18 @@ class UserEntityMeta extends EntityMeta<UserEntity> {
       ColumnDefinition<UserEntity, String>(
         'testEnum',
         write: (entity) {
-          if (entity.testEnum == null) {
+          final testEnum = entity.testEnum;
+
+          if (testEnum == null) {
             return null;
+          } else if (testEnum.isEmpty) {
+            return '';
           }
-          final map = entity.testEnum?.name;
+          final map = testEnum?.name;
 
           return map;
         },
-        read: (json, entity, value) {
-          return entity.readTestEnum(json, value);
-        },
+        read: (json, entity, value) {},
       );
 
   ColumnDefinition<UserEntity, String> get testEnum2 =>
@@ -161,13 +163,13 @@ class UserEntityMeta extends EntityMeta<UserEntity> {
         notNull: true,
         defaultValue: 'first',
         write: (entity) {
-          final map = entity.testEnum2.name;
+          final testEnum2 = entity.testEnum2;
+
+          final map = testEnum2.name;
 
           return map;
         },
-        read: (json, entity, value) {
-          return entity.readTestEnum2(json, value);
-        },
+        read: (json, entity, value) {},
       );
 
   ColumnDefinition<UserEntity, String> get reactionsCounts =>
@@ -175,13 +177,13 @@ class UserEntityMeta extends EntityMeta<UserEntity> {
         'reactionsCounts',
         notNull: true,
         write: (entity) {
-          final map = entity.reactionsCounts;
+          final reactionsCounts = entity.reactionsCounts;
+
+          final map = reactionsCounts;
 
           return jsonEncode(map);
         },
-        read: (json, entity, value) {
-          return entity.readReactionsCounts(json, value);
-        },
+        read: (json, entity, value) {},
       );
 
   ColumnDefinition<UserEntity, String> get firstName =>

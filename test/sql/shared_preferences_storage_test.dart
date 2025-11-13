@@ -1020,10 +1020,11 @@ void main() {
         final insertedEntity1 = await storage.insert(entity1);
         expect(insertedEntity1, isNotNull);
         await expectLater(
-            storage.getSum<int>(
-              column: (t) => t.testInt,
-            ),
-            throwsUnsupportedError);
+          storage.getSum<int>(
+            column: (t) => t.testInt,
+          ),
+          throwsUnsupportedError,
+        );
       });
 
       test('getSumProduct<double>() should throwsUnsupportedError', () async {
@@ -1048,20 +1049,21 @@ void main() {
         final insertedEntity1 = await storage.insert(entity1);
         expect(insertedEntity1, isNotNull);
         await expectLater(
-            storage.getSumProduct<double>(
-              select: (t) => [
-                t.testInt,
-                t.testDouble,
-              ],
-              where: (t) => Filter(
-                entity.meta.id,
-                value: insertedEntity!.id,
-              ).or(
-                entity.meta.id,
-                value: insertedEntity1!.id,
-              ),
+          storage.getSumProduct<double>(
+            select: (t) => [
+              t.testInt,
+              t.testDouble,
+            ],
+            where: (t) => Filter(
+              entity.meta.id,
+              value: insertedEntity!.id,
+            ).or(
+              entity.meta.id,
+              value: insertedEntity1!.id,
             ),
-            throwsUnsupportedError);
+          ),
+          throwsUnsupportedError,
+        );
       });
 
       test('getSum<double>() should throwsUnsupportedError', () async {
@@ -1086,17 +1088,18 @@ void main() {
         final insertedEntity1 = await storage.insert(entity1);
         expect(insertedEntity1, isNotNull);
         await expectLater(
-            storage.getSum<double>(
-              column: (t) => t.testDouble,
-              where: (t) => Filter(
-                entity.meta.id,
-                value: insertedEntity!.id,
-              ).or(
-                entity.meta.id,
-                value: insertedEntity1!.id,
-              ),
+          storage.getSum<double>(
+            column: (t) => t.testDouble,
+            where: (t) => Filter(
+              entity.meta.id,
+              value: insertedEntity!.id,
+            ).or(
+              entity.meta.id,
+              value: insertedEntity1!.id,
             ),
-            throwsUnsupportedError);
+          ),
+          throwsUnsupportedError,
+        );
       });
 
       test('parseInt should return expected int', () {
