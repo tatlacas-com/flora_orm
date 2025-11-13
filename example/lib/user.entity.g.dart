@@ -147,14 +147,14 @@ class UserEntityMeta extends EntityMeta<UserEntity> {
 
           if (testEnum == null) {
             return null;
-          } else if (testEnum.isEmpty) {
-            return '';
           }
-          final map = testEnum?.name;
+          final map = testEnum.name;
 
           return map;
         },
-        read: (json, entity, value) {},
+        read: (json, entity, value) {
+          return entity.readTestEnum(json, value);
+        },
       );
 
   ColumnDefinition<UserEntity, String> get testEnum2 =>
@@ -169,7 +169,9 @@ class UserEntityMeta extends EntityMeta<UserEntity> {
 
           return map;
         },
-        read: (json, entity, value) {},
+        read: (json, entity, value) {
+          return entity.readTestEnum2(json, value);
+        },
       );
 
   ColumnDefinition<UserEntity, String> get reactionsCounts =>
@@ -183,7 +185,9 @@ class UserEntityMeta extends EntityMeta<UserEntity> {
 
           return jsonEncode(map);
         },
-        read: (json, entity, value) {},
+        read: (json, entity, value) {
+          return entity.readReactionsCounts(json, value);
+        },
       );
 
   ColumnDefinition<UserEntity, String> get firstName =>

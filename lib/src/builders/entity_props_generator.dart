@@ -452,13 +452,30 @@ class ${className}Meta extends  EntityMeta<$className> {
             final typeName = isPremitiveType ? alias : fieldName;
             metaCode.writeln('''
           write: (entity) {
+            final $typeName = entity.$typeName;
     ''');
+
             if (isDartCoreList) {
+              if (isNotNull) {
+                metaCode.writeln('''
+            if ($typeName.isEmpty) {
+            return '';
+          }
+    ''');
+              } else {
+                metaCode.writeln('''
+            if($typeName == null){
+                return null;
+            } else if ($typeName.isEmpty) {
+            return '';
+          }
+    ''');
+              }
               final map = ogIsPremitiveType
                   ? (fieldType == 'DateTime' ? 'p.toIso8601String()' : 'p')
                   : (isEnum ? 'p.name' : 'p.toMap()');
               metaCode.writeln('''
-            final map = entity.$typeName${isNotNull ? '' : '?'}.map((p) => $map).toList();
+            final map = $typeName${isNotNull ? '' : '?'}.map((p) => $map).toList();
     ''');
             } else {
               final typeName = isPremitiveType ? alias : fieldName;
@@ -472,18 +489,8 @@ class ${className}Meta extends  EntityMeta<$className> {
               } else {
                 map = (isEnum ? '.name' : '.toMap()');
               }
-              metaCode.writeln('''
-            final $typeName = entity.$typeName;
-    ''');
 
               if (isNotNull) {
-                if (isDartCoreList) {
-                  metaCode.writeln('''
-            if ($typeName.isEmpty) {
-            return '';
-          }
-    ''');
-                }
                 metaCode.writeln('''
             final map = $typeName$map;
     ''');
@@ -491,10 +498,8 @@ class ${className}Meta extends  EntityMeta<$className> {
                 metaCode.writeln('''
             if($typeName == null){
                 return null;
-            } else if ($typeName.isEmpty) {
-            return '';
-          }
-            final map = $typeName?$map;
+            }
+            final map = $typeName$map;
     ''');
               }
             }
@@ -535,6 +540,7 @@ class ${className}Meta extends  EntityMeta<$className> {
     ''');
             }
             metaCode.writeln('''
+            return entity.read$fieldNameCamel(json, value);
           },
         );
     ''');

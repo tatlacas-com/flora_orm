@@ -1,5 +1,9 @@
 
 
+## 3.3.2
+
+* FIX: isEmpty list query
+
 ## 3.3.1
 
 * FIX: conditions that do not require args

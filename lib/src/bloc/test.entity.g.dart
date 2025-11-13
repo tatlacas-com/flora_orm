@@ -266,14 +266,14 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
 
           if (testEnum1 == null) {
             return null;
-          } else if (testEnum1.isEmpty) {
-            return '';
           }
-          final map = testEnum1?.name;
+          final map = testEnum1.name;
 
           return map;
         },
-        read: (json, entity, value) {},
+        read: (json, entity, value) {
+          return entity.readTestEnum1(json, value);
+        },
       );
 
   ColumnDefinition<TestEntity, String> get testEnum2 =>
@@ -285,14 +285,14 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
 
           if (testEnum2 == null) {
             return null;
-          } else if (testEnum2.isEmpty) {
-            return '';
           }
-          final map = testEnum2?.name;
+          final map = testEnum2.name;
 
           return map;
         },
-        read: (json, entity, value) {},
+        read: (json, entity, value) {
+          return entity.readTestEnum2(json, value);
+        },
       );
 
   ColumnDefinition<TestEntity, String> get testEnum3 =>
@@ -307,7 +307,9 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
 
           return map;
         },
-        read: (json, entity, value) {},
+        read: (json, entity, value) {
+          return entity.readTestEnum3(json, value);
+        },
       );
 
   ColumnDefinition<TestEntity, String> get intList =>
@@ -315,7 +317,13 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
         'intList',
         notNull: true,
         write: (entity) {
-          final map = entity.intList.map((p) => p).toList();
+          final intList = entity.intList;
+
+          if (intList.isEmpty) {
+            return '';
+          }
+
+          final map = intList.map((p) => p).toList();
 
           return jsonEncode(map);
         },
@@ -323,6 +331,8 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
           if (value == '') {
             value = '[]';
           }
+
+          return entity.readIntList(json, value);
         },
       );
 
