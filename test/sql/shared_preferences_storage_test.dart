@@ -249,7 +249,7 @@ void main() {
         final json = await storage.firstWhereOrNull(
           orderBy: (t) => [
             OrmOrder(
-              column: entity.meta.createdAt,
+              entity.meta.createdAt,
               direction: OrderDirection.desc,
             ),
           ],
@@ -276,7 +276,7 @@ void main() {
         final json = await storage.firstWhereOrNull(
           orderBy: (t) => [
             OrmOrder(
-              column: entity.meta.createdAt,
+              entity.meta.createdAt,
               direction: OrderDirection.desc,
             ),
           ],
@@ -306,7 +306,7 @@ void main() {
         final json = await storage.firstWhereOrNull(
           orderBy: (t) => [
             OrmOrder(
-              column: entity.meta.createdAt,
+              entity.meta.createdAt,
               direction: OrderDirection.desc,
             ),
           ],
@@ -332,7 +332,7 @@ void main() {
         final json = await storage.firstWhereOrNull(
           orderBy: (t) => [
             OrmOrder(
-              column: entity.meta.createdAt,
+              entity.meta.createdAt,
               direction: OrderDirection.desc,
             ),
           ],
@@ -361,7 +361,7 @@ void main() {
         final json = await storage.firstWhereOrNull(
           orderBy: (t) => [
             OrmOrder(
-              column: entity.meta.createdAt,
+              entity.meta.createdAt,
               direction: OrderDirection.desc,
             ),
           ],
@@ -390,7 +390,7 @@ void main() {
         final json = await storage.firstWhereOrNull(
           orderBy: (t) => [
             OrmOrder(
-              column: entity.meta.createdAt,
+              entity.meta.createdAt,
               direction: OrderDirection.desc,
             ),
           ],
@@ -419,7 +419,7 @@ void main() {
         final json = await storage.firstWhereOrNull(
           orderBy: (t) => [
             OrmOrder(
-              column: entity.meta.createdAt,
+              entity.meta.createdAt,
               direction: OrderDirection.desc,
             ),
           ],
@@ -447,7 +447,7 @@ void main() {
         final json = await storage.firstWhereOrNull(
           orderBy: (t) => [
             OrmOrder(
-              column: entity.meta.createdAt,
+              entity.meta.createdAt,
               direction: OrderDirection.desc,
             ),
           ],
@@ -477,7 +477,7 @@ void main() {
         final json = await storage.firstWhereOrNull(
           orderBy: (t) => [
             OrmOrder(
-              column: entity.meta.createdAt,
+              entity.meta.createdAt,
               direction: OrderDirection.desc,
             ),
           ],
@@ -506,7 +506,7 @@ void main() {
         final json = await storage.firstWhereOrNull(
           orderBy: (t) => [
             OrmOrder(
-              column: entity.meta.createdAt,
+              entity.meta.createdAt,
               direction: OrderDirection.desc,
             ),
           ],
@@ -535,7 +535,7 @@ void main() {
         final json = await storage.firstWhereOrNull(
           orderBy: (t) => [
             OrmOrder(
-              column: entity.meta.createdAt,
+              entity.meta.createdAt,
               direction: OrderDirection.desc,
             ),
           ],
@@ -563,7 +563,7 @@ void main() {
         final json = await storage.firstWhereOrNull(
           orderBy: (t) => [
             OrmOrder(
-              column: entity.meta.createdAt,
+              entity.meta.createdAt,
               direction: OrderDirection.desc,
             ),
           ],
@@ -592,7 +592,7 @@ void main() {
         final json = await storage.firstWhereOrNull(
           orderBy: (t) => [
             OrmOrder(
-              column: entity.meta.createdAt,
+              entity.meta.createdAt,
               direction: OrderDirection.desc,
             ),
           ],
@@ -621,7 +621,7 @@ void main() {
         final json = await storage.firstWhereOrNull(
           orderBy: (t) => [
             OrmOrder(
-              column: entity.meta.createdAt,
+              entity.meta.createdAt,
               direction: OrderDirection.desc,
             ),
           ],
@@ -681,7 +681,7 @@ void main() {
             entity.meta.id,
             value: insertedEntity1!.id,
           ),
-          orderBy: (t) => [OrmOrder(column: t.testInt)],
+          orderBy: (t) => [OrmOrder(t.testInt)],
         );
         expect(json, isNotNull);
         final entities = json.map<TestEntity>((e) => e).toList();
@@ -699,7 +699,7 @@ void main() {
             entity.meta.id,
             value: 'xyzNotFound',
           ),
-          orderBy: (t) => [OrmOrder(column: t.testInt)],
+          orderBy: (t) => [OrmOrder(t.testInt)],
         );
         expect(json, isNotNull);
         expect(json.length, 0);
@@ -716,7 +716,7 @@ void main() {
 
         final insertedEntity = await storage.insert(entity);
         final json = await storage.all(
-          orderBy: (t) => [OrmOrder(column: entity.meta.createdAt)],
+          orderBy: (t) => [OrmOrder(entity.meta.createdAt)],
         );
         expect(json, isNotNull);
         expect(json.length, greaterThan(0));
@@ -758,7 +758,7 @@ void main() {
           ),
           orderBy: (t) => [
             OrmOrder(
-              column: t.testInt,
+              t.testInt,
               direction: OrderDirection.desc,
             ),
           ],

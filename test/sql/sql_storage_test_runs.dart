@@ -205,7 +205,7 @@ void run(String desc, TestEntityStore store) {
     final json = await store.firstWhereOrNull(
       orderBy: (t) => [
         OrmOrder(
-          column: t.createdAt,
+          t.createdAt,
           direction: OrderDirection.desc,
         ),
       ],
@@ -234,7 +234,7 @@ void run(String desc, TestEntityStore store) {
     final json = await store.firstWhereOrNull(
       orderBy: (t) => [
         OrmOrder(
-          column: t.createdAt,
+          t.createdAt,
           direction: OrderDirection.desc,
         ),
       ],
@@ -261,7 +261,7 @@ void run(String desc, TestEntityStore store) {
     final json = await store.firstWhereOrNull(
       orderBy: (t) => [
         OrmOrder(
-          column: t.createdAt,
+          t.createdAt,
           direction: OrderDirection.desc,
         ),
       ],
@@ -285,7 +285,7 @@ void run(String desc, TestEntityStore store) {
     final json = await store.firstWhereOrNull(
       orderBy: (t) => [
         OrmOrder(
-          column: t.createdAt,
+          t.createdAt,
           direction: OrderDirection.desc,
         ),
       ],
@@ -313,7 +313,7 @@ void run(String desc, TestEntityStore store) {
     final json = await store.firstWhereOrNull(
       orderBy: (t) => [
         OrmOrder(
-          column: t.createdAt,
+          t.createdAt,
           direction: OrderDirection.desc,
         ),
       ],
@@ -339,7 +339,7 @@ void run(String desc, TestEntityStore store) {
     final json = await store.firstWhereOrNull(
       orderBy: (t) => [
         OrmOrder(
-          column: t.createdAt,
+          t.createdAt,
           direction: OrderDirection.desc,
         ),
       ],
@@ -366,7 +366,7 @@ void run(String desc, TestEntityStore store) {
     final json = await store.firstWhereOrNull(
       orderBy: (t) => [
         OrmOrder(
-          column: t.createdAt,
+          t.createdAt,
           direction: OrderDirection.desc,
         ),
       ],
@@ -394,7 +394,7 @@ void run(String desc, TestEntityStore store) {
     final json = await store.firstWhereOrNull(
       orderBy: (t) => [
         OrmOrder(
-          column: t.createdAt,
+          t.createdAt,
           direction: OrderDirection.desc,
         ),
       ],
@@ -422,7 +422,7 @@ void run(String desc, TestEntityStore store) {
     final json = await store.firstWhereOrNull(
       orderBy: (t) => [
         OrmOrder(
-          column: t.createdAt,
+          t.createdAt,
           direction: OrderDirection.desc,
         ),
       ],
@@ -449,7 +449,7 @@ void run(String desc, TestEntityStore store) {
     final json = await store.firstWhereOrNull(
       orderBy: (t) => [
         OrmOrder(
-          column: t.createdAt,
+          t.createdAt,
           direction: OrderDirection.desc,
         ),
       ],
@@ -477,7 +477,7 @@ void run(String desc, TestEntityStore store) {
     final json = await store.firstWhereOrNull(
       orderBy: (t) => [
         OrmOrder(
-          column: t.createdAt,
+          t.createdAt,
           direction: OrderDirection.desc,
         ),
       ],
@@ -505,7 +505,7 @@ void run(String desc, TestEntityStore store) {
     final json = await store.firstWhereOrNull(
       orderBy: (t) => [
         OrmOrder(
-          column: t.createdAt,
+          t.createdAt,
           direction: OrderDirection.desc,
         ),
       ],
@@ -532,7 +532,7 @@ void run(String desc, TestEntityStore store) {
     final json = await store.firstWhereOrNull(
       orderBy: (t) => [
         OrmOrder(
-          column: t.createdAt,
+          t.createdAt,
           direction: OrderDirection.desc,
         ),
       ],
@@ -559,7 +559,7 @@ void run(String desc, TestEntityStore store) {
     final json = await store.firstWhereOrNull(
       orderBy: (t) => [
         OrmOrder(
-          column: t.createdAt,
+          t.createdAt,
           direction: OrderDirection.desc,
         ),
       ],
@@ -586,7 +586,7 @@ void run(String desc, TestEntityStore store) {
     final json = await store.firstWhereOrNull(
       orderBy: (t) => [
         OrmOrder(
-          column: t.createdAt,
+          t.createdAt,
           direction: OrderDirection.desc,
         ),
       ],
@@ -613,7 +613,7 @@ void run(String desc, TestEntityStore store) {
     final json = await store.firstWhereOrNull(
       orderBy: (t) => [
         OrmOrder(
-          column: t.createdAt,
+          t.createdAt,
           direction: OrderDirection.desc,
         ),
       ],
@@ -672,7 +672,7 @@ void run(String desc, TestEntityStore store) {
         t.id,
         value: insertedEntity1!.id,
       ),
-      orderBy: (t) => [OrmOrder(column: t.testInt)],
+      orderBy: (t) => [OrmOrder(t.testInt)],
     );
     expect(json, isNotNull);
     final entities = json.map<TestEntity>((e) => e).toList();
@@ -689,7 +689,7 @@ void run(String desc, TestEntityStore store) {
         t.id,
         value: 'xyzNotFound',
       ),
-      orderBy: (t) => [OrmOrder(column: t.testInt)],
+      orderBy: (t) => [OrmOrder(t.testInt)],
     );
     expect(json, isNotNull);
     expect(json.length, 0);
@@ -706,7 +706,7 @@ void run(String desc, TestEntityStore store) {
 
     final insertedEntity = await store.insert(entity);
     final json = await store.all(
-      orderBy: (t) => [OrmOrder(column: t.createdAt)],
+      orderBy: (t) => [OrmOrder(t.createdAt)],
     );
     expect(json, isNotNull);
     expect(json.length, greaterThan(0));
@@ -747,7 +747,7 @@ void run(String desc, TestEntityStore store) {
       ),
       orderBy: (t) => [
         OrmOrder(
-          column: t.testInt,
+          t.testInt,
           direction: OrderDirection.desc,
         ),
       ],
