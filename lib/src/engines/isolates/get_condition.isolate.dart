@@ -1,4 +1,4 @@
-import 'package:flora_orm/src/models/orm_condition.dart';
+import 'package:flora_orm/src/model/orm_condition.dart';
 
 String getCondition(String columnName, OrmCondition condition) {
   switch (condition) {

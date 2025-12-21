@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
-import 'package:flora_orm/src/models/column_definition_extension.dart';
-import 'package:flora_orm/src/models/entity.dart';
+import 'package:flora_orm/src/model/column_definition_extension.dart';
+import 'package:flora_orm/src/model/model.dart';
 
-class ColumnDefinition<TEntity extends EntityBase, TType> extends Equatable {
+class ColumnDefinition<TModel extends ModelBase, TType> extends Equatable {
   ColumnDefinition(
     this.name, {
     required this.write,
@@ -28,12 +28,9 @@ class ColumnDefinition<TEntity extends EntityBase, TType> extends Equatable {
 
   ColumnType get columnType => _columnType;
   final TType? defaultValue;
-  final TType? Function(TEntity entity) write;
-  final TEntity Function(
-    Map<String, dynamic> json,
-    TEntity entity,
-    dynamic value,
-  ) read;
+  final TType? Function(TModel model) write;
+  final TModel Function(Map<String, dynamic> json, TModel model, dynamic value)
+      read;
 
   @override
   List<Object?> get props => [
@@ -50,7 +47,7 @@ class ColumnDefinition<TEntity extends EntityBase, TType> extends Equatable {
 
   @override
   String toString() =>
-      'StorageColumn<$TEntity, $TType> {name:$name, primaryKey:$primaryKey, '
+      'StorageColumn<$TModel, $TType> {name:$name, primaryKey:$primaryKey, '
       'autoIncrementPrimary:$autoIncrementPrimary, notNull:$notNull, '
       'unique:$unique, _columnType:$_columnType}';
 
@@ -84,16 +81,9 @@ class ColumnDefinition<TEntity extends EntityBase, TType> extends Equatable {
     return value;
   }
 
-  void commitValue(TEntity entity, Map<String, dynamic> map) {
-    setValue(map, write(entity));
+  void commitValue(TModel model, Map<String, dynamic> map) {
+    setValue(map, write(model));
   }
 }
 
-enum ColumnType {
-  text,
-  integer,
-  real,
-  blob,
-  boolean,
-  dateTime,
-}
+enum ColumnType { text, integer, real, blob, boolean, dateTime }

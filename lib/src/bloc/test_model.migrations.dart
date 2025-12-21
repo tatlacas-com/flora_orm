@@ -1,12 +1,10 @@
-part of 'test.entity.dart';
+part of 'test_model.dart';
 
-mixin TestEntityMigrations on Entity<TestEntity, TestEntityMeta> {
+mixin TestModelMigrations on Model<TestModel, TestModelMeta> {
   @override
   bool createTableAt(int newVersion) {
     return switch (newVersion) {
-      /// replace dbVersion with the version number this entity was introduced.
-      /// remember to update dbVersion to this version
-      /// in your OrmContext instance
+      1 => true,
       _ => false,
     };
   }
@@ -19,7 +17,7 @@ mixin TestEntityMigrations on Entity<TestEntity, TestEntityMeta> {
   }
 
   @override
-  List<ColumnDefinition<TestEntity, dynamic>> addColumnsAt(
+  List<ColumnDefinition<TestModel, dynamic>> addColumnsAt(
     int newVersion,
   ) {
     return switch (newVersion) {

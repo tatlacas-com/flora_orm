@@ -1,13 +1,13 @@
 import 'package:equatable/equatable.dart';
-import 'package:flora_orm/src/models/column_definition.dart';
-import 'package:flora_orm/src/models/entity.dart';
-import 'package:flora_orm/src/models/filter_condition.dart';
-import 'package:flora_orm/src/models/orm_condition.dart';
+import 'package:flora_orm/src/model/column_definition.dart';
+import 'package:flora_orm/src/model/filter_condition.dart';
+import 'package:flora_orm/src/model/model.dart';
+import 'package:flora_orm/src/model/orm_condition.dart';
 
-class Filter<TEntity extends EntityBase> extends Equatable {
+class Filter<TModel extends ModelBase> extends Equatable {
   /// [openGroup] adds left bracket, [closeGroup] adds right bracket
   Filter(
-    ColumnDefinition<TEntity, dynamic>? column, {
+    ColumnDefinition<TModel, dynamic>? column, {
     OrmCondition condition = OrmCondition.isEqualTo,
     dynamic value,
     dynamic secondaryValue,
@@ -37,14 +37,15 @@ class Filter<TEntity extends EntityBase> extends Equatable {
 
   factory Filter.startGroup() {
     return Filter._(
-      filters: [const FilterCondition(openGroup: true, isForGrouping: true)]
-          .toList(),
+      filters: [
+        const FilterCondition(openGroup: true, isForGrouping: true),
+      ].toList(),
     );
   }
   late final List<FilterCondition> filters;
 
   FilterCondition _addFilter(
-    ColumnDefinition<TEntity, dynamic> column, {
+    ColumnDefinition<TModel, dynamic> column, {
     OrmCondition condition = OrmCondition.isEqualTo,
     dynamic value,
     dynamic secondaryValue,
@@ -88,7 +89,7 @@ class Filter<TEntity extends EntityBase> extends Equatable {
   }
 
   Filter and(
-    ColumnDefinition<TEntity, dynamic> column, {
+    ColumnDefinition<TModel, dynamic> column, {
     OrmCondition condition = OrmCondition.isEqualTo,
     dynamic value,
     dynamic secondaryValue,
@@ -113,7 +114,7 @@ class Filter<TEntity extends EntityBase> extends Equatable {
   }
 
   Filter filter(
-    ColumnDefinition<TEntity, dynamic> column, {
+    ColumnDefinition<TModel, dynamic> column, {
     OrmCondition condition = OrmCondition.isEqualTo,
     dynamic value,
     dynamic secondaryValue,
@@ -137,7 +138,7 @@ class Filter<TEntity extends EntityBase> extends Equatable {
   }
 
   Filter or(
-    ColumnDefinition<TEntity, dynamic> column, {
+    ColumnDefinition<TModel, dynamic> column, {
     OrmCondition condition = OrmCondition.isEqualTo,
     dynamic value,
     dynamic secondaryValue,

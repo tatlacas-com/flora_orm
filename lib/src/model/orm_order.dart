@@ -1,13 +1,10 @@
 import 'package:equatable/equatable.dart';
 import 'package:flora_orm/flora_orm.dart';
 
-class OrmOrder<TEntity extends EntityBase> extends Equatable {
-  const OrmOrder(
-    this.column, {
-    this.direction = OrderDirection.asc,
-  });
+class OrmOrder<TModel extends ModelBase> extends Equatable {
+  const OrmOrder(this.column, {this.direction = OrderDirection.asc});
   final OrderDirection direction;
-  final ColumnDefinition<TEntity, dynamic> column;
+  final ColumnDefinition<TModel, dynamic> column;
 
   @override
   List<Object?> get props => [direction, column];
@@ -15,8 +12,7 @@ class OrmOrder<TEntity extends EntityBase> extends Equatable {
 
 enum OrderDirection {
   asc,
-  desc,
-  ;
+  desc;
 
   String get sortStr => this == desc ? ' DESC' : '';
 }

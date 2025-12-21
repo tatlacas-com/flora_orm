@@ -1,29 +1,25 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:equatable/equatable.dart';
-import 'package:flora_orm/src/contexts/store_context.dart';
+import 'package:flora_orm/src/context/store_context.dart';
 import 'package:flora_orm/src/engines/isolates/get_where_string.isolate.dart';
-import 'package:flora_orm/src/models/entity.dart';
-import 'package:flora_orm/src/models/orm.dart';
-import 'package:flora_orm/src/models/orm_order.dart';
+import 'package:flora_orm/src/model/model.dart';
+import 'package:flora_orm/src/model/orm.dart';
+import 'package:flora_orm/src/model/orm_order.dart';
 import 'package:flutter/foundation.dart';
 
-class WhereParams<TEntity extends EntityBase,
-    TMeta extends EntityMeta<TEntity>> {
-  WhereParams({
-    required this.filter,
-    required this.t,
-  });
+class WhereParams<TModel extends ModelBase, TMeta extends ModelMeta<TModel>> {
+  WhereParams({required this.filter, required this.t});
   Filter Function(TMeta t) filter;
   final TMeta t;
 }
 
 abstract class OrmEngine<
-    TEntity extends EntityBase,
-    TMeta extends EntityMeta<TEntity>,
-    TStoreContext extends StoreContext<TEntity>> extends Equatable {
+    TModel extends ModelBase,
+    TMeta extends ModelMeta<TModel>,
+    TStoreContext extends StoreContext<TModel>> extends Equatable {
   final StoreContext dbContext;
   @protected
-  final TEntity mType;
+  final TModel mType;
   TMeta get t => mType.meta as TMeta;
   final bool useIsolateDefault;
 
@@ -33,29 +29,20 @@ abstract class OrmEngine<
     this.useIsolateDefault = true,
   });
 
-  Future<TEntity?> insert(
-    TEntity item, {
+  Future<TModel?> insert(TModel item, {bool? useIsolate});
+
+  Future<List<TModel>?> insertList(Iterable<TModel> items, {bool? useIsolate});
+
+  Future<TModel?> insertOrUpdate(TModel item, {bool? useIsolate});
+
+  Future<List<TModel>?> insertOrUpdateList(
+    Iterable<TModel> items, {
     bool? useIsolate,
   });
 
-  Future<List<TEntity>?> insertList(
-    Iterable<TEntity> items, {
-    bool? useIsolate,
-  });
-
-  Future<TEntity?> insertOrUpdate(
-    TEntity item, {
-    bool? useIsolate,
-  });
-
-  Future<List<TEntity>?> insertOrUpdateList(
-    Iterable<TEntity> items, {
-    bool? useIsolate,
-  });
-
-  Future<TEntity?> firstWhereOrNull(
+  Future<TModel?> firstWhereOrNull(
     Filter Function(TMeta t) where, {
-    List<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
+    List<ColumnDefinition<TModel, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? offset,
     bool? useIsolate,
@@ -64,7 +51,7 @@ abstract class OrmEngine<
   });
   Future<Map<String, dynamic>?> firstWhereOrNullMap(
     Filter Function(TMeta t) where, {
-    List<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
+    List<ColumnDefinition<TModel, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? offset,
     bool? useIsolate,
@@ -73,7 +60,7 @@ abstract class OrmEngine<
   });
 
   Future<T> getSum<T>({
-    required ColumnDefinition<TEntity, dynamic> Function(TMeta t) column,
+    required ColumnDefinition<TModel, dynamic> Function(TMeta t) column,
     Filter Function(TMeta t)? where,
     bool? useIsolate,
     Map<String, dynamic>? isolateArgs,
@@ -81,7 +68,7 @@ abstract class OrmEngine<
   });
 
   Future<T> getSumProduct<T>({
-    required List<ColumnDefinition<TEntity, dynamic>> Function(TMeta t) select,
+    required List<ColumnDefinition<TModel, dynamic>> Function(TMeta t) select,
     Filter Function(TMeta t)? where,
     bool? useIsolate,
     Map<String, dynamic>? isolateArgs,
@@ -103,16 +90,16 @@ abstract class OrmEngine<
 
   Future<int> update({
     required Filter Function(TMeta t) where,
-    TEntity entity,
-    Map<ColumnDefinition<TEntity, dynamic>, dynamic> Function(TMeta t)?
+    TModel model,
+    Map<ColumnDefinition<TModel, dynamic>, dynamic> Function(TMeta t)?
         columnValues,
     bool? useIsolate,
   });
 
   @protected
-  Future<List<TEntity>> query({
+  Future<List<TModel>> query({
     Filter Function(TMeta t)? where,
-    List<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
+    List<ColumnDefinition<TModel, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? limit,
     int? offset,
@@ -123,7 +110,7 @@ abstract class OrmEngine<
   @protected
   Future<List<Map<String, dynamic>>> queryMap({
     Filter Function(TMeta t)? where,
-    List<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
+    List<ColumnDefinition<TModel, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? limit,
     int? offset,
@@ -132,8 +119,8 @@ abstract class OrmEngine<
     void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   });
 
-  Future<List<TEntity>> all({
-    List<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
+  Future<List<TModel>> all({
+    List<ColumnDefinition<TModel, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? limit,
     int? offset,
@@ -142,9 +129,9 @@ abstract class OrmEngine<
     void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap,
   });
 
-  Future<List<TEntity>> where(
+  Future<List<TModel>> where(
     Filter Function(TMeta t)? filter, {
-    List<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
+    List<ColumnDefinition<TModel, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? limit,
     int? offset,
@@ -155,7 +142,7 @@ abstract class OrmEngine<
 
   Future<List<Map<String, dynamic>>> whereMap(
     Filter Function(TMeta t)? filter, {
-    List<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
+    List<ColumnDefinition<TModel, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? limit,
     int? offset,

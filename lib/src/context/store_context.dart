@@ -1,6 +1,6 @@
-import 'package:flora_orm/src/models/entity.dart';
+import 'package:flora_orm/src/model/model.dart';
 
-abstract class StoreContext<TEntity extends EntityBase> {
+abstract class StoreContext<TModel extends ModelBase> {
   const StoreContext({
     required this.dbName,
     required this.dbVersion,
@@ -8,7 +8,7 @@ abstract class StoreContext<TEntity extends EntityBase> {
   });
   final int dbVersion;
   final String dbName;
-  final List<TEntity> tables;
+  final List<TModel> tables;
 
   Future<String> getDbPath();
 

@@ -1,11 +1,11 @@
 import 'package:flora_orm/src/engines/isolates/db_value.isolate.dart';
 import 'package:flora_orm/src/engines/isolates/get_condition.isolate.dart';
-import 'package:flora_orm/src/models/entity.dart';
-import 'package:flora_orm/src/models/filter.dart';
-import 'package:flora_orm/src/models/formatted_query.dart';
-import 'package:flora_orm/src/models/orm_condition.dart';
+import 'package:flora_orm/src/model/filter.dart';
+import 'package:flora_orm/src/model/formatted_query.dart';
+import 'package:flora_orm/src/model/model.dart';
+import 'package:flora_orm/src/model/orm_condition.dart';
 
-FormattedQuery getWhereString<TEntity extends EntityBase>(Filter filter) {
+FormattedQuery getWhereString<TModel extends ModelBase>(Filter filter) {
   final stringBuffer = StringBuffer();
   final whereArgs = <dynamic>[];
   for (final element in filter.filters) {

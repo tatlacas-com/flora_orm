@@ -1,20 +1,15 @@
-part of 'entity.dart';
+part of 'model.dart';
 
-abstract class EntityBase {
-  const EntityBase({
-    this.id,
-    this.collectionId,
-    this.createdAt,
-    this.updatedAt,
-  });
+abstract class ModelBase {
+  const ModelBase({this.id, this.collectionId, this.createdAt, this.updatedAt});
   final String? id;
   final String? collectionId;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
-  EntityBase updateDates({DateTime? createdAt});
+  ModelBase updateDates({DateTime? createdAt});
 
-  EntityBase copyWith({
+  ModelBase copyWith({
     String? id,
     String? collectionId,
     DateTime? createdAt,
@@ -22,7 +17,7 @@ abstract class EntityBase {
     Map<String, dynamic>? json,
   });
 
-  EntityMeta get meta;
+  ModelMeta get meta;
 
   List<String> additionalUpgradeQueries(int oldVersion, int newVersion);
 
@@ -46,5 +41,5 @@ abstract class EntityBase {
 
   Map<String, dynamic> toDb();
 
-  EntityBase load(Map<String, dynamic> json);
+  ModelBase load(Map<String, dynamic> json);
 }

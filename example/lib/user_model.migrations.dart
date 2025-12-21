@@ -1,6 +1,6 @@
-part of 'user.entity.dart';
+part of 'user_model.dart';
 
-mixin UserEntityMigrations on Entity<UserEntity, UserEntityMeta> {
+mixin UserModelMigrations on Model<UserModel, UserModelMeta> {
   @override
   bool createTableAt(int newVersion) {
     return switch (newVersion) {
@@ -17,7 +17,7 @@ mixin UserEntityMigrations on Entity<UserEntity, UserEntityMeta> {
   }
 
   @override
-  List<ColumnDefinition<UserEntity, dynamic>> addColumnsAt(
+  List<ColumnDefinition<UserModel, dynamic>> addColumnsAt(
     int newVersion,
   ) {
     return switch (newVersion) {

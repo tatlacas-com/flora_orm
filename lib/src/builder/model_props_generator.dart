@@ -5,10 +5,8 @@ import 'dart:io';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/dart/element/visitor.dart';
 import 'package:build/build.dart';
-import 'package:flora_orm/src/builders/annotations.dart';
-import 'package:flora_orm/src/models/entity.dart';
+import 'package:flora_orm/src/builder/annotations.dart';
 import 'package:path/path.dart' as path;
 import 'package:source_gen/source_gen.dart';
 
@@ -37,33 +35,55 @@ class _ExtraField {
   final String typeFull;
 }
 
-// Define a visitor class to search for a property with a specific name.
-class PropertyFinder extends RecursiveElementVisitor<void> {
-  PropertyFinder(this.propertyName);
-  final String propertyName;
-  FieldElement? foundProperty;
-
-  @override
-  void visitFieldElement(FieldElement element) {
-    if (element.name == propertyName) {
-      foundProperty = element;
+FieldElement? _findFieldByName(ClassElement classElement, String propertyName) {
+  for (final field in classElement.fields) {
+    if (field.name == propertyName) {
+      return field;
     }
   }
+
+  for (final supertype in classElement.allSupertypes) {
+    if (supertype.element is ClassElement) {
+      final superClass = supertype.element as ClassElement;
+      for (final field in superClass.fields) {
+        if (field.name == propertyName) {
+          return field;
+        }
+      }
+    }
+  }
+
+  return null;
 }
 
-class EntityPropsGenerator extends GeneratorForAnnotation<OrmEntity> {
+class ModelPropsGenerator extends GeneratorForAnnotation<OrmModel> {
+  static const _ormColumnChecker = TypeChecker.typeNamedLiterally(
+    'OrmColumn',
+    inPackage: 'flora_orm',
+  );
+  static const _copyablePropChecker = TypeChecker.typeNamedLiterally(
+    'CopyableProp',
+    inPackage: 'flora_orm',
+  );
+  static const _nullablePropChecker = TypeChecker.typeNamedLiterally(
+    'NullableProp',
+    inPackage: 'flora_orm',
+  );
+  static const _modelChecker = TypeChecker.typeNamedLiterally(
+    'Model',
+    inPackage: 'flora_orm',
+  );
+
   bool _hasDbAnnotation(FieldElement field) {
-    return const TypeChecker.fromRuntime(OrmColumn)
-            .hasAnnotationOfExact(field) ||
-        const TypeChecker.fromRuntime(CopyableProp)
-            .hasAnnotationOfExact(field) ||
-        const TypeChecker.fromRuntime(NullableProp).hasAnnotationOfExact(field);
+    return _ormColumnChecker.hasAnnotationOfExact(field) ||
+        _copyablePropChecker.hasAnnotationOfExact(field) ||
+        _nullablePropChecker.hasAnnotationOfExact(field);
   }
 
   static const _excludedSuperClasses = [
-    'Entity',
+    'Model',
     'Equatable',
-    'EntityBase',
+    'ModelBase',
     'Object',
   ];
 
@@ -78,8 +98,8 @@ class EntityPropsGenerator extends GeneratorForAnnotation<OrmEntity> {
 
     final tableName = annotation.read('tableName').literalValue as String?;
 
-    if (!const TypeChecker.fromRuntime(Entity).isAssignableFrom(element)) {
-      throw Exception('$className is not an Entity class');
+    if (!_modelChecker.isAssignableFrom(element)) {
+      throw Exception('$className is not an Model class');
     }
 
     final allFields = <FieldElement>[...classElement.fields];
@@ -101,18 +121,18 @@ class EntityPropsGenerator extends GeneratorForAnnotation<OrmEntity> {
     final propsList = StringBuffer();
 
     mixinCode.writeln(
-      'mixin _${className}Mixin on Entity<$className, ${className}Meta> {',
+      'mixin _${className}Mixin on Model<$className, ${className}Meta> {',
     );
     metaCode
       ..writeln('''
 typedef ${className}Store
     = OrmEngine<$className, ${className}Meta, StoreContext<$className>>;
 
-class ${className}Meta extends  EntityMeta<$className> {     
+class ${className}Meta extends  ModelMeta<$className> {     
   const ${className}Meta();
 
   @override
-  String get tableName => '${tableName ?? convertClassNameToSnakeCase(className)}';
+  String get tableName => '${tableName ?? convertClassNameToSnakeCase(className!)}';
           ''')
       ..writeln('''
   @override
@@ -120,36 +140,36 @@ class ${className}Meta extends  EntityMeta<$className> {
   ColumnDefinition<$className, String>(
         'id',
         primaryKey: true,
-        write: (entity) => entity.id,
-        read: (json, entity, value) =>
-            entity.copyWith(id: value as String?, json: json),
+        write: (model) => model.id,
+        read: (json, model, value) =>
+            model.copyWith(id: value as String?, json: json),
       );
 
   @override
   ColumnDefinition<$className, String> get collectionId => 
   ColumnDefinition<$className, String>(
         'collectionId',
-        write: (entity) => entity.collectionId,
-        read: (json, entity, value) =>
-            entity.copyWith(collectionId: value as String?, json: json),
+        write: (model) => model.collectionId,
+        read: (json, model, value) =>
+            model.copyWith(collectionId: value as String?, json: json),
       );
 
   @override
   ColumnDefinition<$className, DateTime> get createdAt =>
       ColumnDefinition<$className, DateTime>(
         'createdAt',
-        write: (entity) => entity.createdAt,
-        read: (json, entity, value) =>
-            entity.copyWith(createdAt: value as DateTime?, json: json),
+        write: (model) => model.createdAt,
+        read: (json, model, value) =>
+            model.copyWith(createdAt: value as DateTime?, json: json),
       );
 
   @override
   ColumnDefinition<$className, DateTime> get updatedAt =>
       ColumnDefinition<$className, DateTime>(
         'updatedAt',
-        write: (entity) => entity.updatedAt,
-        read: (json, entity, value) =>
-            entity.copyWith(updatedAt: value as DateTime?, json: json),
+        write: (model) => model.updatedAt,
+        read: (json, model, value) =>
+            model.copyWith(updatedAt: value as DateTime?, json: json),
       );
     ''');
 
@@ -175,7 +195,7 @@ class ${className}Meta extends  EntityMeta<$className> {
             )
             .map(
               (e) => MapEntry(
-                e.name,
+                e.name!,
                 _ExtraField(
                   type: e.type.cleanDisplayString,
                   typeFull: e.type.getDisplayString(),
@@ -186,16 +206,20 @@ class ${className}Meta extends  EntityMeta<$className> {
             .toList(),
       );
     for (final field in allFields) {
-      if (const TypeChecker.fromRuntime(OrmColumn)
-          .hasAnnotationOfExact(field)) {
+      if (_ormColumnChecker.hasAnnotationOfExact(field)) {
         final fieldName = field.name;
         var fieldType = field.type.cleanDisplayString;
 
         final fieldTypeFull = field.type.getDisplayString();
 
         bool premitiveType(String fieldType) {
-          return ['String', 'DateTime', 'int', 'bool', 'double']
-              .contains(fieldType);
+          return [
+            'String',
+            'DateTime',
+            'int',
+            'bool',
+            'double',
+          ].contains(fieldType);
         }
 
         final isPremitiveType = premitiveType(fieldType);
@@ -210,15 +234,14 @@ class ${className}Meta extends  EntityMeta<$className> {
         }
         final ogIsPremitiveType = premitiveType(fieldType);
 
-        final fieldNameCamel = _toUpperCamelCase(fieldName);
-        final fieldMetadata = field.metadata;
+        final fieldNameCamel = _toUpperCamelCase(fieldName!);
         final fieldAnnotations = <ElementAnnotation>[];
-        for (final annotation in fieldMetadata) {
+        for (final annotation in field.metadata.annotations) {
           final tp = annotation.computeConstantValue()?.type;
           if (tp == null) {
             continue;
           }
-          if (const TypeChecker.fromRuntime(OrmColumn).isExactlyType(tp)) {
+          if (_ormColumnChecker.isExactlyType(tp)) {
             columnsList.writeln('$fieldName,');
             fieldAnnotations.add(annotation);
           }
@@ -293,11 +316,14 @@ class ${className}Meta extends  EntityMeta<$className> {
           FieldElement? aliasProperty;
           var aliasNotNull = false;
           if (alias != null && jsonEncoded) {
-            final finder = PropertyFinder(alias);
-            classElement.accept(finder);
-            aliasProperty = finder.foundProperty;
+            aliasProperty = _findFieldByName(classElement, alias);
+            if (aliasProperty == null) {
+              throw Exception(
+                '''Could not find field "$alias" referenced as alias in $className''',
+              );
+            }
             aliasNotNull =
-                aliasProperty!.type.nullabilitySuffix == NullabilitySuffix.none;
+                aliasProperty.type.nullabilitySuffix == NullabilitySuffix.none;
             if (aliasProperty.type.isDartCoreList) {
               jsonEncodedType = aliasProperty.type.cleanDisplayString;
             }
@@ -441,9 +467,12 @@ class ${className}Meta extends  EntityMeta<$className> {
 
           var isDartCoreList = !isPremitiveType && isList;
           if (jsonEncoded && isPremitiveType) {
-            final finder = PropertyFinder(alias!);
-            classElement.accept(finder);
-            final property = finder.foundProperty!;
+            final property = _findFieldByName(classElement, alias!);
+            if (property == null) {
+              throw Exception(
+                '''Could not find field "$alias" referenced as alias in $className''',
+              );
+            }
             isDartCoreList = property.type.isDartCoreList;
             jsonEncodedType = property.type.cleanDisplayString;
           }
@@ -451,8 +480,8 @@ class ${className}Meta extends  EntityMeta<$className> {
           if (jsonEncoded) {
             final typeName = isPremitiveType ? alias : fieldName;
             metaCode.writeln('''
-          write: (entity) {
-            final $typeName = entity.$typeName;
+          write: (model) {
+            final $typeName = model.$typeName;
     ''');
 
             if (isDartCoreList) {
@@ -510,7 +539,7 @@ class ${className}Meta extends  EntityMeta<$className> {
     ''');
           } else {
             metaCode.writeln('''
-          write: (entity) => entity.$fieldName,
+          write: (model) => model.$fieldName,
     ''');
           }
           if (jsonEncoded) {
@@ -519,8 +548,9 @@ class ${className}Meta extends  EntityMeta<$className> {
                 copyWithPropsList.writeln('$jsonEncodedType? $alias,');
                 copyWithList.writeln('$alias: $alias ?? this.$alias,');
               } else {
-                copyWithPropsList
-                    .writeln('ValueGetter<$jsonEncodedType?>? $alias,');
+                copyWithPropsList.writeln(
+                  'ValueGetter<$jsonEncodedType?>? $alias,',
+                );
                 copyWithList.writeln(
                   '$alias: $alias != null ? $alias() : this.$alias,',
                 );
@@ -530,7 +560,7 @@ class ${className}Meta extends  EntityMeta<$className> {
               }
             }
             metaCode.writeln('''
-          read: (json, entity, value){
+          read: (json, model, value){
     ''');
             if (isDartCoreList) {
               metaCode.writeln('''
@@ -540,13 +570,13 @@ class ${className}Meta extends  EntityMeta<$className> {
     ''');
             }
             metaCode.writeln('''
-            return entity.read$fieldNameCamel(json, value);
+            return model.read$fieldNameCamel(json, value);
           },
         );
     ''');
           } else if (notNull) {
             metaCode.writeln('''
-          read: (json, entity, value) => entity.copyWith(
+          read: (json, model, value) => model.copyWith(
             $fieldName: value as $fieldType?, 
             json: json,
           ),
@@ -554,7 +584,7 @@ class ${className}Meta extends  EntityMeta<$className> {
     ''');
           } else {
             metaCode.writeln('''
-          read: (json, entity, value) => entity.copyWith(
+          read: (json, model, value) => model.copyWith(
             $fieldName: ()=>value as $fieldType?, 
             json: json,
           ),
@@ -567,8 +597,9 @@ class ${className}Meta extends  EntityMeta<$className> {
             copyWithPropsList.writeln('$prefix$fieldType$suffix? $fieldName,');
             copyWithList.writeln('$fieldName: $fieldName ?? this.$fieldName,');
           } else {
-            copyWithPropsList
-                .writeln('ValueGetter<$prefix$fieldType$suffix?>? $fieldName,');
+            copyWithPropsList.writeln(
+              'ValueGetter<$prefix$fieldType$suffix?>? $fieldName,',
+            );
             copyWithList.writeln(
               '$fieldName: $fieldName != null ? '
               '$fieldName() : this.$fieldName,',
@@ -579,22 +610,20 @@ class ${className}Meta extends  EntityMeta<$className> {
             extraFields.remove(fieldName);
           }
         }
-      } else if (const TypeChecker.fromRuntime(NullableProp)
-          .hasAnnotationOfExact(field)) {
+      } else if (_nullablePropChecker.hasAnnotationOfExact(field)) {
         final fieldName = field.name;
         final fieldType = field.type.cleanDisplayString;
         final fieldTypeFull = field.type.getDisplayString();
-        extraFields[fieldName] = _ExtraField(
+        extraFields[fieldName!] = _ExtraField(
           type: fieldType,
           notNull: false,
           typeFull: fieldTypeFull,
         );
-      } else if (const TypeChecker.fromRuntime(CopyableProp)
-          .hasAnnotationOfExact(field)) {
+      } else if (_copyablePropChecker.hasAnnotationOfExact(field)) {
         final fieldName = field.name;
         final fieldType = field.type.cleanDisplayString;
         final fieldTypeFull = field.type.getDisplayString();
-        extraFields[fieldName] = _ExtraField(
+        extraFields[fieldName!] = _ExtraField(
           type: fieldType,
           notNull: field.type.nullabilitySuffix == NullabilitySuffix.none,
           typeFull: fieldTypeFull,
@@ -610,8 +639,9 @@ class ${className}Meta extends  EntityMeta<$className> {
         copyWithPropsList.writeln('${extraField.type}? $fieldName,');
         copyWithList.writeln('$fieldName: $fieldName ?? this.$fieldName,');
       } else {
-        copyWithPropsList
-            .writeln('ValueGetter<${extraField.type}?>? $fieldName,');
+        copyWithPropsList.writeln(
+          'ValueGetter<${extraField.type}?>? $fieldName,',
+        );
         copyWithList.writeln(
           '$fieldName: $fieldName != null ? '
           '$fieldName() : this.$fieldName,',
@@ -663,7 +693,7 @@ class ${className}Meta extends  EntityMeta<$className> {
       ];''')
       ..writeln('}');
     mixinCode.write(metaCode.toString());
-    await _generateMigrationsFile(buildStep, className);
+    await _generateMigrationsFile(buildStep, className!);
     return mixinCode.toString();
   }
 
@@ -674,12 +704,12 @@ class ${className}Meta extends  EntityMeta<$className> {
     final mixinContent = '''
 part of '${buildStep.inputId.pathSegments.last}';
 
-mixin ${className}Migrations on Entity<$className, ${className}Meta> {
+mixin ${className}Migrations on Model<$className, ${className}Meta> {
   
   @override
   bool createTableAt(int newVersion) {
     return switch (newVersion) {
-    /// replace dbVersion with the version number this entity was introduced.
+    /// replace dbVersion with the version number this model was introduced.
     /// remember to update dbVersion to this version
     /// in your OrmContext instance 
     // TODO(dev): replace _dbVersion with number
@@ -727,7 +757,6 @@ mixin ${className}Migrations on Entity<$className, ${className}Meta> {
     }
   }
 
-  // Helper function to convert the first letter of a string to uppercase
   String _toUpperCamelCase(String input) {
     return input[0].toUpperCase() + input.substring(1);
   }

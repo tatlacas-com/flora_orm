@@ -1,5 +1,5 @@
 import 'package:flora_orm/flora_orm.dart';
-import 'package:flora_orm/src/bloc/test.entity.dart';
+import 'package:flora_orm/src/bloc/test_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'sql_storage_test_runs.dart';
@@ -11,13 +11,11 @@ void main() {
       dbVersion: 4,
       engine: DbEngine.inMemory,
       dbName: 'common_storage_db.db',
-      tables: const <Entity>[
-        TestEntity(),
-      ],
+      tables: const <Model>[TestModel()],
     );
 
     group('Test Engine', () {
-      final TestEntityStore store = orm.getStore(const TestEntity());
+      final TestModelStore store = orm.getStore(const TestModel());
       run('Test engine', store);
     });
     group('Test Db upgrade', () {
