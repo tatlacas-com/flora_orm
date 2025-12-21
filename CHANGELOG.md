@@ -1,5 +1,9 @@
 
 
+## 4.0.0
+
+* migrated from `Entity` to `Model` for improved architecture alignment and consistency
+
 ## 3.3.2
 
 * FIX: isEmpty list query

@@ -1,9 +1,9 @@
 import 'package:flora_orm/flora_orm.dart';
-import 'package:flora_orm/src/contexts/sqflite_store_context_base.dart';
+import 'package:flora_orm/src/context/sqflite_store_context_base.dart';
 import 'package:sqflite_common/sqlite_api.dart';
 import 'package:uuid/uuid.dart';
 
-class Args<TEntity extends EntityBase> {
+class Args<TModel extends ModelBase> {
   Args({
     required this.t,
     required this.maps,
@@ -11,52 +11,50 @@ class Args<TEntity extends EntityBase> {
     required this.onIsolatePreMap,
   });
 
-  final EntityBase t;
+  final ModelBase t;
   final List<Map<String, dynamic>> maps;
 
   final Map<String, dynamic>? isolateArgs;
   void Function(Map<String, dynamic>? isolateArgs)? onIsolatePreMap;
 }
 
-List<EntityBase> entitiesFromMap<TEntity extends EntityBase>(Args args) {
-  final entities = <TEntity>[];
+List<ModelBase> entitiesFromMap<TModel extends ModelBase>(Args args) {
+  final entities = <TModel>[];
   args.onIsolatePreMap?.call(args.isolateArgs);
   for (final item in args.maps) {
-    entities.add(args.t.load(item) as TEntity);
+    entities.add(args.t.load(item) as TModel);
   }
   return entities;
 }
 
-InsertPrep<EntityBase> wInsertOrUpdate(EntityBase item) {
+InsertPrep<ModelBase> wInsertOrUpdate(ModelBase item) {
   var copy = item;
   if (copy.id == null) copy = copy.copyWith(id: const Uuid().v4());
   copy = copy.updateDates();
-  return InsertPrep(entity: copy, map: copy.toDb());
+  return InsertPrep(model: copy, map: copy.toDb());
 }
 
-List<InsertPrep<TEntity>> wInsertOrUpdateList<TEntity extends EntityBase>(
-  Iterable<TEntity> items,
+List<InsertPrep<TModel>> wInsertOrUpdateList<TModel extends ModelBase>(
+  Iterable<TModel> items,
 ) {
-  final resultItems = <InsertPrep<TEntity>>[];
+  final resultItems = <InsertPrep<TModel>>[];
   for (var item in items) {
-    if (item.id == null) item = item.copyWith(id: const Uuid().v4()) as TEntity;
-    item = item.updateDates() as TEntity;
-    resultItems.add(InsertPrep(entity: item, map: item.toDb()));
+    if (item.id == null) item = item.copyWith(id: const Uuid().v4()) as TModel;
+    item = item.updateDates() as TModel;
+    resultItems.add(InsertPrep(model: item, map: item.toDb()));
   }
   return resultItems;
 }
 
-class InsertPrep<TEntity extends EntityBase> {
-  InsertPrep({required this.entity, required this.map});
-  final TEntity entity;
+class InsertPrep<TModel extends ModelBase> {
+  InsertPrep({required this.model, required this.map});
+  final TModel model;
   final Map<String, dynamic> map;
 }
 
-class BaseOrmEngine<
-        TEntity extends EntityBase,
-        TMeta extends EntityMeta<TEntity>,
-        TStoreContext extends StoreContext<TEntity>>
-    extends OrmEngine<TEntity, TMeta, TStoreContext> {
+class BaseOrmEngine<TModel extends ModelBase, TMeta extends ModelMeta<TModel>,
+        TStoreContext extends StoreContext<TModel>>
+    extends OrmEngine<TModel, TMeta, TStoreContext> {
   const BaseOrmEngine(
     super.t, {
     required super.dbContext,
@@ -67,10 +65,7 @@ class BaseOrmEngine<
       super.dbContext as SqfliteStoreContextBase;
 
   @override
-  Future<TEntity?> insert(
-    TEntity item, {
-    bool? useIsolate,
-  }) async {
+  Future<TModel?> insert(TModel item, {bool? useIsolate}) async {
     final result = await insertList([item], useIsolate: useIsolate);
     if (result != null && result.isNotEmpty) {
       return result.first;
@@ -79,13 +74,13 @@ class BaseOrmEngine<
   }
 
   @override
-  Future<List<TEntity>?> insertList(
-    Iterable<TEntity> items, {
+  Future<List<TModel>?> insertList(
+    Iterable<TModel> items, {
     bool? useIsolate,
   }) async {
     final db = await dbContext.database;
-    List<TEntity>? result;
-    final updatedItems = <TEntity>[];
+    List<TModel>? result;
+    final updatedItems = <TModel>[];
     final spawnIsolate = useIsolate ?? useIsolateDefault;
     final response = !spawnIsolate
         ? wInsertOrUpdateList(items)
@@ -95,11 +90,11 @@ class BaseOrmEngine<
       final batch = txn.batch();
       for (final element in response) {
         batch.insert(
-          element.entity.meta.tableName,
+          element.model.meta.tableName,
           element.map,
           conflictAlgorithm: ConflictAlgorithm.abort,
         );
-        updatedItems.add(element.entity as TEntity);
+        updatedItems.add(element.model as TModel);
       }
       result = await _finishBatch(batch, updatedItems);
     });
@@ -107,10 +102,7 @@ class BaseOrmEngine<
   }
 
   @override
-  Future<TEntity?> insertOrUpdate(
-    TEntity item, {
-    bool? useIsolate,
-  }) async {
+  Future<TModel?> insertOrUpdate(TModel item, {bool? useIsolate}) async {
     final result = await insertOrUpdateList([item], useIsolate: useIsolate);
     if (result != null && result.isNotEmpty) {
       return result.first;
@@ -119,13 +111,13 @@ class BaseOrmEngine<
   }
 
   @override
-  Future<List<TEntity>?> insertOrUpdateList(
-    Iterable<TEntity> items, {
+  Future<List<TModel>?> insertOrUpdateList(
+    Iterable<TModel> items, {
     bool? useIsolate,
   }) async {
     final db = await dbContext.database;
-    List<TEntity>? result;
-    final updatedItems = <TEntity>[];
+    List<TModel>? result;
+    final updatedItems = <TModel>[];
 
     final spawnIsolate = useIsolate ?? useIsolateDefault;
     final response = !spawnIsolate
@@ -134,9 +126,9 @@ class BaseOrmEngine<
     await db.transaction((txn) async {
       final batch = txn.batch();
       for (final element in response) {
-        updatedItems.add(element.entity as TEntity);
+        updatedItems.add(element.model as TModel);
         batch.insert(
-          element.entity.meta.tableName,
+          element.model.meta.tableName,
           element.map,
           conflictAlgorithm: ConflictAlgorithm.replace,
         );
@@ -147,9 +139,9 @@ class BaseOrmEngine<
   }
 
   @override
-  Future<TEntity?> firstWhereOrNull(
+  Future<TModel?> firstWhereOrNull(
     Filter Function(TMeta t) where, {
-    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
+    Iterable<ColumnDefinition<TModel, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? offset,
     bool? useIsolate,
@@ -175,7 +167,7 @@ class BaseOrmEngine<
   @override
   Future<Map<String, dynamic>?> firstWhereOrNullMap(
     Filter Function(TMeta t) where, {
-    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
+    Iterable<ColumnDefinition<TModel, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? offset,
     bool? useIsolate,
@@ -200,7 +192,7 @@ class BaseOrmEngine<
 
   @override
   Future<T> getSum<T>({
-    required ColumnDefinition<TEntity, dynamic> Function(TMeta t) column,
+    required ColumnDefinition<TModel, dynamic> Function(TMeta t) column,
     Filter Function(TMeta t)? where,
     bool? useIsolate,
     Map<String, dynamic>? isolateArgs,
@@ -224,7 +216,7 @@ class BaseOrmEngine<
 
   @override
   Future<T> getSumProduct<T>({
-    required Iterable<ColumnDefinition<TEntity, dynamic>> Function(TMeta t)
+    required Iterable<ColumnDefinition<TModel, dynamic>> Function(TMeta t)
         select,
     Filter Function(TMeta t)? where,
     bool? useIsolate,
@@ -258,8 +250,8 @@ class BaseOrmEngine<
   }
 
   @override
-  Future<List<TEntity>> all({
-    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
+  Future<List<TModel>> all({
+    Iterable<ColumnDefinition<TModel, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? limit,
     int? offset,
@@ -279,9 +271,9 @@ class BaseOrmEngine<
   }
 
   @override
-  Future<List<TEntity>> where(
+  Future<List<TModel>> where(
     Filter Function(TMeta t)? filter, {
-    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
+    Iterable<ColumnDefinition<TModel, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? limit,
     int? offset,
@@ -301,8 +293,8 @@ class BaseOrmEngine<
     );
   }
 
-  Future<List<TEntity>> _where({
-    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
+  Future<List<TModel>> _where({
+    Iterable<ColumnDefinition<TModel, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     Filter Function(TMeta t)? filter,
     int? limit,
@@ -330,7 +322,7 @@ class BaseOrmEngine<
   @override
   Future<List<Map<String, dynamic>>> whereMap(
     Filter Function(TMeta t)? filter, {
-    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
+    Iterable<ColumnDefinition<TModel, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? limit,
     int? offset,
@@ -351,7 +343,7 @@ class BaseOrmEngine<
   }
 
   Future<List<Map<String, dynamic>>> _whereMap({
-    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
+    Iterable<ColumnDefinition<TModel, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     Filter Function(TMeta t)? filter,
     int? limit,
@@ -376,12 +368,9 @@ class BaseOrmEngine<
     return [];
   }
 
-  Future<List<TEntity>> _finishBatch(
-    Batch batch,
-    Iterable<TEntity> items,
-  ) async {
+  Future<List<TModel>> _finishBatch(Batch batch, Iterable<TModel> items) async {
     final result = await batch.commit(noResult: false, continueOnError: false);
-    final inserted = <TEntity>[];
+    final inserted = <TModel>[];
     var indx = 0;
     for (final element in result) {
       if (element is int && element > 0) {
@@ -426,12 +415,8 @@ class BaseOrmEngine<
       'Either provide where query or specify all = true to delete all.',
     );
     final db = await dbContext.database;
-    final formattedQuery = where != null
-        ? await whereString(
-            where,
-            useIsolate: useIsolate,
-          )
-        : null;
+    final formattedQuery =
+        where != null ? await whereString(where, useIsolate: useIsolate) : null;
     return db.transaction<int>((txn) async {
       final batch = txn.batch()
         ..delete(
@@ -439,8 +424,10 @@ class BaseOrmEngine<
           where: formattedQuery?.filter,
           whereArgs: formattedQuery?.whereArgs,
         );
-      final result =
-          await batch.commit(noResult: false, continueOnError: false);
+      final result = await batch.commit(
+        noResult: false,
+        continueOnError: false,
+      );
       if (result.isEmpty) {
         return 0;
       }
@@ -455,32 +442,31 @@ class BaseOrmEngine<
   @override
   Future<int> update({
     required Filter Function(TMeta t) where,
-    TEntity? entity,
-    Map<ColumnDefinition<TEntity, dynamic>, dynamic> Function(TMeta t)?
+    TModel? model,
+    Map<ColumnDefinition<TModel, dynamic>, dynamic> Function(TMeta t)?
         columnValues,
     bool? useIsolate,
   }) async {
     assert(
-      entity != null || columnValues != null,
-      'entity and columnValues cannot be both null',
+      model != null || columnValues != null,
+      'model and columnValues cannot be both null',
     );
     final db = await dbContext.database;
-    final formattedQuery = await whereString(
-      where,
-      useIsolate: useIsolate,
-    );
-    var createdAt = entity?.createdAt;
-    if (entity == null) {
-      final res =
-          await firstWhereOrNullMap(where, select: (t) => [t.createdAt]);
+    final formattedQuery = await whereString(where, useIsolate: useIsolate);
+    var createdAt = model?.createdAt;
+    if (model == null) {
+      final res = await firstWhereOrNullMap(
+        where,
+        select: (t) => [t.createdAt],
+      );
       if (res != null && res.containsKey(t.createdAt.name)) {
         createdAt = DateTime.parse(res[t.createdAt.name] as String);
       }
     }
-    entity = (entity ?? mType).updateDates(createdAt: createdAt) as TEntity;
+    model = (model ?? mType).updateDates(createdAt: createdAt) as TModel;
     final update = columnValues != null
-        ? (entity as Entity).toStorageJson(columnValues: columnValues(t))
-        : entity.toDb();
+        ? (model as Model).toStorageJson(columnValues: columnValues(t))
+        : model.toDb();
     return db.update(
       t.tableName,
       update,
@@ -491,9 +477,9 @@ class BaseOrmEngine<
 
   @override
   @protected
-  Future<List<TEntity>> query({
+  Future<List<TModel>> query({
     Filter Function(TMeta t)? where,
-    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
+    Iterable<ColumnDefinition<TModel, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? limit,
     int? offset,
@@ -516,9 +502,7 @@ class BaseOrmEngine<
     }
     final orderByFilter = orderBy
         ?.call(t)
-        ?.map(
-          (e) => '${e.column.name} ${e.direction.sortStr}',
-        )
+        ?.map((e) => '${e.column.name} ${e.direction.sortStr}')
         .join(',');
 
     if (where == null) {
@@ -530,10 +514,7 @@ class BaseOrmEngine<
         offset: offset,
       );
     } else {
-      final formattedQuery = await whereString(
-        where,
-        useIsolate: useIsolate,
-      );
+      final formattedQuery = await whereString(where, useIsolate: useIsolate);
       maps = await db.query(
         t.tableName,
         columns: selectColumns,
@@ -545,24 +526,24 @@ class BaseOrmEngine<
       );
     }
     final spawnIsolate = useIsolate ?? useIsolateDefault;
-    final args = Args<TEntity>(
+    final args = Args<TModel>(
       t: mType.copyWith(),
       maps: maps,
       isolateArgs: isolateArgs,
       onIsolatePreMap: onIsolatePreMap,
     );
     if (!spawnIsolate) {
-      return entitiesFromMap(args).map<TEntity>((e) => e as TEntity).toList();
+      return entitiesFromMap(args).map<TModel>((e) => e as TModel).toList();
     }
     final result = await compute(entitiesFromMap, args);
-    return result.map<TEntity>((e) => e as TEntity).toList();
+    return result.map<TModel>((e) => e as TModel).toList();
   }
 
   @override
   @protected
   Future<List<Map<String, dynamic>>> queryMap({
     Filter Function(TMeta t)? where,
-    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
+    Iterable<ColumnDefinition<TModel, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? limit,
     int? offset,
@@ -585,9 +566,7 @@ class BaseOrmEngine<
     }
     final orderByFilter = orderBy
         ?.call(t)
-        ?.map(
-          (e) => '${e.column.name} ${e.direction.sortStr}',
-        )
+        ?.map((e) => '${e.column.name} ${e.direction.sortStr}')
         .join(',');
 
     if (where == null) {
@@ -599,10 +578,7 @@ class BaseOrmEngine<
         offset: offset,
       );
     } else {
-      final formattedQuery = await whereString(
-        where,
-        useIsolate: useIsolate,
-      );
+      final formattedQuery = await whereString(where, useIsolate: useIsolate);
       maps = await db.query(
         t.tableName,
         columns: cols,
@@ -629,10 +605,7 @@ class BaseOrmEngine<
     if (where == null) {
       return db.rawQuery(query);
     } else {
-      final formattedQuery = await whereString(
-        where,
-        useIsolate: useIsolate,
-      );
+      final formattedQuery = await whereString(where, useIsolate: useIsolate);
       return db.rawQuery(
         '$query WHERE ${formattedQuery.filter}',
         formattedQuery.whereArgs,

@@ -1,12 +1,12 @@
 import 'package:flora_orm/flora_orm.dart';
 
-part 'test.entity.g.dart';
-part 'test.entity.migrations.dart';
+part 'test_model.g.dart';
+part 'test_model.migrations.dart';
 
-@OrmEntity(tableName: 'test')
-class TestEntity extends Entity<TestEntity, TestEntityMeta>
-    with _TestEntityMixin, TestEntityMigrations {
-  const TestEntity({
+@OrmModel(tableName: 'test')
+class TestModel extends Model<TestModel, TestModelMeta>
+    with _TestModelMixin, TestModelMigrations {
+  const TestModel({
     super.id,
     super.collectionId,
     super.createdAt,

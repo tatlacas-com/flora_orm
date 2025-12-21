@@ -3,10 +3,11 @@ import 'package:flora_orm/flora_orm.dart';
 
 import 'package:flora_orm/src/engines/base_orm_engine.dart';
 
-class SqfliteInMemoryEngine<TEntity extends EntityBase,
-        TMeta extends EntityMeta<TEntity>>
-    extends BaseOrmEngine<TEntity, TMeta,
-        SqfliteInMemoryStoreContext<TEntity>> {
+class SqfliteInMemoryEngine<
+  TModel extends ModelBase,
+  TMeta extends ModelMeta<TModel>
+>
+    extends BaseOrmEngine<TModel, TMeta, SqfliteInMemoryStoreContext<TModel>> {
   const SqfliteInMemoryEngine(
     super.t, {
     required super.dbContext,

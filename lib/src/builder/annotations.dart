@@ -1,5 +1,5 @@
 const column = OrmColumn<dynamic>();
-const entity = OrmEntity();
+const model = OrmModel();
 
 /// Supported types:
 ///                 [String], [int], [double], [bool] and [double].
@@ -29,10 +29,8 @@ class OrmColumn<TColumnType> {
   final dynamic defaultValue;
 }
 
-class OrmEntity {
-  const OrmEntity({
-    this.tableName,
-  });
+class OrmModel {
+  const OrmModel({this.tableName});
   final String? tableName;
 }
 

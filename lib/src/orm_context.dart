@@ -15,7 +15,7 @@ class OrmContext extends Equatable {
   OrmContext({
     required int dbVersion,
     required String dbName,
-    required List<EntityBase> tables,
+    required List<ModelBase> tables,
     DbEngine engine = DbEngine.sqflite,
   }) : assert(dbName.trim().isNotEmpty, 'dbName should not be empty') {
     if (kIsWeb && !engine.suppportsWeb) {
@@ -31,25 +31,25 @@ class OrmContext extends Equatable {
     final databaseName = dbName.trim();
     dbContext = switch (_engine) {
       DbEngine.inMemory => SqfliteInMemoryStoreContext(
-          dbVersion: dbVersion,
-          dbName: databaseName,
-          tables: tables,
-        ),
+        dbVersion: dbVersion,
+        dbName: databaseName,
+        tables: tables,
+      ),
       DbEngine.sqfliteCommon => SqfliteCommonStoreContext(
-          dbVersion: dbVersion,
-          dbName: databaseName,
-          tables: tables,
-        ),
+        dbVersion: dbVersion,
+        dbName: databaseName,
+        tables: tables,
+      ),
       DbEngine.sqflite => SqfliteStoreContext(
-          dbVersion: dbVersion,
-          dbName: databaseName,
-          tables: tables,
-        ),
+        dbVersion: dbVersion,
+        dbName: databaseName,
+        tables: tables,
+      ),
       DbEngine.sharedPreferences => SharedPreferenceStoreContext(
-          dbName: databaseName,
-          dbVersion: dbVersion,
-          tables: tables,
-        ),
+        dbName: databaseName,
+        dbVersion: dbVersion,
+        tables: tables,
+      ),
     };
   }
   late final StoreContext dbContext;
@@ -57,34 +57,34 @@ class OrmContext extends Equatable {
   late final DbEngine _engine;
   DbEngine get engine => _engine;
 
-  OrmEngine<TEntity, TMeta, StoreContext<TEntity>>
-      getStore<TEntity extends EntityBase, TMeta extends EntityMeta<TEntity>>(
-    TEntity t,
-  ) {
+  OrmEngine<TModel, TMeta, StoreContext<TModel>> getStore<
+    TModel extends ModelBase,
+    TMeta extends ModelMeta<TModel>
+  >(TModel t) {
     return switch (dbContext) {
-      SharedPreferenceStoreContext() =>
-        SharedPreferenceEngine<TEntity, TMeta>(t, dbContext: dbContext),
-      SqfliteInMemoryStoreContext() =>
-        SqfliteInMemoryEngine<TEntity, TMeta>(t, dbContext: dbContext),
-      SqfliteCommonStoreContext() =>
-        SqfliteCommonEngine<TEntity, TMeta>(t, dbContext: dbContext),
-      _ => SqfliteEngine<TEntity, TMeta>(
-          t,
-          dbContext: dbContext,
-        )
-    } as OrmEngine<TEntity, TMeta, StoreContext<TEntity>>;
+          SharedPreferenceStoreContext() =>
+            SharedPreferenceEngine<TModel, TMeta>(t, dbContext: dbContext),
+          SqfliteInMemoryStoreContext() => SqfliteInMemoryEngine<TModel, TMeta>(
+            t,
+            dbContext: dbContext,
+          ),
+          SqfliteCommonStoreContext() => SqfliteCommonEngine<TModel, TMeta>(
+            t,
+            dbContext: dbContext,
+          ),
+          _ => SqfliteEngine<TModel, TMeta>(t, dbContext: dbContext),
+        }
+        as OrmEngine<TModel, TMeta, StoreContext<TModel>>;
   }
 
   @override
-  List<Object?> get props => [
-        _engine,
-      ];
+  List<Object?> get props => [_engine];
 
   OrmContext copyWith({
     DbEngine? engine,
     int? dbVersion,
     String? dbName,
-    List<EntityBase>? tables,
+    List<ModelBase>? tables,
   }) {
     return OrmContext(
       engine: engine ?? _engine,

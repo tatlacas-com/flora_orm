@@ -1,28 +1,30 @@
-import 'package:flora_orm/src/bloc/test.entity.dart';
+import 'package:flora_orm/src/bloc/test_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  group('Test TestEntity', () {
-    late TestEntity entity;
+  group('Test TestModel', () {
+    late TestModel model;
     setUp(() {
-      entity = TestEntity(
-          testBool: true,
-          testDateTime: DateTime.now(),
-          testDouble: 1,
-          testInt: 10,
-          testString: 'Testing 123',);
+      model = TestModel(
+        testBool: true,
+        testDateTime: DateTime.now(),
+        testDouble: 1,
+        testInt: 10,
+        testString: 'Testing 123',
+      );
     });
 
     test('should be equal', () {
-      final entity1 = TestEntity(
-          testBool: true,
-          testDateTime: entity.testDateTime,
-          testDouble: 1,
-          testInt: 10,
-          testString: 'Testing 123',);
-      expect(entity, entity1);
-      expect(entity.toString(), entity1.toString());
+      final model1 = TestModel(
+        testBool: true,
+        testDateTime: model.testDateTime,
+        testDouble: 1,
+        testInt: 10,
+        testString: 'Testing 123',
+      );
+      expect(model, model1);
+      expect(model.toString(), model1.toString());
     });
   });
 }

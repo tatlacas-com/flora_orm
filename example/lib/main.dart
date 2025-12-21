@@ -1,4 +1,4 @@
-import 'package:example/user.entity.dart';
+import 'package:example/user_model.dart';
 import 'package:flora_orm/flora_orm.dart';
 import 'package:flutter/material.dart';
 
@@ -36,24 +36,20 @@ class _MyHomePageState extends State<MyHomePage> {
   final orm = OrmContext(
     dbVersion: 1,
     dbName: 'orm_db_test.db',
-    tables: <Entity>[
+    tables: <Model>[
       /// You must register all entities you intend to save here
-      UserEntity(),
+      UserModel(),
     ],
   );
 
-  /// Get a storage instance of the Entity type you want to use.
+  /// Get a storage instance of the Model type you want to use.
   /// **IMPORTANT remember to specify type ([UserStore] for this example)
   /// to make your life easier when using storage object
-  late final UserEntityStore storage = orm.getStore(UserEntity());
+  late final UserModelStore storage = orm.getStore(UserModel());
 
-  Future<UserEntity> _insertUser() async {
+  Future<UserModel> _insertUser() async {
     await storage.insertOrUpdate(
-      UserEntity(
-        id: 'user1',
-        firstName: 'John',
-        lastName: 'Doe',
-      ),
+      UserModel(id: 'user1', firstName: 'John', lastName: 'Doe'),
     );
 
     final user = await storage.firstWhereOrNull(

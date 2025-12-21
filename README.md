@@ -41,32 +41,32 @@ import 'package:flora_orm/flora_orm.dart';
 
 ### Initializing
 
-To use `flora_orm`, you need to create entity classes.  
+To use `flora_orm`, you need to create model classes.  
 
 For VS Code users, we have a snippet for you so that you don't have to type the boilerplate code.  
 See [more infomation on how to add and use the snippet](https://github.com/tatlacas-com/flora_orm/tree/main/doc/vscode_snippet.md).
 
-Your entity class must satisfy the following:
+Your model class must satisfy the following:
 
-* Naming conversion is `{entity_name}.entity.dart`. For example `user.entity.dart` _(recommended)_.
-* You **must** add 2 `part`s to the top of the entity file: `{entity_name}.entity.g.dart` and `{entity_name}.entity.migrations.dart`.
-* You **must** annotate the class with `@entity` (or `@OrmEntity()` for granular control).
-* Your entity class **must** extend `Entity<{YourEntityName}, {YourEntityName}Meta> with _{YourEntityName}Mixin, {YourEntityName}Migrations`.
+* Naming conversion is `{model_name}_model.dart`. For example `user_model.dart` _(recommended)_.
+* You **must** add 2 `part`s to the top of the model file: `{model_name}_model.g.dart` and `{model_name}_model.migrations.dart`.
+* You **must** annotate the class with `@model` (or `@OrmModel()` for granular control).
+* Your model class **must** extend `Model<{YourModelName}, {YourModelName}Meta> with _{YourModelName}Mixin, {YourModelName}Migrations`.
 
 
-#### Example Entity
+#### Example Model
 
 ```dart
 import 'package:flora_orm/flora_orm.dart';
 
-part 'user.entity.g.dart';
-part 'user.entity.migrations.dart';
+part 'user_model.g.dart';
+part 'user_model.migrations.dart';
 
-@OrmEntity(tableName: 'user')
-class UserEntity extends Entity<UserEntity, UserEntityMeta>
-    with _UserEntityMixin, UserEntityMigrations {
+@OrmModel(tableName: 'user')
+class UserModel extends Model<UserModel, UserModelMeta>
+    with _UserModelMixin, UserModelMigrations {
 
-  const UserEntity({
+  const UserModel({
     super.id,
     super.collectionId,
     super.createdAt,
@@ -111,7 +111,7 @@ class UserEntity extends Entity<UserEntity, UserEntityMeta>
 enum OAuthProvider { google, apple, facebook }
 ```
 
-Once you have created or updated your entity files, open terminal and run the following from the root directory of your project:
+Once you have created or updated your model files, open terminal and run the following from the root directory of your project:
 ```bash
 dart run build_runner build
 ```
@@ -134,22 +134,22 @@ final ormContext = OrmContext(
       /// dbEngine defaults to DbEngine.sqflite if not specified
       dbEngine: DbEngine.sqflite,
       dbName: 'your_db_name_here.db',
-      tables: <Entity>[
+      tables: <Model>[
         /// instatiate all your entities that must be saved in db here
-        const UserEntity(),
+        const UserModel(),
       ],
     );
 GetIt.I.registerSingleton(ormContext);
 ```
 To keep your code clean, we recommend you have the above code in a seperate file. For example in `src/orm.init.dart`  
 
-**IMPORTANT**: After adding entity classes (and updating existing entities), don't forget to:
+**IMPORTANT**: After adding model classes (and updating existing entities), don't forget to:
 
 1. Run from terminal:
 ```bash
 dart run build_runner build
 ```
-2. Update `dbVersion` in `OrmContext`  - if you changed columns or added new Entity classes.
+2. Update `dbVersion` in `OrmContext`  - if you changed columns or added new Model classes.
 3. **REGISTER** any new entities in `OrmContext`'s `tables: []`.
 
 The `dbEngine` value defaults to `DbEngine.sqflite`, and may be one of the following:
@@ -176,13 +176,13 @@ Once your `OrmContext` is set, you can use it from anywhere in your code. If you
 
 ```dart
 final orm = GetIt.I<OrmContext>();
-final {EntityType}Orm storage = orm.getStore(/* Instance of your Entity here */);
+final {ModelType}Orm storage = orm.getStore(/* Instance of your Model here */);
 ```
-For example, to get `storage` for `UserEntity`:
+For example, to get `storage` for `UserModel`:
 
 ```dart
 final orm = GetIt.I<OrmContext>();
-final UserStore storage = orm.getStore(const UserEntity())
+final UserStore storage = orm.getStore(const UserModel())
 ```
 **IMPORTANT**: You **NEED** to specify type (e.g `UserStore` above) for you to get `ColumnDefition`s on your `Filter`s later. The type class is auto-generated when you run `dart run build_runner build`
 
@@ -191,8 +191,8 @@ final UserStore storage = orm.getStore(const UserEntity())
 ### C~~RUD~~ - Create
 Will throw error if record with same `id` already exists:
 ```dart
-final entity = await storage.insert(
-                                UserEntity(id: 'user1',   
+final model = await storage.insert(
+                                UserModel(id: 'user1',   
                                 displayName: 'Test User',
                                 ));
 ```
@@ -200,8 +200,8 @@ We recommend using [uuid](https://pub.dev/packages/uuid) for generating ids.
   
 You can `insertOrUpdate` instead, which will update record if it exists:
 ```dart
-final entity = await storage.insertOrUpdate(
-                                UserEntity(id: 'user1',   
+final model = await storage.insertOrUpdate(
+                                UserModel(id: 'user1',   
                                 displayName: 'Test User',
                                 ));
 ```
@@ -210,7 +210,7 @@ You can insert more than one record at a time:
 
 ```dart
 final entities = await storage.insertList([
-                                UserEntity(id: 'user1',   
+                                UserModel(id: 'user1',   
                                 displayName: 'Test User'), 
                                 ...,
                                 ]);
@@ -218,7 +218,7 @@ final entities = await storage.insertList([
 An equivalent for insertOrUpdate for more that one record exists:
 ```dart
 final entities = await storage.insertOrUpdateList([
-                                UserEntity(id: 'user1',   
+                                UserModel(id: 'user1',   
                                 displayName: 'Test User'), 
                                 ...,
                                 ]);
@@ -228,7 +228,7 @@ final entities = await storage.insertOrUpdateList([
 Get single record:
 
 ```dart
-final entity = await storage.firstWhereOrNull(...);
+final model = await storage.firstWhereOrNull(...);
 ```
 More than one record:
 
@@ -261,7 +261,7 @@ The function has a parameter `t` which is meta description of your properties as
 
 Here are some examples:
 
-##### Get `UserEntity` with `id = 'user1'`
+##### Get `UserModel` with `id = 'user1'`
 ```dart
 final user = await storage.firstWhereOrNull(
       where: (t) => Filter(
@@ -271,7 +271,7 @@ final user = await storage.firstWhereOrNull(
     );
 ```
 
-##### Delete all `UserEntity`s with `uid != null`
+##### Delete all `UserModel`s with `uid != null`
 ```dart
 await storage.delete(
       where: (t) => Filter(
@@ -280,7 +280,7 @@ await storage.delete(
       ),
     );
 ```
-##### Get all `UserEntity`s with `rating >= 20`
+##### Get all `UserModel`s with `rating >= 20`
 ```dart
 final users = await storage.where(
       where: (t) => Filter(
@@ -290,7 +290,7 @@ final users = await storage.where(
       ),
     );
 ```
-##### Get all `UserEntity`s with `rating between 10 and 100`
+##### Get all `UserModel`s with `rating between 10 and 100`
 ```dart
 final users = await storage.where(
       where: (t) => Filter(
@@ -340,18 +340,18 @@ final users = await storage.where(
 ```
 `startGroup()` must usually be followed by `filter()` before chaining additional filters. Remember to `endGroup()`/`closeGroup`.
 
-## Migrations - Changes to Entity classes and Database updates
+## Migrations - Changes to Model classes and Database updates
 
-If you update any of your `Entity` classes, you need to run `dart run build_runner build` again.  
+If you update any of your `Model` classes, you need to run `dart run build_runner build` again.  
 
-If you add/remove `@column` or any annotated item in your `Entity`  classes then **increment**  `OrmContext`'s `dbVersion`, **register** new Entity classes in `OrmContext`'s `tables: []`, and add the migrations in the respective `{entity_name}.entity.migrations.dart` files.  
+If you add/remove `@column` or any annotated item in your `Model`  classes then **increment**  `OrmContext`'s `dbVersion`, **register** new Model classes in `OrmContext`'s `tables: []`, and add the migrations in the respective `{model_name}_model.migrations.dart` files.  
 
-The simplest way to migrate is either to drop and recreate the entity table (losing all data in that table), or specifying the added columns:  
+The simplest way to migrate is either to drop and recreate the model table (losing all data in that table), or specifying the added columns:  
 
-Example `UserEntity` migration: _(the file itself is auto-generated the first time you run `dart run build_runner build`)_:
+Example `UserModel` migration: _(the file itself is auto-generated the first time you run `dart run build_runner build`)_:
 
 ```dart
-mixin UserEntityMigrations on Entity<UserEntity, UserEntityMeta> {
+mixin UserModelMigrations on Model<UserModel, UserModelMeta> {
   @override
   bool recreateTableAt(int newVersion) {
     return switch (newVersion) {
@@ -362,13 +362,13 @@ mixin UserEntityMigrations on Entity<UserEntity, UserEntityMeta> {
   }
 
   @override
-  List<ColumnDefinition<UserEntity, dynamic>> addColumnsAt(
+  List<ColumnDefinition<UserModel, dynamic>> addColumnsAt(
     int newVersion,
   ) {
     return switch (newVersion) {
         /// Here we are saying we added property 
         /// named provider when we set dbVersion = 2.
-        /// All [@column] properties in your entity class 
+        /// All [@column] properties in your model class 
         /// are available in [meta] object as [ColumnDefinition]s
       2 => [meta.provider],
       _ => [],
@@ -377,20 +377,20 @@ mixin UserEntityMigrations on Entity<UserEntity, UserEntityMeta> {
 }
 ```
 
-In `{entity_name}.entity.migrations.dart` You can also override `downgradeTable()` and `additionalUpgradeQueries()`, returning queries that must be run during that operation.  
+In `{model_name}_model.migrations.dart` You can also override `downgradeTable()` and `additionalUpgradeQueries()`, returning queries that must be run during that operation.  
 
 You can also override `onUpgradeComplete` and `onDowngradeComplete` to return custom queries that will be run after completion of upgrade/downgrade.  
 
 There is also `onCreateComplete` which you can return queries that will be run the first time the database is created.
 
-**IMPORTANT**: As a reminder, after adding Entity classes (and edited existing Entity classes), don't forget to:
+**IMPORTANT**: As a reminder, after adding Model classes (and edited existing Model classes), don't forget to:
 
 1. Run from terminal:
 ```bash
 dart run build_runner build
 ```
-2. Update `dbVersion` in `OrmContext` - if you changed columns or added new Entity classes.
-3. **REGISTER** the new entity in `OrmContext`'s `tables: []`.
+2. Update `dbVersion` in `OrmContext` - if you changed columns or added new Model classes.
+3. **REGISTER** the new model in `OrmContext`'s `tables: []`.
 
 ## Supported data types
 
@@ -403,19 +403,19 @@ dart run build_runner build
 * Custom classes (Objects) - they need to have factory `fromMap(map)` and function `toMap()`
 * Lists of above types (e.g `List<String>`)
 
-All entity classes will already have toMap implemented. You need to define the factory `fromMap(map)` if you want to have the class as a column in another entity.   
+All model classes will already have toMap implemented. You need to define the factory `fromMap(map)` if you want to have the class as a column in another model.   
 For convenience, you can call the `load()` function that will do the rest.
 
-Example factory for `UserEntity`:
+Example factory for `UserModel`:
 
 ```dart
-@OrmEntity(tableName: 'user')
-class UserEntity extends Entity<UserEntit... {
+@OrmModel(tableName: 'user')
+class UserModel extends Model<UserEntit... {
   
   /// default constructor here
 
-  factory UserEntity.fromMap(Map<String, dynamic> map) {
-    return const UserEntity().load(map);
+  factory UserModel.fromMap(Map<String, dynamic> map) {
+    return const UserModel().load(map);
   }
 
   /// rest of the class here

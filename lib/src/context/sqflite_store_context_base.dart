@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flora_orm/flora_orm.dart';
 import 'package:sqflite_common/sqlite_api.dart';
 
-abstract class SqfliteStoreContextBase<TEntity extends EntityBase>
-    extends StoreContext<TEntity> {
+abstract class SqfliteStoreContextBase<TModel extends ModelBase>
+    extends StoreContext<TModel> {
   SqfliteStoreContextBase({
     required super.dbName,
     required super.dbVersion,
@@ -80,32 +80,24 @@ abstract class SqfliteStoreContextBase<TEntity extends EntityBase>
     });
   }
 
-  List<String> _upgradeQueries(
-    TEntity element,
-    int oldVersion,
-    int newVersion,
-  ) {
-    if (element is! Entity) {
+  List<String> _upgradeQueries(TModel element, int oldVersion, int newVersion) {
+    if (element is! Model) {
       return [];
     }
     final allQueries = <String>[];
-    final columns = <ColumnDefinition<TEntity, dynamic>>[];
+    final columns = <ColumnDefinition<TModel, dynamic>>[];
     var old = oldVersion;
     while (++old < newVersion) {
       columns.addAll(element.addColumnsAt(old).cast());
     }
     columns.addAll(element.addColumnsAt(newVersion).cast());
     allQueries
-      ..addAll(
-        columns.map(
-          (column) => element.addColumn(column),
-        ),
-      )
+      ..addAll(columns.map((column) => element.addColumn(column)))
       ..addAll(element.additionalUpgradeQueries(old, newVersion));
     return allQueries;
   }
 
-  bool _recreateOn(EntityBase element, int oldVersion, int newVersion) {
+  bool _recreateOn(ModelBase element, int oldVersion, int newVersion) {
     var old = oldVersion;
     while (++old < newVersion) {
       if (element.recreateTableAt(old)) {
@@ -115,7 +107,7 @@ abstract class SqfliteStoreContextBase<TEntity extends EntityBase>
     return element.recreateTableAt(newVersion);
   }
 
-  bool _createOn(EntityBase element, int oldVersion, int newVersion) {
+  bool _createOn(ModelBase element, int oldVersion, int newVersion) {
     var old = oldVersion;
     while (++old < newVersion) {
       if (element.createTableAt(old)) {
@@ -139,8 +131,8 @@ abstract class SqfliteStoreContextBase<TEntity extends EntityBase>
         final queries = _recreateOn(element, oldVersion, newVersion)
             ? element.recreateTable(newVersion)
             : _createOn(element, oldVersion, newVersion)
-                ? [element.createTable(newVersion)]
-                : _upgradeQueries(element, oldVersion, newVersion);
+            ? [element.createTable(newVersion)]
+            : _upgradeQueries(element, oldVersion, newVersion);
         if (queries.isNotEmpty == true) {
           allQueries.addAll(queries);
           upgradeQueriesFound = true;
@@ -184,9 +176,7 @@ abstract class SqfliteStoreContextBase<TEntity extends EntityBase>
       final title = 'SQFLITE $what';
       final titleSize = title.length + 5;
       final paddingsCount = (titleSize < 78 ? (78 - titleSize) : 0);
-      debugPrint(
-        '╔${'═' * 4} SQFLITE $what ${'═' * paddingsCount}╗',
-      );
+      debugPrint('╔${'═' * 4} SQFLITE $what ${'═' * paddingsCount}╗');
       if (moreInfo != null) {
         _printMaxed(moreInfo);
       }

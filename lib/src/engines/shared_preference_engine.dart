@@ -1,15 +1,14 @@
 import 'package:collection/collection.dart';
 import 'package:flora_orm/flora_orm.dart';
-import 'package:flora_orm/src/contexts/shared_preference_store_context.dart';
+import 'package:flora_orm/src/context/shared_preference_store_context.dart';
 import 'package:flora_orm/src/engines/base_orm_engine.dart';
-import 'package:flora_orm/src/models/orm.dart';
+import 'package:flora_orm/src/model/orm.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
-class SharedPreferenceEngine<TEntity extends EntityBase,
-        TMeta extends EntityMeta<TEntity>>
-    extends BaseOrmEngine<TEntity, TMeta,
-        SharedPreferenceStoreContext<TEntity>> {
+class SharedPreferenceEngine<TModel extends ModelBase,
+        TMeta extends ModelMeta<TModel>>
+    extends BaseOrmEngine<TModel, TMeta, SharedPreferenceStoreContext<TModel>> {
   SharedPreferenceEngine(
     super.t, {
     required super.dbContext,
@@ -55,10 +54,7 @@ class SharedPreferenceEngine<TEntity extends EntityBase,
   }
 
   @override
-  Future<TEntity?> insert(
-    TEntity item, {
-    bool? useIsolate,
-  }) async {
+  Future<TModel?> insert(TModel item, {bool? useIsolate}) async {
     final result = await insertList([item], useIsolate: useIsolate);
     if (result != null && result.isNotEmpty) {
       return result.first;
@@ -67,9 +63,9 @@ class SharedPreferenceEngine<TEntity extends EntityBase,
   }
 
   @override
-  Future<TEntity?> firstWhereOrNull(
+  Future<TModel?> firstWhereOrNull(
     Filter Function(TMeta t) where, {
-    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
+    Iterable<ColumnDefinition<TModel, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? offset,
     bool? useIsolate,
@@ -83,13 +79,11 @@ class SharedPreferenceEngine<TEntity extends EntityBase,
 
     final records = await getItems() ?? {};
     final filters = where(t).filters;
-    final res = records.entries.firstWhereOrNull(
-      (element) {
-        return _where(element, filters);
-      },
-    );
+    final res = records.entries.firstWhereOrNull((element) {
+      return _where(element, filters);
+    });
     if (res != null) {
-      return mType.load(res.value as Map<String, dynamic>) as TEntity;
+      return mType.load(res.value as Map<String, dynamic>) as TModel;
     }
     return null;
   }
@@ -189,14 +183,14 @@ class SharedPreferenceEngine<TEntity extends EntityBase,
   }
 
   @override
-  Future<List<TEntity>?> insertList(
-    Iterable<TEntity> items, {
+  Future<List<TModel>?> insertList(
+    Iterable<TModel> items, {
     bool? useIsolate,
   }) async {
-    final result = <TEntity>[];
+    final result = <TModel>[];
     for (var item in items) {
       if (item.id == null) {
-        item = item.copyWith(id: const Uuid().v4()) as TEntity;
+        item = item.copyWith(id: const Uuid().v4()) as TModel;
       }
       item = await _saveItem(item, true);
       result.add(item);
@@ -205,10 +199,7 @@ class SharedPreferenceEngine<TEntity extends EntityBase,
   }
 
   @override
-  Future<TEntity?> insertOrUpdate(
-    TEntity item, {
-    bool? useIsolate,
-  }) async {
+  Future<TModel?> insertOrUpdate(TModel item, {bool? useIsolate}) async {
     final result = await insertOrUpdateList([item], useIsolate: useIsolate);
     if (result != null && result.isNotEmpty) {
       return result.first;
@@ -217,14 +208,14 @@ class SharedPreferenceEngine<TEntity extends EntityBase,
   }
 
   @override
-  Future<List<TEntity>?> insertOrUpdateList(
-    Iterable<TEntity> items, {
+  Future<List<TModel>?> insertOrUpdateList(
+    Iterable<TModel> items, {
     bool? useIsolate,
   }) async {
-    final result = <TEntity>[];
+    final result = <TModel>[];
     for (var item in items) {
       if (item.id == null) {
-        item = item.copyWith(id: const Uuid().v4()) as TEntity;
+        item = item.copyWith(id: const Uuid().v4()) as TModel;
       }
       item = await _saveItem(item);
       result.add(item);
@@ -232,14 +223,14 @@ class SharedPreferenceEngine<TEntity extends EntityBase,
     return result;
   }
 
-  Future<TEntity> _saveItem(TEntity item, [bool checkExisting = false]) async {
+  Future<TModel> _saveItem(TModel item, [bool checkExisting = false]) async {
     if (checkExisting) {
       final curr = await read(key: item.id!);
       if (curr != null) {
         throw Exception('Already exists');
       }
     }
-    final result = item.updateDates() as TEntity;
+    final result = item.updateDates() as TModel;
     await write(key: result.id!, value: result.toMap());
     return result;
   }
@@ -261,11 +252,9 @@ class SharedPreferenceEngine<TEntity extends EntityBase,
     }
     final filters = where(t).filters;
     final res = items.entries
-        .where(
-          (element) {
-            return _where(element, filters);
-          },
-        )
+        .where((element) {
+          return _where(element, filters);
+        })
         .map((e) => e.key)
         .toList();
 
@@ -277,28 +266,29 @@ class SharedPreferenceEngine<TEntity extends EntityBase,
   @override
   Future<int> update({
     required Filter Function(TMeta t) where,
-    TEntity? entity,
-    Map<ColumnDefinition<TEntity, dynamic>, dynamic> Function(TMeta t)?
+    TModel? model,
+    Map<ColumnDefinition<TModel, dynamic>, dynamic> Function(TMeta t)?
         columnValues,
     bool? useIsolate,
   }) async {
-    final query = where(t)
-        .filters
-        .where((element) => element.column?.name == 'id')
-        .toList();
+    final query = where(
+      t,
+    ).filters.where((element) => element.column?.name == 'id').toList();
     if (query.isNotEmpty == true) {
-      var createdAt = entity?.createdAt;
-      if (entity == null) {
-        final res =
-            await firstWhereOrNullMap(where, select: (t) => [t.createdAt]);
+      var createdAt = model?.createdAt;
+      if (model == null) {
+        final res = await firstWhereOrNullMap(
+          where,
+          select: (t) => [t.createdAt],
+        );
         if (res != null && res.containsKey(t.createdAt.name)) {
           createdAt = res[t.createdAt.name] as DateTime?;
         }
       }
-      entity = (entity ?? mType).updateDates(createdAt: createdAt) as TEntity;
+      model = (model ?? mType).updateDates(createdAt: createdAt) as TModel;
       final update = columnValues != null
-          ? (entity as Entity).toStorageJson(columnValues: columnValues(t))
-          : entity.toMap();
+          ? (model as Model).toStorageJson(columnValues: columnValues(t))
+          : model.toMap();
       await write(key: query[0].value as String, value: update);
       return 1;
     }
@@ -306,9 +296,9 @@ class SharedPreferenceEngine<TEntity extends EntityBase,
   }
 
   @override
-  Future<List<TEntity>> query({
+  Future<List<TModel>> query({
     Filter Function(TMeta t)? where,
-    Iterable<ColumnDefinition<TEntity, dynamic>>? Function(TMeta t)? select,
+    Iterable<ColumnDefinition<TModel, dynamic>>? Function(TMeta t)? select,
     List<OrmOrder>? Function(TMeta t)? orderBy,
     int? limit,
     int? offset,
@@ -319,21 +309,15 @@ class SharedPreferenceEngine<TEntity extends EntityBase,
     final records = await getItems() ?? {};
     if (where == null) {
       return records.entries
-          .map(
-            (e) => mType.load(e.value as Map<String, dynamic>) as TEntity,
-          )
+          .map((e) => mType.load(e.value as Map<String, dynamic>) as TModel)
           .toList();
     }
     final filters = where(t).filters;
-    final res = records.entries.where(
-      (element) {
-        return _where(element, filters);
-      },
-    );
+    final res = records.entries.where((element) {
+      return _where(element, filters);
+    });
     return res
-        .map(
-          (e) => mType.load(e.value as Map<String, dynamic>) as TEntity,
-        )
+        .map((e) => mType.load(e.value as Map<String, dynamic>) as TModel)
         .toList();
   }
 

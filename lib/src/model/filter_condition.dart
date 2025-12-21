@@ -1,10 +1,10 @@
 import 'package:equatable/equatable.dart';
 
-import 'package:flora_orm/src/models/column_definition.dart';
-import 'package:flora_orm/src/models/entity.dart';
-import 'package:flora_orm/src/models/orm_condition.dart';
+import 'package:flora_orm/src/model/column_definition.dart';
+import 'package:flora_orm/src/model/model.dart';
+import 'package:flora_orm/src/model/orm_condition.dart';
 
-class FilterCondition<TEntity extends EntityBase> extends Equatable {
+class FilterCondition<TModel extends ModelBase> extends Equatable {
   const FilterCondition({
     this.column,
     this.condition = OrmCondition.isEqualTo,
@@ -16,7 +16,7 @@ class FilterCondition<TEntity extends EntityBase> extends Equatable {
     this.and = false,
     this.or = false,
   });
-  final ColumnDefinition<TEntity, dynamic>? column;
+  final ColumnDefinition<TModel, dynamic>? column;
   final OrmCondition condition;
   final dynamic value;
   final dynamic secondaryValue;

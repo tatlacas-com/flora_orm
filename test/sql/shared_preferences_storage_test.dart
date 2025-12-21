@@ -1,12 +1,14 @@
 import 'package:flora_orm/engines/shared_preference_engine.dart';
 import 'package:flora_orm/flora_orm.dart';
-import 'package:flora_orm/src/bloc/test.entity.dart';
+import 'package:flora_orm/src/bloc/test_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class MockSharedPreferenceEngine<TEntity extends EntityBase,
-        TMeta extends EntityMeta<TEntity>>
-    extends SharedPreferenceEngine<TEntity, TMeta> {
+class MockSharedPreferenceEngine<
+  TModel extends ModelBase,
+  TMeta extends ModelMeta<TModel>
+>
+    extends SharedPreferenceEngine<TModel, TMeta> {
   MockSharedPreferenceEngine(super.t, {required super.dbContext});
 
   @override
@@ -34,20 +36,18 @@ void main() {
       dbVersion: 4,
       engine: DbEngine.sharedPreferences,
       dbName: 'common_storage_db.db',
-      tables: const <Entity>[
-        TestEntity(),
-      ],
+      tables: const <Model>[TestModel()],
     );
     group('Test engine', () {
-      late TestEntityStore storage;
+      late TestModelStore storage;
       setUpAll(() {
         storage = MockSharedPreferenceEngine(
-          const TestEntity(),
+          const TestModel(),
           dbContext: orm.dbContext,
         );
       });
-      test('insert(entity) should insert entity', () async {
-        final entity = TestEntity(
+      test('insert(model) should insert model', () async {
+        final model = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
           testDouble: 1,
@@ -55,28 +55,30 @@ void main() {
           testString: 'Testing 123',
         );
 
-        final insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
+        final insertedModel = await storage.insert(model);
+        expect(insertedModel, isNotNull);
       });
 
-      test('insert(entity) should insert entity and return expected entity',
-          () async {
-        var entity = TestEntity(
-          testBool: true,
-          testDateTime: DateTime.now(),
-          testDouble: 1,
-          testInt: 10,
-          testString: 'Testing 1234',
-        );
+      test(
+        'insert(model) should insert model and return expected model',
+        () async {
+          var model = TestModel(
+            testBool: true,
+            testDateTime: DateTime.now(),
+            testDouble: 1,
+            testInt: 10,
+            testString: 'Testing 1234',
+          );
 
-        final insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
-        entity = entity.copyWith(id: insertedEntity!.id);
-        expect(insertedEntity, entity);
-      });
+          final insertedModel = await storage.insert(model);
+          expect(insertedModel, isNotNull);
+          model = model.copyWith(id: insertedModel!.id);
+          expect(insertedModel, model);
+        },
+      );
 
-      test('insertOrUpdate(entity) should insert or update entity', () async {
-        var entity = TestEntity(
+      test('insertOrUpdate(model) should insert or update model', () async {
+        var model = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
           testDouble: 1,
@@ -84,57 +86,41 @@ void main() {
           testString: 'Testing 12345',
         );
 
-        final insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
-        entity = insertedEntity!.copyWith(testString: () => 'Updated string');
-        final updated = await storage.insertOrUpdate(entity);
+        final insertedModel = await storage.insert(model);
+        expect(insertedModel, isNotNull);
+        model = insertedModel!.copyWith(testString: () => 'Updated string');
+        final updated = await storage.insertOrUpdate(model);
         expect(updated, isNotNull);
-        expect(updated, entity);
+        expect(updated, model);
       });
 
-      test('getEntity() with empty columns should throw ArgumentError',
-          () async {
-        final entity = TestEntity(
-          testBool: true,
-          testDateTime: DateTime.now(),
-          testDouble: 1,
-          testInt: 11,
-          testString: 'Testing 123456',
-        );
+      test(
+        'getModel() with empty columns should throw ArgumentError',
+        () async {
+          final model = TestModel(
+            testBool: true,
+            testDateTime: DateTime.now(),
+            testDouble: 1,
+            testInt: 11,
+            testString: 'Testing 123456',
+          );
 
-        final insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
-        Future<TestEntity?>? fxn() async => storage.firstWhereOrNull(
-              select: (t) => [],
-              (t) => Filter(
-                t.id,
-                value: insertedEntity!.id,
-              )
-                  .and(
-                    t.testInt,
-                    value: entity.testInt,
-                  )
-                  .and(
-                    t.testBool,
-                    value: entity.testBool,
-                  )
-                  .and(
-                    t.testDouble,
-                    value: entity.testDouble,
-                  )
-                  .and(
-                    t.testDateTime,
-                    value: entity.testDateTime,
-                  ),
-            );
-        await expectLater(
-          fxn(),
-          throwsA(const TypeMatcher<ArgumentError>()),
-        );
-      });
+          final insertedModel = await storage.insert(model);
+          expect(insertedModel, isNotNull);
+          Future<TestModel?>? fxn() async => storage.firstWhereOrNull(
+            select: (t) => [],
+            (t) => Filter(t.id, value: insertedModel!.id)
+                .and(t.testInt, value: model.testInt)
+                .and(t.testBool, value: model.testBool)
+                .and(t.testDouble, value: model.testDouble)
+                .and(t.testDateTime, value: model.testDateTime),
+          );
+          await expectLater(fxn(), throwsA(const TypeMatcher<ArgumentError>()));
+        },
+      );
 
-      test('getEntity() should return entity with given id', () async {
-        var entity = TestEntity(
+      test('getModel() should return model with given id', () async {
+        var model = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
           testDouble: 1,
@@ -142,314 +128,269 @@ void main() {
           testString: 'Testing xxx',
         );
 
-        final insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
+        final insertedModel = await storage.insert(model);
+        expect(insertedModel, isNotNull);
         final json = await storage.firstWhereOrNull(
-          (t) => Filter(
-            entity.meta.id,
-            value: insertedEntity!.id,
-          ),
+          (t) => Filter(model.meta.id, value: insertedModel!.id),
         );
         expect(json, isNotNull);
-        entity = json!;
-        expect(insertedEntity, entity);
+        model = json!;
+        expect(insertedModel, model);
       });
 
-      test('getEntity() should return expected entity',
-          skip: 'Not supported yet', () async {
-        var entity = TestEntity(
+      test(
+        'getModel() should return expected model',
+        skip: 'Not supported yet',
+        () async {
+          var model = TestModel(
+            testBool: true,
+            testDateTime: DateTime.now(),
+            testDouble: 1,
+            testInt: 11,
+            testString: 'Testing 123456',
+          );
+
+          final insertedModel = await storage.insert(model);
+          expect(insertedModel, isNotNull);
+          final json = await storage.firstWhereOrNull(
+            (t) => Filter(model.meta.id, value: insertedModel!.id)
+                .and(t.testInt, value: model.testInt)
+                .and(t.testBool, value: model.testBool)
+                .and(t.testDouble, value: model.testDouble)
+                .and(t.testDateTime, value: model.testDateTime),
+          );
+          expect(json, isNotNull);
+          model = json!;
+          expect(insertedModel, model);
+        },
+      );
+
+      test(
+        'getModel() with columns should return expected model values',
+        skip: 'Not supported yet',
+        () async {
+          var model = TestModel(
+            testBool: true,
+            testDateTime: DateTime.now(),
+            testDouble: 1,
+            testInt: 11,
+            testString: 'Testing 123456',
+          );
+
+          final insertedModel = await storage.insert(model);
+          expect(insertedModel, isNotNull);
+          final json = await storage.firstWhereOrNull(
+            select: (t) => [t.testInt],
+            (t) => Filter(model.meta.id, value: insertedModel!.id)
+                .and(t.testInt, value: model.testInt)
+                .and(t.testBool, value: model.testBool)
+                .and(t.testDouble, value: model.testDouble)
+                .and(t.testDateTime, value: model.testDateTime),
+          );
+          expect(json, isNotNull);
+          model = json!;
+          expect(model.toString(), const TestModel(testInt: 11).toString());
+        },
+      );
+
+      test(
+        'getModel(NotEqualTo) should return expected model',
+        skip: 'Not supported yet',
+        () async {
+          var model = TestModel(
+            testBool: true,
+            testDateTime: DateTime.now(),
+            testDouble: 1,
+            testInt: 11,
+            testString: 'Testing 123456',
+          );
+
+          final insertedModel = await storage.insert(model);
+          expect(insertedModel, isNotNull);
+          final json = await storage.firstWhereOrNull(
+            orderBy: (t) => [
+              OrmOrder(model.meta.createdAt, direction: OrderDirection.desc),
+            ],
+            (t) => Filter(
+              model.meta.id,
+              condition: OrmCondition.isNotEqualTo,
+              value: '12',
+            ),
+          );
+          expect(json, isNotNull);
+          model = json!;
+          expect(insertedModel, model);
+        },
+      );
+
+      test('getModel(Null) should return expected model', () async {
+        var model = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
-          testDouble: 1,
-          testInt: 11,
           testString: 'Testing 123456',
         );
 
-        final insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
-        final json = await storage.firstWhereOrNull(
-          (t) => Filter(
-            entity.meta.id,
-            value: insertedEntity!.id,
-          )
-              .and(
-                t.testInt,
-                value: entity.testInt,
-              )
-              .and(
-                t.testBool,
-                value: entity.testBool,
-              )
-              .and(
-                t.testDouble,
-                value: entity.testDouble,
-              )
-              .and(
-                t.testDateTime,
-                value: entity.testDateTime,
-              ),
-        );
-        expect(json, isNotNull);
-        entity = json!;
-        expect(insertedEntity, entity);
-      });
-
-      test('getEntity() with columns should return expected entity values',
-          skip: 'Not supported yet', () async {
-        var entity = TestEntity(
-          testBool: true,
-          testDateTime: DateTime.now(),
-          testDouble: 1,
-          testInt: 11,
-          testString: 'Testing 123456',
-        );
-
-        final insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
-        final json = await storage.firstWhereOrNull(
-          select: (t) => [t.testInt],
-          (t) => Filter(
-            entity.meta.id,
-            value: insertedEntity!.id,
-          )
-              .and(
-                t.testInt,
-                value: entity.testInt,
-              )
-              .and(
-                t.testBool,
-                value: entity.testBool,
-              )
-              .and(
-                t.testDouble,
-                value: entity.testDouble,
-              )
-              .and(
-                t.testDateTime,
-                value: entity.testDateTime,
-              ),
-        );
-        expect(json, isNotNull);
-        entity = json!;
-        expect(entity.toString(), const TestEntity(testInt: 11).toString());
-      });
-
-      test('getEntity(NotEqualTo) should return expected entity',
-          skip: 'Not supported yet', () async {
-        var entity = TestEntity(
-          testBool: true,
-          testDateTime: DateTime.now(),
-          testDouble: 1,
-          testInt: 11,
-          testString: 'Testing 123456',
-        );
-
-        final insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
+        final insertedModel = await storage.insert(model);
+        expect(insertedModel, isNotNull);
         final json = await storage.firstWhereOrNull(
           orderBy: (t) => [
-            OrmOrder(
-              entity.meta.createdAt,
-              direction: OrderDirection.desc,
-            ),
-          ],
-          (t) => Filter(
-            entity.meta.id,
-            condition: OrmCondition.isNotEqualTo,
-            value: '12',
-          ),
-        );
-        expect(json, isNotNull);
-        entity = json!;
-        expect(insertedEntity, entity);
-      });
-
-      test('getEntity(Null) should return expected entity', () async {
-        var entity = TestEntity(
-          testBool: true,
-          testDateTime: DateTime.now(),
-          testString: 'Testing 123456',
-        );
-
-        final insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
-        final json = await storage.firstWhereOrNull(
-          orderBy: (t) => [
-            OrmOrder(
-              entity.meta.createdAt,
-              direction: OrderDirection.desc,
-            ),
+            OrmOrder(model.meta.createdAt, direction: OrderDirection.desc),
           ],
           (t) => Filter(
             t.testInt,
             condition: OrmCondition.isNull,
-          ).and(
-            t.testDouble,
-            condition: OrmCondition.isNull,
-          ),
+          ).and(t.testDouble, condition: OrmCondition.isNull),
         );
         expect(json, isNotNull);
-        entity = json!;
-        expect(insertedEntity, entity);
+        model = json!;
+        expect(insertedModel, model);
       });
 
-      test('getEntity(NotNull) should return expected entity',
-          skip: 'Not supported yet', () async {
-        final entity = TestEntity(
-          testBool: true,
-          testDateTime: DateTime.now(),
-          testString: 'Testing 123456',
-        );
+      test(
+        'getModel(NotNull) should return expected model',
+        skip: 'Not supported yet',
+        () async {
+          final model = TestModel(
+            testBool: true,
+            testDateTime: DateTime.now(),
+            testString: 'Testing 123456',
+          );
 
-        final insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
-        final json = await storage.firstWhereOrNull(
-          orderBy: (t) => [
-            OrmOrder(
-              entity.meta.createdAt,
-              direction: OrderDirection.desc,
-            ),
-          ],
-          (t) => Filter(
-            t.testString,
-            condition: OrmCondition.isNotNull,
-          ),
-        );
-        expect(json, isNotNull);
-        expect(insertedEntity, json);
-      });
+          final insertedModel = await storage.insert(model);
+          expect(insertedModel, isNotNull);
+          final json = await storage.firstWhereOrNull(
+            orderBy: (t) => [
+              OrmOrder(model.meta.createdAt, direction: OrderDirection.desc),
+            ],
+            (t) => Filter(t.testString, condition: OrmCondition.isNotNull),
+          );
+          expect(json, isNotNull);
+          expect(insertedModel, json);
+        },
+      );
 
-      test('getEntity(LessThan) should return expected entity', () async {
-        var entity = TestEntity(
+      test('getModel(LessThan) should return expected model', () async {
+        var model = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
           testInt: -15,
           testString: 'Testing 123456',
         );
 
-        final insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
+        final insertedModel = await storage.insert(model);
+        expect(insertedModel, isNotNull);
         final json = await storage.firstWhereOrNull(
           orderBy: (t) => [
-            OrmOrder(
-              entity.meta.createdAt,
-              direction: OrderDirection.desc,
-            ),
+            OrmOrder(model.meta.createdAt, direction: OrderDirection.desc),
           ],
-          (t) => Filter(
-            t.testInt,
-            condition: OrmCondition.isLessThan,
-            value: -14,
-          ),
+          (t) =>
+              Filter(t.testInt, condition: OrmCondition.isLessThan, value: -14),
         );
         expect(json, isNotNull);
-        entity = json!;
-        expect(insertedEntity, entity);
+        model = json!;
+        expect(insertedModel, model);
       });
 
-      test('getEntity(GreaterThan) should return expected entity',
-          skip: 'Not supported yet', () async {
-        var entity = TestEntity(
-          testBool: true,
-          testDateTime: DateTime.now(),
-          testInt: 20000,
-          testString: 'Testing 123456',
-        );
+      test(
+        'getModel(GreaterThan) should return expected model',
+        skip: 'Not supported yet',
+        () async {
+          var model = TestModel(
+            testBool: true,
+            testDateTime: DateTime.now(),
+            testInt: 20000,
+            testString: 'Testing 123456',
+          );
 
-        final insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
-        final json = await storage.firstWhereOrNull(
-          orderBy: (t) => [
-            OrmOrder(
-              entity.meta.createdAt,
-              direction: OrderDirection.desc,
+          final insertedModel = await storage.insert(model);
+          expect(insertedModel, isNotNull);
+          final json = await storage.firstWhereOrNull(
+            orderBy: (t) => [
+              OrmOrder(model.meta.createdAt, direction: OrderDirection.desc),
+            ],
+            (t) => Filter(
+              t.testInt,
+              condition: OrmCondition.isGreaterThan,
+              value: 19999,
             ),
-          ],
-          (t) => Filter(
-            t.testInt,
-            condition: OrmCondition.isGreaterThan,
-            value: 19999,
-          ),
-        );
-        expect(json, isNotNull);
-        entity = json!;
-        expect(insertedEntity, entity);
-      });
+          );
+          expect(json, isNotNull);
+          model = json!;
+          expect(insertedModel, model);
+        },
+      );
 
-      test('getEntity(GreaterThanOrEqual) should return expected entity',
-          skip: 'Not supported yet', () async {
-        var entity = TestEntity(
-          testBool: true,
-          testDateTime: DateTime.now(),
-          testInt: 100,
-          testString: 'Testing 123456',
-        );
+      test(
+        'getModel(GreaterThanOrEqual) should return expected model',
+        skip: 'Not supported yet',
+        () async {
+          var model = TestModel(
+            testBool: true,
+            testDateTime: DateTime.now(),
+            testInt: 100,
+            testString: 'Testing 123456',
+          );
 
-        final insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
-        final json = await storage.firstWhereOrNull(
-          orderBy: (t) => [
-            OrmOrder(
-              entity.meta.createdAt,
-              direction: OrderDirection.desc,
+          final insertedModel = await storage.insert(model);
+          expect(insertedModel, isNotNull);
+          final json = await storage.firstWhereOrNull(
+            orderBy: (t) => [
+              OrmOrder(model.meta.createdAt, direction: OrderDirection.desc),
+            ],
+            (t) => Filter(
+              t.testInt,
+              condition: OrmCondition.isGreaterThanOrEqual,
+              value: 100,
             ),
-          ],
-          (t) => Filter(
-            t.testInt,
-            condition: OrmCondition.isGreaterThanOrEqual,
-            value: 100,
-          ),
-        );
-        expect(json, isNotNull);
-        entity = json!;
-        expect(insertedEntity, entity);
-      });
+          );
+          expect(json, isNotNull);
+          model = json!;
+          expect(insertedModel, model);
+        },
+      );
 
-      test('getEntity(LessThanOrEqual) should return expected entity',
-          skip: 'Not supported yet', () async {
-        var entity = TestEntity(
-          testBool: true,
-          testDateTime: DateTime.now(),
-          testInt: -10,
-          testString: 'Testing 123456',
-        );
+      test(
+        'getModel(LessThanOrEqual) should return expected model',
+        skip: 'Not supported yet',
+        () async {
+          var model = TestModel(
+            testBool: true,
+            testDateTime: DateTime.now(),
+            testInt: -10,
+            testString: 'Testing 123456',
+          );
 
-        final insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
-        final json = await storage.firstWhereOrNull(
-          orderBy: (t) => [
-            OrmOrder(
-              entity.meta.createdAt,
-              direction: OrderDirection.desc,
+          final insertedModel = await storage.insert(model);
+          expect(insertedModel, isNotNull);
+          final json = await storage.firstWhereOrNull(
+            orderBy: (t) => [
+              OrmOrder(model.meta.createdAt, direction: OrderDirection.desc),
+            ],
+            (t) => Filter(
+              t.testInt,
+              condition: OrmCondition.isGreaterThanOrEqual,
+              value: -10,
             ),
-          ],
-          (t) => Filter(
-            t.testInt,
-            condition: OrmCondition.isGreaterThanOrEqual,
-            value: -10,
-          ),
-        );
-        expect(json, isNotNull);
-        entity = json!;
-        expect(insertedEntity, entity);
-      });
+          );
+          expect(json, isNotNull);
+          model = json!;
+          expect(insertedModel, model);
+        },
+      );
 
-      test('getEntity(Between) should return expected entity', () async {
-        var entity = TestEntity(
+      test('getModel(Between) should return expected model', () async {
+        var model = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
           testInt: 1001,
           testString: 'Testing 123456',
         );
 
-        final insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
+        final insertedModel = await storage.insert(model);
+        expect(insertedModel, isNotNull);
         final json = await storage.firstWhereOrNull(
           orderBy: (t) => [
-            OrmOrder(
-              entity.meta.createdAt,
-              direction: OrderDirection.desc,
-            ),
+            OrmOrder(model.meta.createdAt, direction: OrderDirection.desc),
           ],
           (t) => Filter(
             t.testInt,
@@ -459,56 +400,53 @@ void main() {
           ),
         );
         expect(json, isNotNull);
-        entity = json!;
-        expect(insertedEntity, entity);
+        model = json!;
+        expect(insertedModel, model);
       });
 
-      test('getEntity(NotBetween) should return expected entity',
-          skip: 'Not supported yet', () async {
-        var entity = TestEntity(
-          testBool: true,
-          testDateTime: DateTime.now(),
-          testInt: 2020,
-          testString: 'Testing 123456',
-        );
+      test(
+        'getModel(NotBetween) should return expected model',
+        skip: 'Not supported yet',
+        () async {
+          var model = TestModel(
+            testBool: true,
+            testDateTime: DateTime.now(),
+            testInt: 2020,
+            testString: 'Testing 123456',
+          );
 
-        final insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
-        final json = await storage.firstWhereOrNull(
-          orderBy: (t) => [
-            OrmOrder(
-              entity.meta.createdAt,
-              direction: OrderDirection.desc,
+          final insertedModel = await storage.insert(model);
+          expect(insertedModel, isNotNull);
+          final json = await storage.firstWhereOrNull(
+            orderBy: (t) => [
+              OrmOrder(model.meta.createdAt, direction: OrderDirection.desc),
+            ],
+            (t) => Filter(
+              t.testInt,
+              condition: OrmCondition.isNotBetween,
+              value: -500,
+              secondaryValue: 2019,
             ),
-          ],
-          (t) => Filter(
-            t.testInt,
-            condition: OrmCondition.isNotBetween,
-            value: -500,
-            secondaryValue: 2019,
-          ),
-        );
-        expect(json, isNotNull);
-        entity = json!;
-        expect(insertedEntity, entity);
-      });
+          );
+          expect(json, isNotNull);
+          model = json!;
+          expect(insertedModel, model);
+        },
+      );
 
-      test('getEntity(In) should return expected entity', () async {
-        var entity = TestEntity(
+      test('getModel(In) should return expected model', () async {
+        var model = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
           testInt: 11001,
           testString: 'Testing 123456',
         );
 
-        final insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
+        final insertedModel = await storage.insert(model);
+        expect(insertedModel, isNotNull);
         final json = await storage.firstWhereOrNull(
           orderBy: (t) => [
-            OrmOrder(
-              entity.meta.createdAt,
-              direction: OrderDirection.desc,
-            ),
+            OrmOrder(model.meta.createdAt, direction: OrderDirection.desc),
           ],
           (t) => Filter(
             t.testInt,
@@ -517,55 +455,52 @@ void main() {
           ),
         );
         expect(json, isNotNull);
-        entity = json!;
-        expect(insertedEntity, entity);
+        model = json!;
+        expect(insertedModel, model);
       });
 
-      test('getEntity(NotIn) should return expected entity',
-          skip: 'Not supported yet', () async {
-        var entity = TestEntity(
-          testBool: true,
-          testDateTime: DateTime.now(),
-          testInt: 11002,
-          testString: 'Testing 123456',
-        );
+      test(
+        'getModel(NotIn) should return expected model',
+        skip: 'Not supported yet',
+        () async {
+          var model = TestModel(
+            testBool: true,
+            testDateTime: DateTime.now(),
+            testInt: 11002,
+            testString: 'Testing 123456',
+          );
 
-        final insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
-        final json = await storage.firstWhereOrNull(
-          orderBy: (t) => [
-            OrmOrder(
-              entity.meta.createdAt,
-              direction: OrderDirection.desc,
+          final insertedModel = await storage.insert(model);
+          expect(insertedModel, isNotNull);
+          final json = await storage.firstWhereOrNull(
+            orderBy: (t) => [
+              OrmOrder(model.meta.createdAt, direction: OrderDirection.desc),
+            ],
+            (t) => Filter(
+              t.testInt,
+              condition: OrmCondition.isNotIn,
+              value: const [11001, 11005],
             ),
-          ],
-          (t) => Filter(
-            t.testInt,
-            condition: OrmCondition.isNotIn,
-            value: const [11001, 11005],
-          ),
-        );
-        expect(json, isNotNull);
-        entity = json!;
-        expect(insertedEntity, entity);
-      });
+          );
+          expect(json, isNotNull);
+          model = json!;
+          expect(insertedModel, model);
+        },
+      );
 
-      test('getEntity(Like) should return expected entity', () async {
-        var entity = TestEntity(
+      test('getModel(Like) should return expected model', () async {
+        var model = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
           testInt: 11002,
           testString: 'Likeable',
         );
 
-        final insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
+        final insertedModel = await storage.insert(model);
+        expect(insertedModel, isNotNull);
         final json = await storage.firstWhereOrNull(
           orderBy: (t) => [
-            OrmOrder(
-              entity.meta.createdAt,
-              direction: OrderDirection.desc,
-            ),
+            OrmOrder(model.meta.createdAt, direction: OrderDirection.desc),
           ],
           (t) => Filter(
             t.testString,
@@ -574,86 +509,75 @@ void main() {
           ),
         );
         expect(json, isNotNull);
-        entity = json!;
-        expect(insertedEntity, entity);
+        model = json!;
+        expect(insertedModel, model);
       });
 
-      test('getEntity(NotLike) should return expected entity',
-          skip: 'Not supported yet', () async {
-        var entity = TestEntity(
-          testBool: true,
-          testDateTime: DateTime.now(),
-          testInt: 11002,
-          testString: 'Loveable',
-        );
+      test(
+        'getModel(NotLike) should return expected model',
+        skip: 'Not supported yet',
+        () async {
+          var model = TestModel(
+            testBool: true,
+            testDateTime: DateTime.now(),
+            testInt: 11002,
+            testString: 'Loveable',
+          );
 
-        final insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
-        final json = await storage.firstWhereOrNull(
-          orderBy: (t) => [
-            OrmOrder(
-              entity.meta.createdAt,
-              direction: OrderDirection.desc,
+          final insertedModel = await storage.insert(model);
+          expect(insertedModel, isNotNull);
+          final json = await storage.firstWhereOrNull(
+            orderBy: (t) => [
+              OrmOrder(model.meta.createdAt, direction: OrderDirection.desc),
+            ],
+            (t) => Filter(
+              t.testString,
+              condition: OrmCondition.excludes,
+              value: '%Dummy%',
             ),
-          ],
-          (t) => Filter(
-            t.testString,
-            condition: OrmCondition.excludes,
-            value: '%Dummy%',
-          ),
-        );
-        expect(json, isNotNull);
-        entity = json!;
-        expect(insertedEntity, entity);
-      });
+          );
+          expect(json, isNotNull);
+          model = json!;
+          expect(insertedModel, model);
+        },
+      );
 
-      test('getEntity() with complex query should return expected entity',
-          skip: 'Not supported yet', () async {
-        var entity = TestEntity(
-          testBool: true,
-          testDateTime: DateTime.now(),
-          testInt: 11002,
-          testString: 'Loveable',
-        );
+      test(
+        'getModel() with complex query should return expected model',
+        skip: 'Not supported yet',
+        () async {
+          var model = TestModel(
+            testBool: true,
+            testDateTime: DateTime.now(),
+            testInt: 11002,
+            testString: 'Loveable',
+          );
 
-        final insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
-        final json = await storage.firstWhereOrNull(
-          orderBy: (t) => [
-            OrmOrder(
-              entity.meta.createdAt,
-              direction: OrderDirection.desc,
-            ),
-          ],
-          (t) => Filter.startGroup()
-              .filter(
-                t.testString,
-                condition: OrmCondition.includes,
-                value: '%Dummy%',
-              )
-              .and(
-                t.testInt,
-                value: 10,
-              )
-              .endGroup()
-              .or(
-                t.testString,
-                value: 'Loveable',
-                openGroup: true,
-              )
-              .and(
-                t.testInt,
-                value: 11002,
-                closeGroup: true,
-              ),
-        );
-        expect(json, isNotNull);
-        entity = json!;
-        expect(insertedEntity, entity);
-      });
+          final insertedModel = await storage.insert(model);
+          expect(insertedModel, isNotNull);
+          final json = await storage.firstWhereOrNull(
+            orderBy: (t) => [
+              OrmOrder(model.meta.createdAt, direction: OrderDirection.desc),
+            ],
+            (t) => Filter.startGroup()
+                .filter(
+                  t.testString,
+                  condition: OrmCondition.includes,
+                  value: '%Dummy%',
+                )
+                .and(t.testInt, value: 10)
+                .endGroup()
+                .or(t.testString, value: 'Loveable', openGroup: true)
+                .and(t.testInt, value: 11002, closeGroup: true),
+          );
+          expect(json, isNotNull);
+          model = json!;
+          expect(insertedModel, model);
+        },
+      );
 
       test('getEntities() should return expected entities', () async {
-        final entity = TestEntity(
+        final model = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
           testDouble: 1,
@@ -661,9 +585,9 @@ void main() {
           testString: 'Testing a',
         );
 
-        final insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
-        final entity1 = TestEntity(
+        final insertedModel = await storage.insert(model);
+        expect(insertedModel, isNotNull);
+        final model1 = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
           testDouble: 1,
@@ -671,34 +595,25 @@ void main() {
           testString: 'Testing b',
         );
 
-        final insertedEntity1 = await storage.insert(entity1);
-        expect(insertedEntity1, isNotNull);
+        final insertedModel1 = await storage.insert(model1);
+        expect(insertedModel1, isNotNull);
         final json = await storage.where(
           (t) => Filter(
-            entity.meta.id,
-            value: insertedEntity!.id,
-          ).or(
-            entity.meta.id,
-            value: insertedEntity1!.id,
-          ),
+            model.meta.id,
+            value: insertedModel!.id,
+          ).or(model.meta.id, value: insertedModel1!.id),
           orderBy: (t) => [OrmOrder(t.testInt)],
         );
         expect(json, isNotNull);
-        final entities = json.map<TestEntity>((e) => e).toList();
+        final entities = json.map<TestModel>((e) => e).toList();
         expect(entities.length, 2);
-        expect(entities, [
-          insertedEntity,
-          insertedEntity1,
-        ]);
+        expect(entities, [insertedModel, insertedModel1]);
       });
 
       test('getEntities() should return empty array', () async {
-        const entity = TestEntity();
+        const model = TestModel();
         final json = await storage.where(
-          (t) => Filter(
-            entity.meta.id,
-            value: 'xyzNotFound',
-          ),
+          (t) => Filter(model.meta.id, value: 'xyzNotFound'),
           orderBy: (t) => [OrmOrder(t.testInt)],
         );
         expect(json, isNotNull);
@@ -706,7 +621,7 @@ void main() {
       });
 
       test('getEntities() should return items', () async {
-        final entity = TestEntity(
+        final model = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
           testDouble: 1,
@@ -714,93 +629,85 @@ void main() {
           testString: 'Testing a',
         );
 
-        final insertedEntity = await storage.insert(entity);
+        final insertedModel = await storage.insert(model);
         final json = await storage.all(
-          orderBy: (t) => [OrmOrder(entity.meta.createdAt)],
+          orderBy: (t) => [OrmOrder(model.meta.createdAt)],
         );
         expect(json, isNotNull);
         expect(json.length, greaterThan(0));
-        final entities = json.map<TestEntity>((e) => e).toList();
-        expect(entities, contains(insertedEntity));
+        final entities = json.map<TestModel>((e) => e).toList();
+        expect(entities, contains(insertedModel));
       });
 
       test(
-          'getEntities() with orderBy should return '
-          'expected entities in expected order',
-          skip: 'Not supported yet', () async {
-        final entity = TestEntity(
-          testBool: true,
-          testDateTime: DateTime.now(),
-          testDouble: 1,
-          testInt: 11,
-          testString: 'Testing a',
-        );
+        'getEntities() with orderBy should return '
+        'expected entities in expected order',
+        skip: 'Not supported yet',
+        () async {
+          final model = TestModel(
+            testBool: true,
+            testDateTime: DateTime.now(),
+            testDouble: 1,
+            testInt: 11,
+            testString: 'Testing a',
+          );
 
-        final insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
-        final entity1 = TestEntity(
-          testBool: true,
-          testDateTime: DateTime.now(),
-          testDouble: 1,
-          testInt: 12,
-          testString: 'Testing b',
-        );
+          final insertedModel = await storage.insert(model);
+          expect(insertedModel, isNotNull);
+          final model1 = TestModel(
+            testBool: true,
+            testDateTime: DateTime.now(),
+            testDouble: 1,
+            testInt: 12,
+            testString: 'Testing b',
+          );
 
-        final insertedEntity1 = await storage.insert(entity1);
-        expect(insertedEntity1, isNotNull);
-        final json = await storage.where(
-          (t) => Filter(
-            entity.meta.id,
-            value: insertedEntity!.id,
-          ).or(
-            entity.meta.id,
-            value: insertedEntity1!.id,
-          ),
-          orderBy: (t) => [
-            OrmOrder(
-              t.testInt,
-              direction: OrderDirection.desc,
-            ),
-          ],
-        );
-        expect(json, isNotNull);
-        final entities = json.map<TestEntity>((e) => e).toList();
-        expect(entities.length, 2);
-        expect(entities, [
-          insertedEntity1,
-          insertedEntity,
-        ]);
-      });
+          final insertedModel1 = await storage.insert(model1);
+          expect(insertedModel1, isNotNull);
+          final json = await storage.where(
+            (t) => Filter(
+              model.meta.id,
+              value: insertedModel!.id,
+            ).or(model.meta.id, value: insertedModel1!.id),
+            orderBy: (t) => [
+              OrmOrder(t.testInt, direction: OrderDirection.desc),
+            ],
+          );
+          expect(json, isNotNull);
+          final entities = json.map<TestModel>((e) => e).toList();
+          expect(entities.length, 2);
+          expect(entities, [insertedModel1, insertedModel]);
+        },
+      );
 
       test('insertList() should insert entities', () async {
-        final entity = TestEntity(
+        final model = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
           testDouble: 1,
           testInt: 11,
           testString: 'Testing a',
         );
-        final entity1 = TestEntity(
+        final model1 = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
           testDouble: 1,
           testInt: 12,
           testString: 'Testing b',
         );
-        final insertedEntity =
-            await storage.insertList(<TestEntity>[entity, entity1]);
-        expect(insertedEntity, isNotNull);
-        expect(insertedEntity!.length, 2);
-        final a = entity.copyWith(id: insertedEntity[0].id);
-        final b = entity1.copyWith(id: insertedEntity[1].id);
-        expect(insertedEntity, [
-          a,
-          b,
+        final insertedModel = await storage.insertList(<TestModel>[
+          model,
+          model1,
         ]);
+        expect(insertedModel, isNotNull);
+        expect(insertedModel!.length, 2);
+        final a = model.copyWith(id: insertedModel[0].id);
+        final b = model1.copyWith(id: insertedModel[1].id);
+        expect(insertedModel, [a, b]);
       });
 
       test('insertList() with duplicate ids should throw', () async {
-        final entity = TestEntity(
+        final model = TestModel(
           id: 'id1',
           testBool: true,
           testDateTime: DateTime.now(),
@@ -808,7 +715,7 @@ void main() {
           testInt: 11,
           testString: 'Testing a',
         );
-        final entity1 = TestEntity(
+        final model1 = TestModel(
           id: 'id1',
           testBool: true,
           testDateTime: DateTime.now(),
@@ -817,13 +724,13 @@ void main() {
           testString: 'Testing b',
         );
         expect(
-          () async => storage.insertList(<TestEntity>[entity, entity1]),
+          () async => storage.insertList(<TestModel>[model, model1]),
           throwsA(const TypeMatcher<Exception>()),
         );
       });
 
-      test('update() without columnValues should update entity', () async {
-        var entity = TestEntity(
+      test('update() without columnValues should update model', () async {
+        var model = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
           testDouble: 1,
@@ -831,175 +738,171 @@ void main() {
           testString: 'Testing a',
         );
 
-        final insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
-        entity = (insertedEntity!).copyWith(testString: () => 'Updated a');
+        final insertedModel = await storage.insert(model);
+        expect(insertedModel, isNotNull);
+        model = (insertedModel!).copyWith(testString: () => 'Updated a');
         final total = await storage.update(
-          entity: entity,
-          where: (t) => Filter(
-            entity.meta.id,
-            value: entity.id,
-          ),
+          model: model,
+          where: (t) => Filter(model.meta.id, value: model.id),
         );
         expect(total, 1);
       });
 
-      test('update() with columnValues should update',
-          skip: 'Not supported yet', () async {
-        var entity = TestEntity(
-          testBool: true,
-          testDateTime: DateTime.now(),
-          testDouble: 1,
-          testInt: 11,
-          testString: 'Testing a',
-        );
+      test(
+        'update() with columnValues should update',
+        skip: 'Not supported yet',
+        () async {
+          var model = TestModel(
+            testBool: true,
+            testDateTime: DateTime.now(),
+            testDouble: 1,
+            testInt: 11,
+            testString: 'Testing a',
+          );
 
-        var insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
-        final total = await storage.update(
-          where: (t) => Filter(
-            entity.meta.id,
-            value: insertedEntity!.id,
-          ),
-          columnValues: (t) => {t.testString: 'Updated ax1'},
-        );
-        expect(total, 1);
-        final json = await storage.firstWhereOrNull(
-          (t) => Filter(entity.meta.id, value: insertedEntity?.id),
-        );
-        insertedEntity =
-            insertedEntity?.copyWith(testString: () => 'Updated ax1');
-        entity = json!;
-        expect(entity, insertedEntity);
-      });
+          var insertedModel = await storage.insert(model);
+          expect(insertedModel, isNotNull);
+          final total = await storage.update(
+            where: (t) => Filter(model.meta.id, value: insertedModel!.id),
+            columnValues: (t) => {t.testString: 'Updated ax1'},
+          );
+          expect(total, 1);
+          final json = await storage.firstWhereOrNull(
+            (t) => Filter(model.meta.id, value: insertedModel?.id),
+          );
+          insertedModel = insertedModel?.copyWith(
+            testString: () => 'Updated ax1',
+          );
+          model = json!;
+          expect(model, insertedModel);
+        },
+      );
 
       test('insertOrUpdateList() should insert entities', () async {
-        final entity = TestEntity(
+        final model = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
           testDouble: 1,
           testInt: 11,
           testString: 'Testing a',
         );
-        final entity1 = TestEntity(
+        final model1 = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
           testDouble: 1,
           testInt: 12,
           testString: 'Testing b',
         );
-        final insertedEntity =
-            await storage.insertOrUpdateList(<TestEntity>[entity, entity1]);
-        expect(insertedEntity, isNotNull);
-        expect(insertedEntity!.length, 2);
-        final a = entity.copyWith(id: insertedEntity[0].id);
-        final b = entity1.copyWith(id: insertedEntity[1].id);
-        expect(insertedEntity, [
-          a,
-          b,
+        final insertedModel = await storage.insertOrUpdateList(<TestModel>[
+          model,
+          model1,
         ]);
+        expect(insertedModel, isNotNull);
+        expect(insertedModel!.length, 2);
+        final a = model.copyWith(id: insertedModel[0].id);
+        final b = model1.copyWith(id: insertedModel[1].id);
+        expect(insertedModel, [a, b]);
       });
 
       test('insertOrUpdateList() should update entities', () async {
-        var entity = TestEntity(
+        var model = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
           testDouble: 1,
           testInt: 11,
           testString: 'Testing a',
         );
-        var entity1 = TestEntity(
+        var model1 = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
           testDouble: 1,
           testInt: 12,
           testString: 'Testing b',
         );
-        var insertedEntity =
-            await storage.insertList(<TestEntity>[entity, entity1]);
-        expect(insertedEntity, isNotNull);
-        expect(insertedEntity!.length, 2);
-        entity = insertedEntity[0].copyWith(testString: () => 'Updated a');
-        entity1 = insertedEntity[1].copyWith(testString: () => 'Updated b');
-        insertedEntity =
-            await storage.insertOrUpdateList(<TestEntity>[entity, entity1]);
-        expect(insertedEntity, isNotNull);
-        expect(insertedEntity!.length, 2);
-        final a = entity.copyWith(id: insertedEntity[0].id);
-        final b = entity1.copyWith(id: insertedEntity[1].id);
-        expect(insertedEntity, [
-          a,
-          b,
+        var insertedModel = await storage.insertList(<TestModel>[
+          model,
+          model1,
         ]);
+        expect(insertedModel, isNotNull);
+        expect(insertedModel!.length, 2);
+        model = insertedModel[0].copyWith(testString: () => 'Updated a');
+        model1 = insertedModel[1].copyWith(testString: () => 'Updated b');
+        insertedModel = await storage.insertOrUpdateList(<TestModel>[
+          model,
+          model1,
+        ]);
+        expect(insertedModel, isNotNull);
+        expect(insertedModel!.length, 2);
+        final a = model.copyWith(id: insertedModel[0].id);
+        final b = model1.copyWith(id: insertedModel[1].id);
+        expect(insertedModel, [a, b]);
       });
 
       test('getCount() should throwsUnsupportedError', () async {
-        final entity = TestEntity(
+        final model = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
           testDouble: 1,
           testInt: 11,
           testString: 'Testing a',
         );
-        final entity1 = TestEntity(
+        final model1 = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
           testDouble: 1,
           testInt: 12,
           testString: 'Testing b',
         );
-        final insertedEntity =
-            await storage.insertList(<TestEntity>[entity, entity1]);
-        expect(insertedEntity, isNotNull);
-        expect(insertedEntity!.length, 2);
+        final insertedModel = await storage.insertList(<TestModel>[
+          model,
+          model1,
+        ]);
+        expect(insertedModel, isNotNull);
+        expect(insertedModel!.length, 2);
 
         await expectLater(
           storage.getCount(
             where: (t) => Filter(
-              entity.meta.id,
-              value: insertedEntity[0].id,
-            ).or(
-              entity.meta.id,
-              value: insertedEntity[1].id,
-            ),
+              model.meta.id,
+              value: insertedModel[0].id,
+            ).or(model.meta.id, value: insertedModel[1].id),
           ),
           throwsUnsupportedError,
         );
       });
 
       test('delete() should delete expected records', () async {
-        final entity = TestEntity(
+        final model = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
           testDouble: 1,
           testInt: 11,
           testString: 'Testing a',
         );
-        final entity1 = TestEntity(
+        final model1 = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
           testDouble: 1,
           testInt: 12,
           testString: 'Testing b',
         );
-        final insertedEntity =
-            await storage.insertList(<TestEntity>[entity, entity1]);
-        expect(insertedEntity, isNotNull);
-        expect(insertedEntity!.length, 2);
+        final insertedModel = await storage.insertList(<TestModel>[
+          model,
+          model1,
+        ]);
+        expect(insertedModel, isNotNull);
+        expect(insertedModel!.length, 2);
         final total = await storage.delete(
           where: (t) => Filter(
-            entity.meta.id,
-            value: insertedEntity[0].id,
-          ).or(
-            entity.meta.id,
-            value: insertedEntity[1].id,
-          ),
+            model.meta.id,
+            value: insertedModel[0].id,
+          ).or(model.meta.id, value: insertedModel[1].id),
         );
         expect(total, 2);
       });
 
       test('getSum<int>() should throwsUnsupportedError', () async {
-        final entity = TestEntity(
+        final model = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
           testDouble: 1,
@@ -1007,9 +910,9 @@ void main() {
           testString: 'Testing a',
         );
 
-        final insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
-        final entity1 = TestEntity(
+        final insertedModel = await storage.insert(model);
+        expect(insertedModel, isNotNull);
+        final model1 = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
           testDouble: 1,
@@ -1017,18 +920,16 @@ void main() {
           testString: 'Testing b',
         );
 
-        final insertedEntity1 = await storage.insert(entity1);
-        expect(insertedEntity1, isNotNull);
+        final insertedModel1 = await storage.insert(model1);
+        expect(insertedModel1, isNotNull);
         await expectLater(
-          storage.getSum<int>(
-            column: (t) => t.testInt,
-          ),
+          storage.getSum<int>(column: (t) => t.testInt),
           throwsUnsupportedError,
         );
       });
 
       test('getSumProduct<double>() should throwsUnsupportedError', () async {
-        final entity = TestEntity(
+        final model = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
           testDouble: 2,
@@ -1036,9 +937,9 @@ void main() {
           testString: 'Testing a',
         );
 
-        final insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
-        final entity1 = TestEntity(
+        final insertedModel = await storage.insert(model);
+        expect(insertedModel, isNotNull);
+        final model1 = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
           testDouble: 3,
@@ -1046,28 +947,22 @@ void main() {
           testString: 'Testing b',
         );
 
-        final insertedEntity1 = await storage.insert(entity1);
-        expect(insertedEntity1, isNotNull);
+        final insertedModel1 = await storage.insert(model1);
+        expect(insertedModel1, isNotNull);
         await expectLater(
           storage.getSumProduct<double>(
-            select: (t) => [
-              t.testInt,
-              t.testDouble,
-            ],
+            select: (t) => [t.testInt, t.testDouble],
             where: (t) => Filter(
-              entity.meta.id,
-              value: insertedEntity!.id,
-            ).or(
-              entity.meta.id,
-              value: insertedEntity1!.id,
-            ),
+              model.meta.id,
+              value: insertedModel!.id,
+            ).or(model.meta.id, value: insertedModel1!.id),
           ),
           throwsUnsupportedError,
         );
       });
 
       test('getSum<double>() should throwsUnsupportedError', () async {
-        final entity = TestEntity(
+        final model = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
           testDouble: 1.1,
@@ -1075,9 +970,9 @@ void main() {
           testString: 'Testing a',
         );
 
-        final insertedEntity = await storage.insert(entity);
-        expect(insertedEntity, isNotNull);
-        final entity1 = TestEntity(
+        final insertedModel = await storage.insert(model);
+        expect(insertedModel, isNotNull);
+        final model1 = TestModel(
           testBool: true,
           testDateTime: DateTime.now(),
           testDouble: 2.3,
@@ -1085,18 +980,15 @@ void main() {
           testString: 'Testing b',
         );
 
-        final insertedEntity1 = await storage.insert(entity1);
-        expect(insertedEntity1, isNotNull);
+        final insertedModel1 = await storage.insert(model1);
+        expect(insertedModel1, isNotNull);
         await expectLater(
           storage.getSum<double>(
             column: (t) => t.testDouble,
             where: (t) => Filter(
-              entity.meta.id,
-              value: insertedEntity!.id,
-            ).or(
-              entity.meta.id,
-              value: insertedEntity1!.id,
-            ),
+              model.meta.id,
+              value: insertedModel!.id,
+            ).or(model.meta.id, value: insertedModel1!.id),
           ),
           throwsUnsupportedError,
         );

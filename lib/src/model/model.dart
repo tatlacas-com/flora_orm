@@ -1,20 +1,15 @@
 import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
-import 'package:flora_orm/src/models/column_definition_extension.dart';
-import 'package:flora_orm/src/models/orm.dart';
+import 'package:flora_orm/src/model/column_definition_extension.dart';
+import 'package:flora_orm/src/model/orm.dart';
 import 'package:meta/meta.dart';
-part 'entity_base.dart';
-part 'entity_meta.dart';
+part 'model_base.dart';
+part 'model_meta.dart';
 
-abstract class Entity<TEntity extends EntityBase,
-    TMeta extends EntityMeta<TEntity>> extends Equatable implements EntityBase {
-  const Entity({
-    this.id,
-    this.collectionId,
-    this.createdAt,
-    this.updatedAt,
-  });
+abstract class Model<TModel extends ModelBase, TMeta extends ModelMeta<TModel>>
+    extends Equatable implements ModelBase {
+  const Model({this.id, this.collectionId, this.createdAt, this.updatedAt});
   @override
   final String? id;
   @override
@@ -28,10 +23,7 @@ abstract class Entity<TEntity extends EntityBase,
   TMeta get meta;
 
   @override
-  List<Object?> get props => [
-        id,
-        collectionId,
-      ];
+  List<Object?> get props => [id, collectionId];
 
   @override
   String toString() => indentedString({runtimeType.toString(): toMap()});
@@ -42,7 +34,7 @@ abstract class Entity<TEntity extends EntityBase,
   }
 
   @override
-  TEntity copyWith({
+  TModel copyWith({
     String? id,
     String? collectionId,
     DateTime? createdAt,
@@ -50,24 +42,21 @@ abstract class Entity<TEntity extends EntityBase,
     Map<String, dynamic>? json,
   });
 
-  List<ColumnDefinition<TEntity, dynamic>> get compositePrimaryKey =>
-      <ColumnDefinition<TEntity, dynamic>>[];
+  List<ColumnDefinition<TModel, dynamic>> get compositePrimaryKey =>
+      <ColumnDefinition<TModel, dynamic>>[];
 
   @override
-  TEntity updateDates({DateTime? createdAt}) {
+  TModel updateDates({DateTime? createdAt}) {
     createdAt ??= this.createdAt ?? DateTime.now().toUtc();
     final updatedAt = DateTime.now().toUtc();
-    return copyWith(
-      createdAt: createdAt,
-      updatedAt: updatedAt,
-    );
+    return copyWith(createdAt: createdAt, updatedAt: updatedAt);
   }
 
   @override
   Map<String, dynamic> toMap() {
     final map = <String, dynamic>{};
     for (final column in meta.columns) {
-      column.commitValue(this as TEntity, map);
+      column.commitValue(this as TModel, map);
     }
     return map;
   }
@@ -76,36 +65,33 @@ abstract class Entity<TEntity extends EntityBase,
   Map<String, dynamic> toDb() {
     final map = <String, dynamic>{};
     for (final column in meta.columns) {
-      column.commitValue(this as TEntity, map);
+      column.commitValue(this as TModel, map);
     }
     return map;
   }
 
   ///Reads the values from database and set the corresponding values
   @override
-  TEntity load(Map<String, dynamic> json) {
-    var entity = this as TEntity;
+  TModel load(Map<String, dynamic> json) {
+    var model = this as TModel;
     for (final column in meta.columns) {
       final value = column.getValueFrom(json);
-      if (column is ColumnDefinition<TEntity, double> && value is int) {
-        entity = column.read(json, entity, value.toDouble());
+      if (column is ColumnDefinition<TModel, double> && value is int) {
+        model = column.read(json, model, value.toDouble());
       } else {
-        entity = column.read(json, entity, value);
+        model = column.read(json, model, value);
       }
     }
-    return entity;
+    return model;
   }
 
   @override
   @nonVirtual
   List<String> recreateTable(int newVersion) {
-    return [
-      dropTable(meta.tableName),
-      createTable(newVersion),
-    ];
+    return [dropTable(meta.tableName), createTable(newVersion)];
   }
 
-  List<ColumnDefinition<TEntity, dynamic>> addColumnsAt(int newVersion);
+  List<ColumnDefinition<TModel, dynamic>> addColumnsAt(int newVersion);
 
   @override
   @nonVirtual
@@ -113,8 +99,9 @@ abstract class Entity<TEntity extends EntityBase,
     var indx = 1;
     final stringBuffer = StringBuffer();
     for (final element in meta.columns) {
-      stringBuffer
-          .write('${element.name} ${getColumnType(element.columnType)}');
+      stringBuffer.write(
+        '${element.name} ${getColumnType(element.columnType)}',
+      );
       columnDefinition(element, stringBuffer);
       if (indx++ != meta.columns.length) stringBuffer.write(',');
     }
@@ -145,7 +132,7 @@ abstract class Entity<TEntity extends EntityBase,
   }
 
   Map<String, dynamic> toStorageJson({
-    required Map<ColumnDefinition<TEntity, dynamic>, dynamic> columnValues,
+    required Map<ColumnDefinition<TModel, dynamic>, dynamic> columnValues,
   }) {
     final map = <String, dynamic>{};
     columnValues.forEach((key, value) {
@@ -154,7 +141,7 @@ abstract class Entity<TEntity extends EntityBase,
     return map;
   }
 
-  String addColumn(ColumnDefinition<TEntity, dynamic> column) {
+  String addColumn(ColumnDefinition<TModel, dynamic> column) {
     final str = StringBuffer();
     columnDefinition(column, str);
     return 'ALTER TABLE ${meta.tableName} ADD ${column.name} '
@@ -179,7 +166,7 @@ abstract class Entity<TEntity extends EntityBase,
 
   @protected
   void columnDefinition(
-    ColumnDefinition<TEntity, dynamic> element,
+    ColumnDefinition<TModel, dynamic> element,
     StringBuffer stringBuffer,
   ) {
     if (element.primaryKey) stringBuffer.write(' PRIMARY KEY');
@@ -188,10 +175,7 @@ abstract class Entity<TEntity extends EntityBase,
     if (element.notNull) stringBuffer.write(' NOT NULL');
     if (element.defaultValue != null) {
       stringBuffer.write(
-        ' DEFAULT ${generateDefaultValue(
-          colType: element.columnType,
-          defaultValue: element.defaultValue,
-        )}',
+        ''' DEFAULT ${generateDefaultValue(colType: element.columnType, defaultValue: element.defaultValue)}''',
       );
     }
   }

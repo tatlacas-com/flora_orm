@@ -1,18 +1,18 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'test.entity.dart';
+part of 'test_model.dart';
 
 // **************************************************************************
-// EntityPropsGenerator
+// ModelPropsGenerator
 // **************************************************************************
 
-mixin _TestEntityMixin on Entity<TestEntity, TestEntityMeta> {
-  static const TestEntityMeta _meta = TestEntityMeta();
+mixin _TestModelMixin on Model<TestModel, TestModelMeta> {
+  static const TestModelMeta _meta = TestModelMeta();
 
   @override
-  TestEntityMeta get meta => _meta;
+  TestModelMeta get meta => _meta;
 
-  TestEntity readTestEnum1(Map<String, dynamic> json, dynamic value) {
+  TestModel readTestEnum1(Map<String, dynamic> json, dynamic value) {
     TestEnum? item;
     if (value != null) {
       item = <TestEnum?>[...TestEnum.values].firstWhere(
@@ -24,7 +24,7 @@ mixin _TestEntityMixin on Entity<TestEntity, TestEntityMeta> {
     );
   }
 
-  TestEntity readTestEnum2(Map<String, dynamic> json, dynamic value) {
+  TestModel readTestEnum2(Map<String, dynamic> json, dynamic value) {
     TestEnum? item;
     if (value != null) {
       item = <TestEnum?>[...TestEnum.values].firstWhere(
@@ -36,7 +36,7 @@ mixin _TestEntityMixin on Entity<TestEntity, TestEntityMeta> {
     );
   }
 
-  TestEntity readTestEnum3(Map<String, dynamic> json, dynamic value) {
+  TestModel readTestEnum3(Map<String, dynamic> json, dynamic value) {
     TestEnum? item;
     if (value != null) {
       item = <TestEnum?>[...TestEnum.values].firstWhere(
@@ -48,7 +48,7 @@ mixin _TestEntityMixin on Entity<TestEntity, TestEntityMeta> {
     );
   }
 
-  TestEntity readIntList(Map<String, dynamic> json, dynamic value) {
+  TestModel readIntList(Map<String, dynamic> json, dynamic value) {
     List<int>? items;
     if (value != null) {
       final list = value is List ? value : jsonDecode(value as String);
@@ -89,7 +89,7 @@ mixin _TestEntityMixin on Entity<TestEntity, TestEntityMeta> {
         intList,
       ];
   @override
-  TestEntity copyWith({
+  TestModel copyWith({
     String? id,
     String? collectionId,
     DateTime? createdAt,
@@ -108,7 +108,7 @@ mixin _TestEntityMixin on Entity<TestEntity, TestEntityMeta> {
     List<int>? intList,
     Map<String, dynamic>? json,
   }) {
-    return TestEntity(
+    return TestModel(
       id: id ?? this.id,
       collectionId: collectionId ?? this.collectionId,
       createdAt: createdAt ?? this.createdAt,
@@ -130,139 +130,139 @@ mixin _TestEntityMixin on Entity<TestEntity, TestEntityMeta> {
     );
   }
 }
-typedef TestEntityStore
-    = OrmEngine<TestEntity, TestEntityMeta, StoreContext<TestEntity>>;
+typedef TestModelStore
+    = OrmEngine<TestModel, TestModelMeta, StoreContext<TestModel>>;
 
-class TestEntityMeta extends EntityMeta<TestEntity> {
-  const TestEntityMeta();
+class TestModelMeta extends ModelMeta<TestModel> {
+  const TestModelMeta();
 
   @override
   String get tableName => 'test';
 
   @override
-  ColumnDefinition<TestEntity, String> get id =>
-      ColumnDefinition<TestEntity, String>(
+  ColumnDefinition<TestModel, String> get id =>
+      ColumnDefinition<TestModel, String>(
         'id',
         primaryKey: true,
-        write: (entity) => entity.id,
-        read: (json, entity, value) =>
-            entity.copyWith(id: value as String?, json: json),
+        write: (model) => model.id,
+        read: (json, model, value) =>
+            model.copyWith(id: value as String?, json: json),
       );
 
   @override
-  ColumnDefinition<TestEntity, String> get collectionId =>
-      ColumnDefinition<TestEntity, String>(
+  ColumnDefinition<TestModel, String> get collectionId =>
+      ColumnDefinition<TestModel, String>(
         'collectionId',
-        write: (entity) => entity.collectionId,
-        read: (json, entity, value) =>
-            entity.copyWith(collectionId: value as String?, json: json),
+        write: (model) => model.collectionId,
+        read: (json, model, value) =>
+            model.copyWith(collectionId: value as String?, json: json),
       );
 
   @override
-  ColumnDefinition<TestEntity, DateTime> get createdAt =>
-      ColumnDefinition<TestEntity, DateTime>(
+  ColumnDefinition<TestModel, DateTime> get createdAt =>
+      ColumnDefinition<TestModel, DateTime>(
         'createdAt',
-        write: (entity) => entity.createdAt,
-        read: (json, entity, value) =>
-            entity.copyWith(createdAt: value as DateTime?, json: json),
+        write: (model) => model.createdAt,
+        read: (json, model, value) =>
+            model.copyWith(createdAt: value as DateTime?, json: json),
       );
 
   @override
-  ColumnDefinition<TestEntity, DateTime> get updatedAt =>
-      ColumnDefinition<TestEntity, DateTime>(
+  ColumnDefinition<TestModel, DateTime> get updatedAt =>
+      ColumnDefinition<TestModel, DateTime>(
         'updatedAt',
-        write: (entity) => entity.updatedAt,
-        read: (json, entity, value) =>
-            entity.copyWith(updatedAt: value as DateTime?, json: json),
+        write: (model) => model.updatedAt,
+        read: (json, model, value) =>
+            model.copyWith(updatedAt: value as DateTime?, json: json),
       );
 
-  ColumnDefinition<TestEntity, String> get testString =>
-      ColumnDefinition<TestEntity, String>(
+  ColumnDefinition<TestModel, String> get testString =>
+      ColumnDefinition<TestModel, String>(
         'testString',
-        write: (entity) => entity.testString,
-        read: (json, entity, value) => entity.copyWith(
+        write: (model) => model.testString,
+        read: (json, model, value) => model.copyWith(
           testString: () => value as String?,
           json: json,
         ),
       );
 
-  ColumnDefinition<TestEntity, String> get testUpgrade =>
-      ColumnDefinition<TestEntity, String>(
+  ColumnDefinition<TestModel, String> get testUpgrade =>
+      ColumnDefinition<TestModel, String>(
         'testUpgrade',
-        write: (entity) => entity.testUpgrade,
-        read: (json, entity, value) => entity.copyWith(
+        write: (model) => model.testUpgrade,
+        read: (json, model, value) => model.copyWith(
           testUpgrade: () => value as String?,
           json: json,
         ),
       );
 
-  ColumnDefinition<TestEntity, DateTime> get testDateTime =>
-      ColumnDefinition<TestEntity, DateTime>(
+  ColumnDefinition<TestModel, DateTime> get testDateTime =>
+      ColumnDefinition<TestModel, DateTime>(
         'testDateTime',
-        write: (entity) => entity.testDateTime,
-        read: (json, entity, value) => entity.copyWith(
+        write: (model) => model.testDateTime,
+        read: (json, model, value) => model.copyWith(
           testDateTime: () => value as DateTime?,
           json: json,
         ),
       );
 
-  ColumnDefinition<TestEntity, int> get testInt =>
-      ColumnDefinition<TestEntity, int>(
+  ColumnDefinition<TestModel, int> get testInt =>
+      ColumnDefinition<TestModel, int>(
         'testInt',
-        write: (entity) => entity.testInt,
-        read: (json, entity, value) => entity.copyWith(
+        write: (model) => model.testInt,
+        read: (json, model, value) => model.copyWith(
           testInt: () => value as int?,
           json: json,
         ),
       );
 
-  ColumnDefinition<TestEntity, double> get testDouble2 =>
-      ColumnDefinition<TestEntity, double>(
+  ColumnDefinition<TestModel, double> get testDouble2 =>
+      ColumnDefinition<TestModel, double>(
         'testDouble2',
         notNull: true,
         defaultValue: 10,
-        write: (entity) => entity.testDouble2,
-        read: (json, entity, value) => entity.copyWith(
+        write: (model) => model.testDouble2,
+        read: (json, model, value) => model.copyWith(
           testDouble2: value as double?,
           json: json,
         ),
       );
 
-  ColumnDefinition<TestEntity, int> get testIntWithDefault =>
-      ColumnDefinition<TestEntity, int>(
+  ColumnDefinition<TestModel, int> get testIntWithDefault =>
+      ColumnDefinition<TestModel, int>(
         'testIntWithDefault',
-        write: (entity) => entity.testIntWithDefault,
-        read: (json, entity, value) => entity.copyWith(
+        write: (model) => model.testIntWithDefault,
+        read: (json, model, value) => model.copyWith(
           testIntWithDefault: () => value as int?,
           json: json,
         ),
       );
 
-  ColumnDefinition<TestEntity, bool> get testBool =>
-      ColumnDefinition<TestEntity, bool>(
+  ColumnDefinition<TestModel, bool> get testBool =>
+      ColumnDefinition<TestModel, bool>(
         'testBool',
-        write: (entity) => entity.testBool,
-        read: (json, entity, value) => entity.copyWith(
+        write: (model) => model.testBool,
+        read: (json, model, value) => model.copyWith(
           testBool: () => value as bool?,
           json: json,
         ),
       );
 
-  ColumnDefinition<TestEntity, double> get testDouble =>
-      ColumnDefinition<TestEntity, double>(
+  ColumnDefinition<TestModel, double> get testDouble =>
+      ColumnDefinition<TestModel, double>(
         'testDouble',
-        write: (entity) => entity.testDouble,
-        read: (json, entity, value) => entity.copyWith(
+        write: (model) => model.testDouble,
+        read: (json, model, value) => model.copyWith(
           testDouble: () => value as double?,
           json: json,
         ),
       );
 
-  ColumnDefinition<TestEntity, String> get testEnum1 =>
-      ColumnDefinition<TestEntity, String>(
+  ColumnDefinition<TestModel, String> get testEnum1 =>
+      ColumnDefinition<TestModel, String>(
         'testEnum1',
-        write: (entity) {
-          final testEnum1 = entity.testEnum1;
+        write: (model) {
+          final testEnum1 = model.testEnum1;
 
           if (testEnum1 == null) {
             return null;
@@ -271,17 +271,17 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
 
           return map;
         },
-        read: (json, entity, value) {
-          return entity.readTestEnum1(json, value);
+        read: (json, model, value) {
+          return model.readTestEnum1(json, value);
         },
       );
 
-  ColumnDefinition<TestEntity, String> get testEnum2 =>
-      ColumnDefinition<TestEntity, String>(
+  ColumnDefinition<TestModel, String> get testEnum2 =>
+      ColumnDefinition<TestModel, String>(
         'testEnum2',
         defaultValue: 'value1',
-        write: (entity) {
-          final testEnum2 = entity.testEnum2;
+        write: (model) {
+          final testEnum2 = model.testEnum2;
 
           if (testEnum2 == null) {
             return null;
@@ -290,34 +290,34 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
 
           return map;
         },
-        read: (json, entity, value) {
-          return entity.readTestEnum2(json, value);
+        read: (json, model, value) {
+          return model.readTestEnum2(json, value);
         },
       );
 
-  ColumnDefinition<TestEntity, String> get testEnum3 =>
-      ColumnDefinition<TestEntity, String>(
+  ColumnDefinition<TestModel, String> get testEnum3 =>
+      ColumnDefinition<TestModel, String>(
         'testEnum3',
         notNull: true,
         defaultValue: 'value1',
-        write: (entity) {
-          final testEnum3 = entity.testEnum3;
+        write: (model) {
+          final testEnum3 = model.testEnum3;
 
           final map = testEnum3.name;
 
           return map;
         },
-        read: (json, entity, value) {
-          return entity.readTestEnum3(json, value);
+        read: (json, model, value) {
+          return model.readTestEnum3(json, value);
         },
       );
 
-  ColumnDefinition<TestEntity, String> get intList =>
-      ColumnDefinition<TestEntity, String>(
+  ColumnDefinition<TestModel, String> get intList =>
+      ColumnDefinition<TestModel, String>(
         'intList',
         notNull: true,
-        write: (entity) {
-          final intList = entity.intList;
+        write: (model) {
+          final intList = model.intList;
 
           if (intList.isEmpty) {
             return '';
@@ -327,17 +327,17 @@ class TestEntityMeta extends EntityMeta<TestEntity> {
 
           return jsonEncode(map);
         },
-        read: (json, entity, value) {
+        read: (json, model, value) {
           if (value == '') {
             value = '[]';
           }
 
-          return entity.readIntList(json, value);
+          return model.readIntList(json, value);
         },
       );
 
   @override
-  Iterable<ColumnDefinition<TestEntity, dynamic>> get columns => [
+  Iterable<ColumnDefinition<TestModel, dynamic>> get columns => [
         id,
         collectionId,
         createdAt,

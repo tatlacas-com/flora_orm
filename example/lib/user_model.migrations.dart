@@ -1,9 +1,12 @@
-part of 'user.entity.dart';
+part of 'user_model.dart';
 
-mixin UserEntityMigrations on Entity<UserEntity, UserEntityMeta> {
+mixin UserModelMigrations on Model<UserModel, UserModelMeta> {
   @override
   bool createTableAt(int newVersion) {
     return switch (newVersion) {
+      /// replace dbVersion with the version number this model was introduced.
+      /// remember to update dbVersion to this version
+      /// in your OrmContext instance
       1 => true,
       _ => false,
     };
@@ -17,7 +20,7 @@ mixin UserEntityMigrations on Entity<UserEntity, UserEntityMeta> {
   }
 
   @override
-  List<ColumnDefinition<UserEntity, dynamic>> addColumnsAt(
+  List<ColumnDefinition<UserModel, dynamic>> addColumnsAt(
     int newVersion,
   ) {
     return switch (newVersion) {

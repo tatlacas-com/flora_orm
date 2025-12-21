@@ -1,9 +1,9 @@
 # Read about `build.yaml` at https://pub.dev/packages/build_config
 builders:
   # name of the builder
-  entityPropsBuilder:
+  modelPropsBuilder:
     import: "package:flora_orm/builder.dart"
-    builder_factories: ["entityPropsBuilder"]
+    builder_factories: ["modelPropsBuilder"]
     build_extensions: {".dart": [".g.part"]}
     auto_apply: dependents
     build_to: cache
@@ -12,7 +12,7 @@ builders:
 targets:
   $default:
     builders:
-      flora_orm|entityPropsBuilder:
+      flora_orm|modelPropsBuilder:
         generate_for:
-          - lib/*.entity.dart
-          - lib/**/*.entity.dart
+          - lib/*_model.dart
+          - lib/**/*_model.dart

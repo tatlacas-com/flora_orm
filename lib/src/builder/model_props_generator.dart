@@ -7,8 +7,8 @@ import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/dart/element/visitor.dart';
 import 'package:build/build.dart';
-import 'package:flora_orm/src/builders/annotations.dart';
-import 'package:flora_orm/src/models/entity.dart';
+import 'package:flora_orm/src/builder/annotations.dart';
+import 'package:flora_orm/src/model/model.dart';
 import 'package:path/path.dart' as path;
 import 'package:source_gen/source_gen.dart';
 
@@ -51,19 +51,21 @@ class PropertyFinder extends RecursiveElementVisitor<void> {
   }
 }
 
-class EntityPropsGenerator extends GeneratorForAnnotation<OrmEntity> {
+class ModelPropsGenerator extends GeneratorForAnnotation<OrmModel> {
   bool _hasDbAnnotation(FieldElement field) {
-    return const TypeChecker.fromRuntime(OrmColumn)
-            .hasAnnotationOfExact(field) ||
-        const TypeChecker.fromRuntime(CopyableProp)
-            .hasAnnotationOfExact(field) ||
+    return const TypeChecker.fromRuntime(
+          OrmColumn,
+        ).hasAnnotationOfExact(field) ||
+        const TypeChecker.fromRuntime(
+          CopyableProp,
+        ).hasAnnotationOfExact(field) ||
         const TypeChecker.fromRuntime(NullableProp).hasAnnotationOfExact(field);
   }
 
   static const _excludedSuperClasses = [
-    'Entity',
+    'Model',
     'Equatable',
-    'EntityBase',
+    'ModelBase',
     'Object',
   ];
 
@@ -78,8 +80,8 @@ class EntityPropsGenerator extends GeneratorForAnnotation<OrmEntity> {
 
     final tableName = annotation.read('tableName').literalValue as String?;
 
-    if (!const TypeChecker.fromRuntime(Entity).isAssignableFrom(element)) {
-      throw Exception('$className is not an Entity class');
+    if (!const TypeChecker.fromRuntime(Model).isAssignableFrom(element)) {
+      throw Exception('$className is not an Model class');
     }
 
     final allFields = <FieldElement>[...classElement.fields];
@@ -101,14 +103,14 @@ class EntityPropsGenerator extends GeneratorForAnnotation<OrmEntity> {
     final propsList = StringBuffer();
 
     mixinCode.writeln(
-      'mixin _${className}Mixin on Entity<$className, ${className}Meta> {',
+      'mixin _${className}Mixin on Model<$className, ${className}Meta> {',
     );
     metaCode
       ..writeln('''
 typedef ${className}Store
     = OrmEngine<$className, ${className}Meta, StoreContext<$className>>;
 
-class ${className}Meta extends  EntityMeta<$className> {     
+class ${className}Meta extends  ModelMeta<$className> {     
   const ${className}Meta();
 
   @override
@@ -120,36 +122,36 @@ class ${className}Meta extends  EntityMeta<$className> {
   ColumnDefinition<$className, String>(
         'id',
         primaryKey: true,
-        write: (entity) => entity.id,
-        read: (json, entity, value) =>
-            entity.copyWith(id: value as String?, json: json),
+        write: (model) => model.id,
+        read: (json, model, value) =>
+            model.copyWith(id: value as String?, json: json),
       );
 
   @override
   ColumnDefinition<$className, String> get collectionId => 
   ColumnDefinition<$className, String>(
         'collectionId',
-        write: (entity) => entity.collectionId,
-        read: (json, entity, value) =>
-            entity.copyWith(collectionId: value as String?, json: json),
+        write: (model) => model.collectionId,
+        read: (json, model, value) =>
+            model.copyWith(collectionId: value as String?, json: json),
       );
 
   @override
   ColumnDefinition<$className, DateTime> get createdAt =>
       ColumnDefinition<$className, DateTime>(
         'createdAt',
-        write: (entity) => entity.createdAt,
-        read: (json, entity, value) =>
-            entity.copyWith(createdAt: value as DateTime?, json: json),
+        write: (model) => model.createdAt,
+        read: (json, model, value) =>
+            model.copyWith(createdAt: value as DateTime?, json: json),
       );
 
   @override
   ColumnDefinition<$className, DateTime> get updatedAt =>
       ColumnDefinition<$className, DateTime>(
         'updatedAt',
-        write: (entity) => entity.updatedAt,
-        read: (json, entity, value) =>
-            entity.copyWith(updatedAt: value as DateTime?, json: json),
+        write: (model) => model.updatedAt,
+        read: (json, model, value) =>
+            model.copyWith(updatedAt: value as DateTime?, json: json),
       );
     ''');
 
@@ -186,16 +188,22 @@ class ${className}Meta extends  EntityMeta<$className> {
             .toList(),
       );
     for (final field in allFields) {
-      if (const TypeChecker.fromRuntime(OrmColumn)
-          .hasAnnotationOfExact(field)) {
+      if (const TypeChecker.fromRuntime(
+        OrmColumn,
+      ).hasAnnotationOfExact(field)) {
         final fieldName = field.name;
         var fieldType = field.type.cleanDisplayString;
 
         final fieldTypeFull = field.type.getDisplayString();
 
         bool premitiveType(String fieldType) {
-          return ['String', 'DateTime', 'int', 'bool', 'double']
-              .contains(fieldType);
+          return [
+            'String',
+            'DateTime',
+            'int',
+            'bool',
+            'double',
+          ].contains(fieldType);
         }
 
         final isPremitiveType = premitiveType(fieldType);
@@ -451,8 +459,8 @@ class ${className}Meta extends  EntityMeta<$className> {
           if (jsonEncoded) {
             final typeName = isPremitiveType ? alias : fieldName;
             metaCode.writeln('''
-          write: (entity) {
-            final $typeName = entity.$typeName;
+          write: (model) {
+            final $typeName = model.$typeName;
     ''');
 
             if (isDartCoreList) {
@@ -510,7 +518,7 @@ class ${className}Meta extends  EntityMeta<$className> {
     ''');
           } else {
             metaCode.writeln('''
-          write: (entity) => entity.$fieldName,
+          write: (model) => model.$fieldName,
     ''');
           }
           if (jsonEncoded) {
@@ -519,8 +527,9 @@ class ${className}Meta extends  EntityMeta<$className> {
                 copyWithPropsList.writeln('$jsonEncodedType? $alias,');
                 copyWithList.writeln('$alias: $alias ?? this.$alias,');
               } else {
-                copyWithPropsList
-                    .writeln('ValueGetter<$jsonEncodedType?>? $alias,');
+                copyWithPropsList.writeln(
+                  'ValueGetter<$jsonEncodedType?>? $alias,',
+                );
                 copyWithList.writeln(
                   '$alias: $alias != null ? $alias() : this.$alias,',
                 );
@@ -530,7 +539,7 @@ class ${className}Meta extends  EntityMeta<$className> {
               }
             }
             metaCode.writeln('''
-          read: (json, entity, value){
+          read: (json, model, value){
     ''');
             if (isDartCoreList) {
               metaCode.writeln('''
@@ -540,13 +549,13 @@ class ${className}Meta extends  EntityMeta<$className> {
     ''');
             }
             metaCode.writeln('''
-            return entity.read$fieldNameCamel(json, value);
+            return model.read$fieldNameCamel(json, value);
           },
         );
     ''');
           } else if (notNull) {
             metaCode.writeln('''
-          read: (json, entity, value) => entity.copyWith(
+          read: (json, model, value) => model.copyWith(
             $fieldName: value as $fieldType?, 
             json: json,
           ),
@@ -554,7 +563,7 @@ class ${className}Meta extends  EntityMeta<$className> {
     ''');
           } else {
             metaCode.writeln('''
-          read: (json, entity, value) => entity.copyWith(
+          read: (json, model, value) => model.copyWith(
             $fieldName: ()=>value as $fieldType?, 
             json: json,
           ),
@@ -567,8 +576,9 @@ class ${className}Meta extends  EntityMeta<$className> {
             copyWithPropsList.writeln('$prefix$fieldType$suffix? $fieldName,');
             copyWithList.writeln('$fieldName: $fieldName ?? this.$fieldName,');
           } else {
-            copyWithPropsList
-                .writeln('ValueGetter<$prefix$fieldType$suffix?>? $fieldName,');
+            copyWithPropsList.writeln(
+              'ValueGetter<$prefix$fieldType$suffix?>? $fieldName,',
+            );
             copyWithList.writeln(
               '$fieldName: $fieldName != null ? '
               '$fieldName() : this.$fieldName,',
@@ -579,8 +589,9 @@ class ${className}Meta extends  EntityMeta<$className> {
             extraFields.remove(fieldName);
           }
         }
-      } else if (const TypeChecker.fromRuntime(NullableProp)
-          .hasAnnotationOfExact(field)) {
+      } else if (const TypeChecker.fromRuntime(
+        NullableProp,
+      ).hasAnnotationOfExact(field)) {
         final fieldName = field.name;
         final fieldType = field.type.cleanDisplayString;
         final fieldTypeFull = field.type.getDisplayString();
@@ -589,8 +600,9 @@ class ${className}Meta extends  EntityMeta<$className> {
           notNull: false,
           typeFull: fieldTypeFull,
         );
-      } else if (const TypeChecker.fromRuntime(CopyableProp)
-          .hasAnnotationOfExact(field)) {
+      } else if (const TypeChecker.fromRuntime(
+        CopyableProp,
+      ).hasAnnotationOfExact(field)) {
         final fieldName = field.name;
         final fieldType = field.type.cleanDisplayString;
         final fieldTypeFull = field.type.getDisplayString();
@@ -610,8 +622,9 @@ class ${className}Meta extends  EntityMeta<$className> {
         copyWithPropsList.writeln('${extraField.type}? $fieldName,');
         copyWithList.writeln('$fieldName: $fieldName ?? this.$fieldName,');
       } else {
-        copyWithPropsList
-            .writeln('ValueGetter<${extraField.type}?>? $fieldName,');
+        copyWithPropsList.writeln(
+          'ValueGetter<${extraField.type}?>? $fieldName,',
+        );
         copyWithList.writeln(
           '$fieldName: $fieldName != null ? '
           '$fieldName() : this.$fieldName,',
@@ -674,12 +687,12 @@ class ${className}Meta extends  EntityMeta<$className> {
     final mixinContent = '''
 part of '${buildStep.inputId.pathSegments.last}';
 
-mixin ${className}Migrations on Entity<$className, ${className}Meta> {
+mixin ${className}Migrations on Model<$className, ${className}Meta> {
   
   @override
   bool createTableAt(int newVersion) {
     return switch (newVersion) {
-    /// replace dbVersion with the version number this entity was introduced.
+    /// replace dbVersion with the version number this model was introduced.
     /// remember to update dbVersion to this version
     /// in your OrmContext instance 
     // TODO(dev): replace _dbVersion with number

@@ -1,19 +1,19 @@
 import 'package:flora_orm/flora_orm.dart';
 
-class SharedPreferenceStoreContext<TEntity extends EntityBase>
-    extends StoreContext<TEntity> {
+class SharedPreferenceStoreContext<TModel extends ModelBase>
+    extends StoreContext<TModel> {
   SharedPreferenceStoreContext({
     required super.dbName,
     required super.dbVersion,
     required super.tables,
   });
 
-  SharedPreferenceStoreContext<TEntity> copyWith({
+  SharedPreferenceStoreContext<TModel> copyWith({
     String? dbName,
     int? dbVersion,
-    List<TEntity>? tables,
+    List<TModel>? tables,
   }) {
-    return SharedPreferenceStoreContext<TEntity>(
+    return SharedPreferenceStoreContext<TModel>(
       dbName: dbName ?? this.dbName,
       dbVersion: dbVersion ?? this.dbVersion,
       tables: tables ?? this.tables,
