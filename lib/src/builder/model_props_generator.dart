@@ -5,8 +5,10 @@ import 'dart:io';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:analyzer/dart/element/visitor.dart';
 import 'package:build/build.dart';
 import 'package:flora_orm/src/builder/annotations.dart';
+import 'package:flora_orm/src/model/model.dart';
 import 'package:path/path.dart' as path;
 import 'package:source_gen/source_gen.dart';
 
@@ -35,49 +37,29 @@ class _ExtraField {
   final String typeFull;
 }
 
-FieldElement? _findFieldByName(ClassElement classElement, String propertyName) {
-  for (final field in classElement.fields) {
-    if (field.name == propertyName) {
-      return field;
+// Define a visitor class to search for a property with a specific name.
+class PropertyFinder extends RecursiveElementVisitor<void> {
+  PropertyFinder(this.propertyName);
+  final String propertyName;
+  FieldElement? foundProperty;
+
+  @override
+  void visitFieldElement(FieldElement element) {
+    if (element.name == propertyName) {
+      foundProperty = element;
     }
   }
-
-  for (final supertype in classElement.allSupertypes) {
-    if (supertype.element is ClassElement) {
-      final superClass = supertype.element as ClassElement;
-      for (final field in superClass.fields) {
-        if (field.name == propertyName) {
-          return field;
-        }
-      }
-    }
-  }
-
-  return null;
 }
 
 class ModelPropsGenerator extends GeneratorForAnnotation<OrmModel> {
-  static const _ormColumnChecker = TypeChecker.typeNamedLiterally(
-    'OrmColumn',
-    inPackage: 'flora_orm',
-  );
-  static const _copyablePropChecker = TypeChecker.typeNamedLiterally(
-    'CopyableProp',
-    inPackage: 'flora_orm',
-  );
-  static const _nullablePropChecker = TypeChecker.typeNamedLiterally(
-    'NullableProp',
-    inPackage: 'flora_orm',
-  );
-  static const _modelChecker = TypeChecker.typeNamedLiterally(
-    'Model',
-    inPackage: 'flora_orm',
-  );
-
   bool _hasDbAnnotation(FieldElement field) {
-    return _ormColumnChecker.hasAnnotationOfExact(field) ||
-        _copyablePropChecker.hasAnnotationOfExact(field) ||
-        _nullablePropChecker.hasAnnotationOfExact(field);
+    return const TypeChecker.fromRuntime(
+          OrmColumn,
+        ).hasAnnotationOfExact(field) ||
+        const TypeChecker.fromRuntime(
+          CopyableProp,
+        ).hasAnnotationOfExact(field) ||
+        const TypeChecker.fromRuntime(NullableProp).hasAnnotationOfExact(field);
   }
 
   static const _excludedSuperClasses = [
@@ -98,7 +80,7 @@ class ModelPropsGenerator extends GeneratorForAnnotation<OrmModel> {
 
     final tableName = annotation.read('tableName').literalValue as String?;
 
-    if (!_modelChecker.isAssignableFrom(element)) {
+    if (!const TypeChecker.fromRuntime(Model).isAssignableFrom(element)) {
       throw Exception('$className is not an Model class');
     }
 
@@ -132,7 +114,7 @@ class ${className}Meta extends  ModelMeta<$className> {
   const ${className}Meta();
 
   @override
-  String get tableName => '${tableName ?? convertClassNameToSnakeCase(className!)}';
+  String get tableName => '${tableName ?? convertClassNameToSnakeCase(className)}';
           ''')
       ..writeln('''
   @override
@@ -195,7 +177,7 @@ class ${className}Meta extends  ModelMeta<$className> {
             )
             .map(
               (e) => MapEntry(
-                e.name!,
+                e.name,
                 _ExtraField(
                   type: e.type.cleanDisplayString,
                   typeFull: e.type.getDisplayString(),
@@ -206,7 +188,9 @@ class ${className}Meta extends  ModelMeta<$className> {
             .toList(),
       );
     for (final field in allFields) {
-      if (_ormColumnChecker.hasAnnotationOfExact(field)) {
+      if (const TypeChecker.fromRuntime(
+        OrmColumn,
+      ).hasAnnotationOfExact(field)) {
         final fieldName = field.name;
         var fieldType = field.type.cleanDisplayString;
 
@@ -234,14 +218,15 @@ class ${className}Meta extends  ModelMeta<$className> {
         }
         final ogIsPremitiveType = premitiveType(fieldType);
 
-        final fieldNameCamel = _toUpperCamelCase(fieldName!);
+        final fieldNameCamel = _toUpperCamelCase(fieldName);
+        final fieldMetadata = field.metadata;
         final fieldAnnotations = <ElementAnnotation>[];
-        for (final annotation in field.metadata.annotations) {
+        for (final annotation in fieldMetadata) {
           final tp = annotation.computeConstantValue()?.type;
           if (tp == null) {
             continue;
           }
-          if (_ormColumnChecker.isExactlyType(tp)) {
+          if (const TypeChecker.fromRuntime(OrmColumn).isExactlyType(tp)) {
             columnsList.writeln('$fieldName,');
             fieldAnnotations.add(annotation);
           }
@@ -316,14 +301,11 @@ class ${className}Meta extends  ModelMeta<$className> {
           FieldElement? aliasProperty;
           var aliasNotNull = false;
           if (alias != null && jsonEncoded) {
-            aliasProperty = _findFieldByName(classElement, alias);
-            if (aliasProperty == null) {
-              throw Exception(
-                '''Could not find field "$alias" referenced as alias in $className''',
-              );
-            }
+            final finder = PropertyFinder(alias);
+            classElement.accept(finder);
+            aliasProperty = finder.foundProperty;
             aliasNotNull =
-                aliasProperty.type.nullabilitySuffix == NullabilitySuffix.none;
+                aliasProperty!.type.nullabilitySuffix == NullabilitySuffix.none;
             if (aliasProperty.type.isDartCoreList) {
               jsonEncodedType = aliasProperty.type.cleanDisplayString;
             }
@@ -467,12 +449,9 @@ class ${className}Meta extends  ModelMeta<$className> {
 
           var isDartCoreList = !isPremitiveType && isList;
           if (jsonEncoded && isPremitiveType) {
-            final property = _findFieldByName(classElement, alias!);
-            if (property == null) {
-              throw Exception(
-                '''Could not find field "$alias" referenced as alias in $className''',
-              );
-            }
+            final finder = PropertyFinder(alias!);
+            classElement.accept(finder);
+            final property = finder.foundProperty!;
             isDartCoreList = property.type.isDartCoreList;
             jsonEncodedType = property.type.cleanDisplayString;
           }
@@ -610,20 +589,24 @@ class ${className}Meta extends  ModelMeta<$className> {
             extraFields.remove(fieldName);
           }
         }
-      } else if (_nullablePropChecker.hasAnnotationOfExact(field)) {
+      } else if (const TypeChecker.fromRuntime(
+        NullableProp,
+      ).hasAnnotationOfExact(field)) {
         final fieldName = field.name;
         final fieldType = field.type.cleanDisplayString;
         final fieldTypeFull = field.type.getDisplayString();
-        extraFields[fieldName!] = _ExtraField(
+        extraFields[fieldName] = _ExtraField(
           type: fieldType,
           notNull: false,
           typeFull: fieldTypeFull,
         );
-      } else if (_copyablePropChecker.hasAnnotationOfExact(field)) {
+      } else if (const TypeChecker.fromRuntime(
+        CopyableProp,
+      ).hasAnnotationOfExact(field)) {
         final fieldName = field.name;
         final fieldType = field.type.cleanDisplayString;
         final fieldTypeFull = field.type.getDisplayString();
-        extraFields[fieldName!] = _ExtraField(
+        extraFields[fieldName] = _ExtraField(
           type: fieldType,
           notNull: field.type.nullabilitySuffix == NullabilitySuffix.none,
           typeFull: fieldTypeFull,
@@ -693,7 +676,7 @@ class ${className}Meta extends  ModelMeta<$className> {
       ];''')
       ..writeln('}');
     mixinCode.write(metaCode.toString());
-    await _generateMigrationsFile(buildStep, className!);
+    await _generateMigrationsFile(buildStep, className);
     return mixinCode.toString();
   }
 
@@ -757,6 +740,7 @@ mixin ${className}Migrations on Model<$className, ${className}Meta> {
     }
   }
 
+  // Helper function to convert the first letter of a string to uppercase
   String _toUpperCamelCase(String input) {
     return input[0].toUpperCase() + input.substring(1);
   }

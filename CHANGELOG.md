@@ -1,5 +1,9 @@
 
 
+## 4.0.1
+
+* rever analyzer upgrade - breaks when used along other popular packages which have not upgraded
+
 ## 4.0.0
 
 * migrated from `Entity` to `Model` for improved architecture alignment and consistency
