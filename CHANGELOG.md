@@ -1,5 +1,9 @@
 
 
+## 4.2.0
+
+* use analyzer 8.4.0
+
 ## 4.1.0
 
 * upgraded packages major versions. 
