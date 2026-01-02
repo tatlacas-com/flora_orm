@@ -1,5 +1,10 @@
 
 
+## 4.1.0
+
+* upgraded packages major versions. 
+* upgrade sdk to 3.10.0
+
 ## 4.0.1
 
 * rever analyzer upgrade - breaks when used along other popular packages which have not upgraded
