@@ -16,36 +16,33 @@ mixin _UserModelMixin on Model<UserModel, UserModelMeta> {
     TestEnum? item;
     if (value != null) {
       item = <TestEnum?>[...TestEnum.values].firstWhere(
-          (element) => element?.name == value as String,
-          orElse: () => null);
+        (element) => element?.name == value as String,
+        orElse: () => null,
+      );
     }
-    return copyWith(
-      testEnum: () => item,
-    );
+    return copyWith(testEnum: () => item);
   }
 
   UserModel readTestEnum2(Map<String, dynamic> json, dynamic value) {
     TestEnum? item;
     if (value != null) {
       item = <TestEnum?>[...TestEnum.values].firstWhere(
-          (element) => element?.name == value as String,
-          orElse: () => null);
+        (element) => element?.name == value as String,
+        orElse: () => null,
+      );
     }
-    return copyWith(
-      testEnum2: item,
-    );
+    return copyWith(testEnum2: item);
   }
 
   UserModel readReactionsCounts(Map<String, dynamic> json, dynamic value) {
     Map<String, int>? item;
     if (value != null) {
-      final map =
-          value is Map<String, dynamic> ? value : jsonDecode(value as String);
+      final map = value is Map<String, dynamic>
+          ? value
+          : jsonDecode(value as String);
       item = map.cast<String, int>();
     }
-    return copyWith(
-      reactionsCounts: item,
-    );
+    return copyWith(reactionsCounts: item);
   }
 
   TestEnum? get testEnum;
@@ -57,14 +54,15 @@ mixin _UserModelMixin on Model<UserModel, UserModelMeta> {
 
   @override
   List<Object?> get props => [
-        ...super.props,
-        testEnum,
-        testEnum2,
-        reactionsCounts,
-        firstName,
-        lastName,
-        test2,
-      ];
+    ...super.props,
+
+    testEnum,
+    testEnum2,
+    reactionsCounts,
+    firstName,
+    lastName,
+    test2,
+  ];
   @override
   UserModel copyWith({
     String? id,
@@ -77,6 +75,7 @@ mixin _UserModelMixin on Model<UserModel, UserModelMeta> {
     ValueGetter<String?>? firstName,
     ValueGetter<String?>? lastName,
     ValueGetter<String?>? test2,
+
     Map<String, dynamic>? json,
   }) {
     return UserModel(
@@ -93,8 +92,8 @@ mixin _UserModelMixin on Model<UserModel, UserModelMeta> {
     );
   }
 }
-typedef UserModelStore
-    = OrmEngine<UserModel, UserModelMeta, StoreContext<UserModel>>;
+typedef UserModelStore =
+    OrmEngine<UserModel, UserModelMeta, StoreContext<UserModel>>;
 
 class UserModelMeta extends ModelMeta<UserModel> {
   const UserModelMeta();
@@ -142,6 +141,7 @@ class UserModelMeta extends ModelMeta<UserModel> {
   ColumnDefinition<UserModel, String> get testEnum =>
       ColumnDefinition<UserModel, String>(
         'testEnum',
+
         write: (model) {
           final testEnum = model.testEnum;
 
@@ -152,6 +152,7 @@ class UserModelMeta extends ModelMeta<UserModel> {
 
           return map;
         },
+
         read: (json, model, value) {
           return model.readTestEnum(json, value);
         },
@@ -160,8 +161,11 @@ class UserModelMeta extends ModelMeta<UserModel> {
   ColumnDefinition<UserModel, String> get testEnum2 =>
       ColumnDefinition<UserModel, String>(
         'testEnum2',
+
         notNull: true,
+
         defaultValue: 'first',
+
         write: (model) {
           final testEnum2 = model.testEnum2;
 
@@ -169,6 +173,7 @@ class UserModelMeta extends ModelMeta<UserModel> {
 
           return map;
         },
+
         read: (json, model, value) {
           return model.readTestEnum2(json, value);
         },
@@ -177,7 +182,9 @@ class UserModelMeta extends ModelMeta<UserModel> {
   ColumnDefinition<UserModel, String> get reactionsCounts =>
       ColumnDefinition<UserModel, String>(
         'reactionsCounts',
+
         notNull: true,
+
         write: (model) {
           final reactionsCounts = model.reactionsCounts;
 
@@ -185,6 +192,7 @@ class UserModelMeta extends ModelMeta<UserModel> {
 
           return jsonEncode(map);
         },
+
         read: (json, model, value) {
           return model.readReactionsCounts(json, value);
         },
@@ -193,33 +201,34 @@ class UserModelMeta extends ModelMeta<UserModel> {
   ColumnDefinition<UserModel, String> get firstName =>
       ColumnDefinition<UserModel, String>(
         'firstName',
+
         write: (model) => model.firstName,
-        read: (json, model, value) => model.copyWith(
-          firstName: () => value as String?,
-          json: json,
-        ),
+
+        read: (json, model, value) =>
+            model.copyWith(firstName: () => value as String?, json: json),
       );
 
   ColumnDefinition<UserModel, String> get lastName =>
       ColumnDefinition<UserModel, String>(
         'lastName',
+
         write: (model) => model.lastName,
-        read: (json, model, value) => model.copyWith(
-          lastName: () => value as String?,
-          json: json,
-        ),
+
+        read: (json, model, value) =>
+            model.copyWith(lastName: () => value as String?, json: json),
       );
 
   @override
   Iterable<ColumnDefinition<UserModel, dynamic>> get columns => [
-        id,
-        collectionId,
-        createdAt,
-        updatedAt,
-        testEnum,
-        testEnum2,
-        reactionsCounts,
-        firstName,
-        lastName,
-      ];
+    id,
+    collectionId,
+    createdAt,
+    updatedAt,
+
+    testEnum,
+    testEnum2,
+    reactionsCounts,
+    firstName,
+    lastName,
+  ];
 }
