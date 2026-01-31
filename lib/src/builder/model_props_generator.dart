@@ -385,7 +385,7 @@ class ${className}Meta extends  ModelMeta<$className> {
               mixinCode.writeln('''
     $fieldType? item;
     if (value != null) {
-      ${isEnum ? '' : 'final map = value is Map<String, dynamic> ? value : jsonDecode(value as String);'}
+      ${isEnum ? '' : 'final map = value is Map<String, dynamic> ? value : jsonDecode(value as String) as Map<String, dynamic>;'}
       item = ${isEnum ? '''<$fieldType?>[...$fieldType.values].firstWhere(
           (element) => element?.name == value as String,
           orElse: () => null)''' : fnName} ;
@@ -488,7 +488,7 @@ class ${className}Meta extends  ModelMeta<$className> {
           write: (model) {
             final $typeName = model.$typeName;
     ''');
-
+            var earlyReturned = false;
             if (isDartCoreList) {
               if (isNotNull) {
                 metaCode.writeln('''
@@ -497,6 +497,7 @@ class ${className}Meta extends  ModelMeta<$className> {
           }
     ''');
               } else {
+                earlyReturned = true;
                 metaCode.writeln('''
             if($typeName == null){
                 return null;
@@ -509,7 +510,7 @@ class ${className}Meta extends  ModelMeta<$className> {
                   ? (fieldType == 'DateTime' ? 'p.toIso8601String()' : 'p')
                   : (isEnum ? 'p.name' : 'p.toMap()');
               metaCode.writeln('''
-            final map = $typeName${isNotNull ? '' : '?'}.map((p) => $map).toList();
+            final map = $typeName${isNotNull || earlyReturned ? '' : '?'}.map((p) => $map).toList();
     ''');
             } else {
               final typeName = isPremitiveType ? alias : fieldName;

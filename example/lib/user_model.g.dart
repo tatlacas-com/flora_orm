@@ -39,7 +39,7 @@ mixin _UserModelMixin on Model<UserModel, UserModelMeta> {
     if (value != null) {
       final map = value is Map<String, dynamic>
           ? value
-          : jsonDecode(value as String);
+          : jsonDecode(value as String) as Map<String, dynamic>;
       item = map.cast<String, int>();
     }
     return copyWith(reactionsCounts: item);

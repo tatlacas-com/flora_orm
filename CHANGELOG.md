@@ -1,4 +1,11 @@
+# 4.2.1
 
+* fix map type casting to Map<String, dynamic>
+* remove nullable access when there is early return
+
+# 4.2.0
+
+* use analyzer 8.4.0
 
 ## 4.1.0
 
