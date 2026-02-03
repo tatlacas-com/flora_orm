@@ -20,7 +20,7 @@ In VSCode click on __Settings__ icon then __Snippets__. Create new snippet then 
 		"",
 		"  const ${TM_FILENAME_BASE/^(.*)\\_model$/${1:/pascalcase}/}Model({",
 		"    super.id,",
-		"    super.collectionId,",
+		"    super.restorationId,",
 		"    super.createdAt,",
 		"    super.updatedAt,",
 		"  });",
@@ -51,7 +51,7 @@ class NotificationModel
     with _NotificationModelMixin, NotificationModelMigrations {
   const NotificationModel({
     super.id,
-    super.collectionId,
+    super.restorationId,
     super.createdAt,
     super.updatedAt,
   });

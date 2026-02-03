@@ -1,3 +1,7 @@
+# 4.2.3
+
+ * introduce restorationId on models
+
 # 4.2.1
 
 * fix map type casting to Map<String, dynamic>

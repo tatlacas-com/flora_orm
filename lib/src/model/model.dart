@@ -8,12 +8,13 @@ part 'model_base.dart';
 part 'model_meta.dart';
 
 abstract class Model<TModel extends ModelBase, TMeta extends ModelMeta<TModel>>
-    extends Equatable implements ModelBase {
-  const Model({this.id, this.collectionId, this.createdAt, this.updatedAt});
+    extends Equatable
+    implements ModelBase {
+  const Model({this.id, this.restorationId, this.createdAt, this.updatedAt});
   @override
   final String? id;
   @override
-  final String? collectionId;
+  final String? restorationId;
   @override
   final DateTime? createdAt;
   @override
@@ -23,7 +24,7 @@ abstract class Model<TModel extends ModelBase, TMeta extends ModelMeta<TModel>>
   TMeta get meta;
 
   @override
-  List<Object?> get props => [id, collectionId];
+  List<Object?> get props => [id, restorationId];
 
   @override
   String toString() => indentedString({runtimeType.toString(): toMap()});
@@ -36,7 +37,7 @@ abstract class Model<TModel extends ModelBase, TMeta extends ModelMeta<TModel>>
   @override
   TModel copyWith({
     String? id,
-    String? collectionId,
+    String? restorationId,
     DateTime? createdAt,
     DateTime? updatedAt,
     Map<String, dynamic>? json,

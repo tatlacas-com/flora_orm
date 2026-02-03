@@ -6,7 +6,7 @@ abstract class ModelMeta<TModel extends ModelBase> {
 
   Iterable<ColumnDefinition<TModel, dynamic>> get columns;
   ColumnDefinition<TModel, String> get id;
-  ColumnDefinition<TModel, String> get collectionId;
+  ColumnDefinition<TModel, String> get restorationId;
 
   ColumnDefinition<TModel, DateTime> get createdAt;
 

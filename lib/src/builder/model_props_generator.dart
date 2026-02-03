@@ -146,12 +146,12 @@ class ${className}Meta extends  ModelMeta<$className> {
       );
 
   @override
-  ColumnDefinition<$className, String> get collectionId => 
+  ColumnDefinition<$className, String> get restorationId => 
   ColumnDefinition<$className, String>(
-        'collectionId',
-        write: (model) => model.collectionId,
+        'restorationId',
+        write: (model) => model.restorationId,
         read: (json, model, value) =>
-            model.copyWith(collectionId: value as String?, json: json),
+            model.copyWith(restorationId: value as String?, json: json),
       );
 
   @override
@@ -379,7 +379,7 @@ class ${className}Meta extends  ModelMeta<$className> {
               } else if (field.type.isDartCoreMap) {
                 fnName = 'map.cast${fieldType.replaceFirst('Map', '')}()';
               } else {
-                fnName = '$fieldType.fromMap(map as Map<String, dynamic>)';
+                fnName = '$fieldType.fromMap(map)';
               }
 
               mixinCode.writeln('''
@@ -669,7 +669,7 @@ class ${className}Meta extends  ModelMeta<$className> {
       @override
       $className copyWith({
         String? id,
-        String? collectionId,
+        String? restorationId,
         DateTime? createdAt,
         DateTime? updatedAt,
         $copyWithPropsList
@@ -677,7 +677,7 @@ class ${className}Meta extends  ModelMeta<$className> {
       }){
         return $className(
           id: id ?? this.id,
-          collectionId: collectionId ?? this.collectionId,
+          restorationId: restorationId ?? this.restorationId,
           createdAt: createdAt ?? this.createdAt,
           updatedAt: updatedAt ?? this.updatedAt,
           $copyWithList
@@ -690,7 +690,7 @@ class ${className}Meta extends  ModelMeta<$className> {
       @override
       Iterable<ColumnDefinition<$className, dynamic>> get columns => [
       id,
-      collectionId,
+      restorationId,
       createdAt,
       updatedAt,
       ''')

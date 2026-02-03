@@ -87,7 +87,7 @@ mixin _TestModelMixin on Model<TestModel, TestModelMeta> {
   @override
   TestModel copyWith({
     String? id,
-    String? collectionId,
+    String? restorationId,
     DateTime? createdAt,
     DateTime? updatedAt,
     ValueGetter<String?>? testString,
@@ -107,7 +107,7 @@ mixin _TestModelMixin on Model<TestModel, TestModelMeta> {
   }) {
     return TestModel(
       id: id ?? this.id,
-      collectionId: collectionId ?? this.collectionId,
+      restorationId: restorationId ?? this.restorationId,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       testString: testString != null ? testString() : this.testString,
@@ -147,12 +147,12 @@ class TestModelMeta extends ModelMeta<TestModel> {
       );
 
   @override
-  ColumnDefinition<TestModel, String> get collectionId =>
+  ColumnDefinition<TestModel, String> get restorationId =>
       ColumnDefinition<TestModel, String>(
-        'collectionId',
-        write: (model) => model.collectionId,
+        'restorationId',
+        write: (model) => model.restorationId,
         read: (json, model, value) =>
-            model.copyWith(collectionId: value as String?, json: json),
+            model.copyWith(restorationId: value as String?, json: json),
       );
 
   @override
@@ -350,7 +350,7 @@ class TestModelMeta extends ModelMeta<TestModel> {
   @override
   Iterable<ColumnDefinition<TestModel, dynamic>> get columns => [
     id,
-    collectionId,
+    restorationId,
     createdAt,
     updatedAt,
 
