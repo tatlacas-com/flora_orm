@@ -1,3 +1,8 @@
+
+# 4.2.2
+
+* remove unused collectionId
+
 # 4.2.1
 
 * fix map type casting to Map<String, dynamic>
