@@ -1,8 +1,9 @@
 part of 'model.dart';
 
 abstract class ModelBase {
-  const ModelBase({this.id, this.createdAt, this.updatedAt});
+  const ModelBase({this.id, this.collectionId, this.createdAt, this.updatedAt});
   final String? id;
+  final String? collectionId;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -10,6 +11,7 @@ abstract class ModelBase {
 
   ModelBase copyWith({
     String? id,
+    String? collectionId,
     DateTime? createdAt,
     DateTime? updatedAt,
     Map<String, dynamic>? json,

@@ -8,6 +8,7 @@ class TestModel extends Model<TestModel, TestModelMeta>
     with _TestModelMixin, TestModelMigrations {
   const TestModel({
     super.id,
+    super.collectionId,
     super.createdAt,
     super.updatedAt,
     this.testString,

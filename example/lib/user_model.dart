@@ -10,6 +10,7 @@ abstract class BaseUser<
     extends Model<TModel, TMeta> {
   const BaseUser({
     super.id,
+    super.collectionId,
     super.createdAt,
     super.updatedAt,
     this.firstName,
@@ -26,6 +27,7 @@ class UserModel extends BaseUser<UserModel, UserModelMeta>
     with _UserModelMixin, UserModelMigrations {
   UserModel({
     super.id,
+    super.collectionId,
     super.createdAt,
     super.updatedAt,
     super.firstName,
