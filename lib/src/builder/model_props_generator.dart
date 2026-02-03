@@ -146,6 +146,15 @@ class ${className}Meta extends  ModelMeta<$className> {
       );
 
   @override
+  ColumnDefinition<$className, String> get restorationId => 
+  ColumnDefinition<$className, String>(
+        'restorationId',
+        write: (model) => model.restorationId,
+        read: (json, model, value) =>
+            model.copyWith(restorationId: value as String?, json: json),
+      );
+
+  @override
   ColumnDefinition<$className, DateTime> get createdAt =>
       ColumnDefinition<$className, DateTime>(
         'createdAt',
@@ -660,6 +669,7 @@ class ${className}Meta extends  ModelMeta<$className> {
       @override
       $className copyWith({
         String? id,
+        String? restorationId,
         DateTime? createdAt,
         DateTime? updatedAt,
         $copyWithPropsList
@@ -667,6 +677,7 @@ class ${className}Meta extends  ModelMeta<$className> {
       }){
         return $className(
           id: id ?? this.id,
+          restorationId: restorationId ?? this.restorationId,
           createdAt: createdAt ?? this.createdAt,
           updatedAt: updatedAt ?? this.updatedAt,
           $copyWithList
@@ -679,6 +690,7 @@ class ${className}Meta extends  ModelMeta<$className> {
       @override
       Iterable<ColumnDefinition<$className, dynamic>> get columns => [
       id,
+      restorationId,
       createdAt,
       updatedAt,
       ''')

@@ -68,7 +68,7 @@ class UserModel extends Model<UserModel, UserModelMeta>
 
   const UserModel({
     super.id,
-    super.collectionId,
+    super.restorationId,
     super.createdAt,
     super.updatedAt,
     this.claims,

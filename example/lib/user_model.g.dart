@@ -66,6 +66,7 @@ mixin _UserModelMixin on Model<UserModel, UserModelMeta> {
   @override
   UserModel copyWith({
     String? id,
+    String? restorationId,
     DateTime? createdAt,
     DateTime? updatedAt,
     ValueGetter<TestEnum?>? testEnum,
@@ -79,6 +80,7 @@ mixin _UserModelMixin on Model<UserModel, UserModelMeta> {
   }) {
     return UserModel(
       id: id ?? this.id,
+      restorationId: restorationId ?? this.restorationId,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       testEnum: testEnum != null ? testEnum() : this.testEnum,
@@ -107,6 +109,15 @@ class UserModelMeta extends ModelMeta<UserModel> {
         write: (model) => model.id,
         read: (json, model, value) =>
             model.copyWith(id: value as String?, json: json),
+      );
+
+  @override
+  ColumnDefinition<UserModel, String> get restorationId =>
+      ColumnDefinition<UserModel, String>(
+        'restorationId',
+        write: (model) => model.restorationId,
+        read: (json, model, value) =>
+            model.copyWith(restorationId: value as String?, json: json),
       );
 
   @override
@@ -210,6 +221,7 @@ class UserModelMeta extends ModelMeta<UserModel> {
   @override
   Iterable<ColumnDefinition<UserModel, dynamic>> get columns => [
     id,
+    restorationId,
     createdAt,
     updatedAt,
 
