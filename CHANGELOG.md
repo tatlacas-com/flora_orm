@@ -1,3 +1,7 @@
+## 4.3.0
+
+- Requires `analyzer` 13 or 14 (was `^8.4.0`), so the package resolves on Flutter 3.50, whose `flutter_test` needs `analyzer >=13`. Generated code is unchanged.
+
 # 4.2.3
 
  * introduce restorationId on models
